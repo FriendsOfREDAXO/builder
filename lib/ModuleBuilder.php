@@ -119,11 +119,6 @@ class ModuleBuilder
 
     public function getEditor(): string
     {
-        // Guard: Builder sollte nur im Backend-Kontext funktionieren, nicht im Frontend (z.B. Gridblock)
-        if (!rex::isBackend()) {
-            return '';
-        }
-
         $this->applyBackendLocale();
 
         $availableElements = $this->getAvailableElements();
@@ -400,11 +395,6 @@ class ModuleBuilder
 
     public function renderOutput(): string
     {
-        // Guard: Builder sollte nur im Backend-Kontext funktionieren
-        if (!rex::isBackend()) {
-            return '';
-        }
-
         $jsonContent = json_encode($this->slices, JSON_UNESCAPED_UNICODE);
         if (!is_string($jsonContent) || $jsonContent === '[]') {
             return '';
@@ -420,9 +410,13 @@ class ModuleBuilder
             $slot = 1;
         }
 
-        // Guard: Nicht im Frontend oder in verschachtelten Kontexten (z.B. Gridblock) versuchen zu laden
-        // Der Builder sollte nur direkt im Backend-Slice-Editor funktionieren
-        if (!rex::isBackend()) {
+        // Schutz vor Verwendung in Gridblock oder anderen Rendering-Kontexten
+        // Nur im direkten Backend-Slice-Editor laden, wo ein sicherer Request-Kontext existiert
+        $page = rex_request('page', 'string', '');
+        $sliceId = rex_request('slice_id', 'int', 0);
+        
+        // Wenn wir nicht im content/edit Backend sind UND es keine slice_id gibt, abbrechen
+        if (strpos($page, 'content/edit') === false && $sliceId <= 0) {
             return '';
         }
 
@@ -432,7 +426,6 @@ class ModuleBuilder
             return '';
         }
 
-        $sliceId = rex_request('slice_id', 'int', 0);
         if ($sliceId <= 0) {
             return self::loadRawValueFromModuleContext($slot);
         }

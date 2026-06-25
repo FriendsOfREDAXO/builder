@@ -184,9 +184,13 @@ class Module
             $slot = 1;
         }
 
-        // Guard: Nicht im Frontend oder in verschachtelten Kontexten (z.B. Gridblock) versuchen zu laden
-        // Der Builder sollte nur direkt im Backend-Slice-Editor funktionieren
-        if (!rex::isBackend()) {
+        // Schutz vor Verwendung in Gridblock oder anderen Rendering-Kontexten
+        // Nur im direkten Backend-Slice-Editor laden, wo ein sicherer Request-Kontext existiert
+        $page = rex_request('page', 'string', '');
+        $sliceId = rex_request('slice_id', 'int', 0);
+        
+        // Wenn wir nicht im content/edit Backend sind UND es keine slice_id gibt, abbrechen
+        if (strpos($page, 'content/edit') === false && $sliceId <= 0) {
             return '';
         }
 
@@ -196,7 +200,6 @@ class Module
             return '';
         }
 
-        $sliceId = rex_request('slice_id', 'int', 0);
         if ($sliceId <= 0) {
             return self::loadRawValueFromModuleContext($slot);
         }
