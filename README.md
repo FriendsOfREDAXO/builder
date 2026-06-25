@@ -4,18 +4,22 @@ Page und Contentbuilder für REDAXO. Modular und erweiterbar.
 
 Komplexe Layouts oder Datenstrukturen visuell gestalten. Mit Builder ist das möglich.
 
+👋 Aber erstmal vorweg: Es ist kein Out-of-the-Box Pagebuilder. Das meiste muss man selbst beisteuern. Ihr entscheided was es kann und welche Elemente es geben wird. Zum Start gibt es ein paar Demo-Elemente mit denenen Ihr spielen könnt. 
+Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe. 
+
+
 ## Features
 
 - Page- und Content-Builder für REDAXO-Module und YForm-Felder
 - Modulare Elemente mit konfigurierbaren Feldern, Gruppen und Einstellungen
-- Framework-Templates für UIkit, Bootstrap und Plain HTML
+- Framework-Templates für UIkit, Bootstrap und Plain HTML bei den mitgelieferten bereits dabei. 
 - Erweiterbar über eigene Elemente in Projekt- oder Addon-Pfaden
 - Klare Extension-Point-Schnittstellen für Framework-, Theme- und Editor-Integration
 - Medienausgabe über Media Manager mit virtuellen Typen (`cb_<preset>__<width>`)
-- Optionale Integration von `media_negotiator` für moderne Bildformate
-- Repeater- und Nested-Elemente für komplexe Inhaltsstrukturen
-- Rollen- und Sichtbarkeitssteuerung über Feldkonfiguration
-- Modul-Generator im Backend zur schnellen REDAXO-Modulerstellung
+- Automatische Integration von `media_negotiator` für moderne Bildformate, wenn vorhanden
+- Repeater- und Nested-Elemente für komplexe Inhaltsstrukturen 😀
+- Rollen- und Sichtbarkeitssteuerung über Feldkonfiguration 😀
+- Modul-Generator im Backend zur schnellen REDAXO-Modulerstellung ⭐️
 
 ## Einsatzbereiche
 
@@ -23,6 +27,7 @@ Komplexe Layouts oder Datenstrukturen visuell gestalten. Mit Builder ist das mö
 - Datengetriebene Seiten mit YForm-Tabellen
 - Wiederverwendbare Inhaltsbausteine für Redaktionen
 - Projektübergreifende Komponentenbibliotheken
+- Unterschiedliche Ausgaben möglich  z.B. HTML, JSON-LD, E-Mail-HTML, CSV was auch immer ihr wollt. 
 
 ## Architekturüberblick
 
@@ -64,3 +69,21 @@ Builder ist auf Erweiterung ausgelegt:
 - Schema-Referenz: [SCHEMA.md](SCHEMA.md)
 - Tutorial: [TUTORIAL.md](TUTORIAL.md)
 - Änderungen: [CHANGELOG.md](CHANGELOG.md)
+
+## Autor
+
+[Friends of REDAXO ](https://github.com/skerbis](https://friendsofredaxo.github.io)
+
+## Lizenz
+
+[MIT Lizenz](LICENSE.md)
+
+## Credits
+
+**Projekt-Lead**
+
+[Thomas Skerbis](https://github.com/skerbis)
+
+**Sponsored by**
+
+[KLXM Crossmedia](https://klxm.de)
