@@ -54,7 +54,13 @@ class Module
 
         // Wenn kein Raw-Value übergeben wurde, den Slot-Wert aus dem aktuellen Slice laden.
         if ($rawValue === null || $rawValue === '') {
-            $rawValue = self::loadRawValueFromCurrentSlice($instance->valueId);
+            try {
+                $rawValue = self::loadRawValueFromCurrentSlice($instance->valueId);
+            } catch (Throwable $e) {
+                // Im Gridblock-Kontext (oder anderen Rendering-Kontexten) kann getCurrentSlice() 
+                // fehlschlagen. Das ist normal und kein Fehler.
+                $rawValue = '';
+            }
             $instance->rawValue = $rawValue;
         }
         

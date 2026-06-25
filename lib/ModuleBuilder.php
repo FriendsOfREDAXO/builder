@@ -88,7 +88,13 @@ class ModuleBuilder
         }
 
         if ($rawValue === null || $rawValue === '') {
-            $rawValue = self::loadRawValueFromCurrentSlice($instance->valueId);
+            try {
+                $rawValue = self::loadRawValueFromCurrentSlice($instance->valueId);
+            } catch (Throwable $e) {
+                // Im Gridblock-Kontext (oder anderen Rendering-Kontexten) kann getCurrentSlice() 
+                // fehlschlagen. Das ist normal und kein Fehler.
+                $rawValue = '';
+            }
         }
 
         // global_defaults als Alias oder als '*'-Key in element_defaults
