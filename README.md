@@ -4,7 +4,7 @@ Page und Contentbuilder für REDAXO. Modular und erweiterbar.
 
 Komplexe Layouts oder Datenstrukturen visuell gestalten. Mit Builder ist das möglich.
 
-👋 Aber erstmal vorweg: Es ist kein Out-of-the-Box Pagebuilder. Das meiste muss man selbst beisteuern. Ihr entscheided was es kann und welche Elemente es geben wird. Zum Start gibt es ein paar Demo-Elemente mit denenen Ihr spielen könnt. 
+👋 Aber erstmal vorweg: Es ist kein Out-of-the-Box Pagebuilder. Das meiste muss man selbst beisteuern. Ihr entscheided was es kann und welche Elemente es geben wird. Zum Start gibt es ein paar Demo-Elemente mit denen Ihr spielen könnt. 
 Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe. 
 
 
