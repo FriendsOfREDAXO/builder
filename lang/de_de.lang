@@ -24,7 +24,7 @@ builder_media_types_preview_install_hint = Erstellt nur kanonische Ratio-Typen (
 builder_media_types_preview_install_with_texts = Titel/Beschreibung für Focuspoint-Auswahl setzen
 builder_media_types_preview_install_requires = Für die Installation müssen media_manager und focuspoint verfügbar sein.
 builder_media_types_preview_install_no_ratios = Es wurden keine focuspoint-basierten Ratio-Presets gefunden.
-builder_media_types_preview_install_success = Focuspoint-Ratio-Typen verarbeitet. Neu: %s, aktualisiert: %s, Effekte gesetzt: %s.
+builder_media_types_preview_install_success = Focuspoint-Ratio-Typen verarbeitet. Neu: {0}, aktualisiert: {1}, Effekte gesetzt: {2}.
 builder_media_types_preview_install_error = Installation fehlgeschlagen: %s
 
 builder_settings = Einstellungen

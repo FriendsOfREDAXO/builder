@@ -24,7 +24,7 @@ builder_media_types_preview_install_hint = Creates only canonical ratio types (e
 builder_media_types_preview_install_with_texts = Set title/description for focuspoint selection
 builder_media_types_preview_install_requires = Installation requires both media_manager and focuspoint addons.
 builder_media_types_preview_install_no_ratios = No focuspoint-based ratio presets were found.
-builder_media_types_preview_install_success = Focuspoint ratio types processed. Created: %s, updated: %s, effects written: %s.
+builder_media_types_preview_install_success = Focuspoint ratio types processed. Created: {0}, updated: {1}, effects written: {2}.
 builder_media_types_preview_install_error = Installation failed: %s
 
 builder_settings = Settings
