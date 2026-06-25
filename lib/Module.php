@@ -184,6 +184,12 @@ class Module
             $slot = 1;
         }
 
+        // Beim Hinzufügen eines neuen Slices (function=add) keine Daten aus dem vorherigen Slice laden
+        $function = rex_request('function', 'string', '');
+        if ($function === 'add') {
+            return '';
+        }
+
         $sliceId = rex_request('slice_id', 'int', 0);
         if ($sliceId <= 0) {
             return self::loadRawValueFromModuleContext($slot);
