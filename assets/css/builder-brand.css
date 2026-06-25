@@ -309,3 +309,186 @@ body.rex-theme-dark .builder-stat span {
         color: #c6ddee;
     }
 }
+
+.builder-main-overview {
+    --builder-main-surface: #ffffff;
+    --builder-main-surface-soft: #f7f9fb;
+    --builder-main-border: #d8e1eb;
+    --builder-main-border-soft: #e2e8ef;
+    --builder-main-divider: #edf1f6;
+    --builder-main-title: #2b3a4d;
+    --builder-main-text: #5f6f83;
+    --builder-main-meta: #8b9ab0;
+}
+
+.builder-main-overview .builder-main-metrics {
+    margin-bottom: 18px;
+}
+
+.builder-main-overview .builder-main-metric {
+    background: var(--builder-main-surface-soft);
+    border: 1px solid var(--builder-main-border-soft);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.builder-main-overview .builder-main-metric__value {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--builder-main-title);
+}
+
+.builder-main-overview .builder-main-metric__label {
+    color: var(--builder-main-text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.builder-main-overview .builder-main-category {
+    margin: 18px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.builder-main-overview .builder-main-category__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--builder-main-title);
+}
+
+.builder-main-overview .builder-main-list {
+    border: 1px solid var(--builder-main-border);
+    border-radius: 6px;
+    background: var(--builder-main-surface);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.builder-main-overview .builder-main-item {
+    padding: 10px 12px;
+}
+
+.builder-main-overview .builder-main-item.is-not-first {
+    border-top: 1px solid var(--builder-main-divider);
+}
+
+.builder-main-overview .builder-main-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--builder-main-title);
+    margin-bottom: 3px;
+}
+
+.builder-main-overview .builder-main-description {
+    color: var(--builder-main-text);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.builder-main-overview .builder-main-meta {
+    text-align: right;
+}
+
+.builder-main-overview .builder-main-badges {
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.builder-main-overview .builder-main-icon-name {
+    color: var(--builder-main-meta);
+    font-size: 12px;
+}
+
+body.rex-theme-dark .builder-main-overview {
+    --builder-main-surface: #1a2733;
+    --builder-main-surface-soft: #1f2f3e;
+    --builder-main-border: #2f4354;
+    --builder-main-border-soft: #385062;
+    --builder-main-divider: #2b3f51;
+    --builder-main-title: #e6f1fa;
+    --builder-main-text: #b9d0e1;
+    --builder-main-meta: #8fb1ca;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .builder-main-overview {
+        --builder-main-surface: #1a2733;
+        --builder-main-surface-soft: #1f2f3e;
+        --builder-main-border: #2f4354;
+        --builder-main-border-soft: #385062;
+        --builder-main-divider: #2b3f51;
+        --builder-main-title: #e6f1fa;
+        --builder-main-text: #b9d0e1;
+        --builder-main-meta: #8fb1ca;
+    }
+}
+
+.builder-modules-picker {
+    --builder-modules-surface: #f9f9f9;
+    --builder-modules-border: #dddddd;
+    --builder-modules-title: #2b3a4d;
+    --builder-modules-source: #777777;
+    --builder-modules-key: #999999;
+    border: 1px solid var(--builder-modules-border);
+    padding: 15px;
+    border-radius: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: var(--builder-modules-surface);
+}
+
+.builder-modules-picker__empty {
+    color: var(--builder-modules-key);
+}
+
+.builder-modules-picker__actions {
+    margin-bottom: 10px;
+}
+
+.builder-modules-picker__category {
+    margin: 14px 0 6px;
+}
+
+.builder-modules-picker__category-title {
+    text-transform: capitalize;
+    color: var(--builder-modules-title);
+}
+
+.builder-modules-picker__item {
+    margin-left: 8px;
+}
+
+.builder-modules-picker__source {
+    color: var(--builder-modules-source);
+}
+
+.builder-modules-picker__key {
+    color: var(--builder-modules-key);
+}
+
+body.rex-theme-dark .builder-modules-picker {
+    --builder-modules-surface: #1a2733;
+    --builder-modules-border: #2f4354;
+    --builder-modules-title: #e6f1fa;
+    --builder-modules-source: #a8bfd2;
+    --builder-modules-key: #8fb1ca;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .builder-modules-picker {
+        --builder-modules-surface: #1a2733;
+        --builder-modules-border: #2f4354;
+        --builder-modules-title: #e6f1fa;
+        --builder-modules-source: #a8bfd2;
+        --builder-modules-key: #8fb1ca;
+    }
+}
+

@@ -577,20 +577,20 @@ $content .= '<div class="form-group">';
 $content .= '<label><strong>Elemente auswählen</strong></label>';
 $content .= '<p class="help-block">Im Einzelmodus werden dafür einzelne REDAXO-Module erzeugt. Im Full-Builder-Modus dient die Auswahl als erlaubte Elementliste.</p>';
 $content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
-$content .= '<div style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; max-height: 400px; overflow-y: auto; background: #f9f9f9;">';
+$content .= '<div class="builder-modules-picker">';
 
 if (empty($elements)) {
-    $content .= '<p style="color: #999;">Keine Elemente gefunden.</p>';
+    $content .= '<p class="builder-modules-picker__empty">Keine Elemente gefunden.</p>';
 } else {
-    $content .= '<div class="form-group">';
+    $content .= '<div class="form-group builder-modules-picker__actions">';
     $content .= '<button type="button" class="btn btn-xs btn-default" onclick="document.querySelectorAll(\'.element-checkbox\').forEach(c => c.checked = true);">Alle auswählen</button>';
     $content .= ' ';
     $content .= '<button type="button" class="btn btn-xs btn-default" onclick="document.querySelectorAll(\'.element-checkbox\').forEach(c => c.checked = false);">Alle abwählen</button>';
     $content .= '</div>';
     
     foreach ($elementsByCategory as $category => $categoryElements) {
-        $content .= '<div style="margin: 14px 0 6px;">';
-        $content .= '<strong style="text-transform: capitalize;">' . rex_escape($category) . '</strong> ';
+        $content .= '<div class="builder-modules-picker__category">';
+        $content .= '<strong class="builder-modules-picker__category-title">' . rex_escape($category) . '</strong> ';
         $content .= '<span class="label label-default">' . count($categoryElements) . '</span>';
         $content .= '</div>';
 
@@ -601,13 +601,13 @@ if (empty($elements)) {
             $source = (string) ($sourceInfo['source'] ?? 'core');
             $badgeClass = $isExternal ? 'label-info' : 'label-success';
             $badgeText = $isExternal ? 'extern' : 'intern';
-            $content .= '<div class="checkbox" style="margin-left: 8px;">';
+            $content .= '<div class="checkbox builder-modules-picker__item">';
             $content .= '<label>';
             $content .= '<input type="checkbox" class="element-checkbox" name="elements[]" value="' . rex_escape($elementKey) . '">';
             $content .= ' <strong>' . rex_escape($elementLabel) . '</strong> ';
             $content .= '<span class="label ' . $badgeClass . '">' . $badgeText . '</span> ';
-            $content .= '<small style="color: #777;">(' . rex_escape($source) . ')</small> ';
-            $content .= '<small style="color: #999;">(Key: ' . rex_escape($moduleKey) . ')</small>';
+            $content .= '<small class="builder-modules-picker__source">(' . rex_escape($source) . ')</small> ';
+            $content .= '<small class="builder-modules-picker__key">(Key: ' . rex_escape($moduleKey) . ')</small>';
             $content .= '</label>';
             $content .= '</div>';
         }

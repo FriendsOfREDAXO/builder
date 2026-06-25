@@ -20,5 +20,5 @@ if (is_readable($tutorialPath)) {
 
 $fragment = new rex_fragment();
 $fragment->setVar('title', $addon->i18n('tutorial'), false);
-$fragment->setVar('body', $content, false);
+$fragment->setVar('body', '<div class="builder-docs-page">' . $content . '</div>', false);
 echo $fragment->parse('core/page/section.php');
