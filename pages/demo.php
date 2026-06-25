@@ -231,12 +231,47 @@ $demoMarkup .= '</div>';
 $demoMarkup .= '</section>';
 
 $demoMarkup .= '<div class="builder-demo-panel">';
+$demoMarkup .= '<div style="display: flex; justify-content: space-between; align-items: center;">';
+$demoMarkup .= '<div>';
 $demoMarkup .= '<h3>Arbeiten in der Demo</h3>';
 $demoMarkup .= '<p class="text-muted">Du kannst die vorhandenen Elemente bearbeiten, neue Demo-Bausteine hinzufügen und die verschachtelte Spaltenstruktur direkt im Builder verändern. Diese Seite schreibt bewusst nichts in den Slice-Speicher zurück.</p>';
+$demoMarkup .= '</div>';
+$demoMarkup .= '<div style="white-space: nowrap; margin-left: 20px;">';
+$demoMarkup .= '<label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal; cursor: pointer;">';
+$demoMarkup .= '<input type="checkbox" id="builder-compact-mode-toggle" style="cursor: pointer;" />';
+$demoMarkup .= '<span style="font-size: 14px;">Kompaktmodus</span>';
+$demoMarkup .= '</label>';
+$demoMarkup .= '</div>';
+$demoMarkup .= '</div>';
 $demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bottom: 0;">Für die Demo wird ein installiertes TinyMCE-Addon empfohlen, damit die Textbausteine direkt im Editor bearbeitet werden können.</div>';
 $demoMarkup .= '</div>';
 
-$demoMarkup .= $builder->getEditor();
+$builderHtml = $builder->getEditor();
+$demoMarkup .= $builderHtml;
+
+// JavaScript für Kompaktmodus-Toggle
+$demoMarkup .= '<script nonce="' . rex_response::getNonce() . '">';
+$demoMarkup .= 'document.addEventListener("DOMContentLoaded", function() {';
+$demoMarkup .= '  const toggle = document.getElementById("builder-compact-mode-toggle");';
+$demoMarkup .= '  const builderElement = document.querySelector(".yform-content-builder");';
+$demoMarkup .= '  if (!toggle || !builderElement) return;';
+$demoMarkup .= '  const savedState = localStorage.getItem("builder-demo-compact-mode") === "1";';
+$demoMarkup .= '  toggle.checked = savedState;';
+$demoMarkup .= '  if (savedState) {';
+$demoMarkup .= '    builderElement.classList.add("compact-mode");';
+$demoMarkup .= '  }';
+$demoMarkup .= '  toggle.addEventListener("change", function() {';
+$demoMarkup .= '    const isChecked = this.checked;';
+$demoMarkup .= '    if (isChecked) {';
+$demoMarkup .= '      builderElement.classList.add("compact-mode");';
+$demoMarkup .= '      localStorage.setItem("builder-demo-compact-mode", "1");';
+$demoMarkup .= '    } else {';
+$demoMarkup .= '      builderElement.classList.remove("compact-mode");';
+$demoMarkup .= '      localStorage.setItem("builder-demo-compact-mode", "0");';
+$demoMarkup .= '    }';
+$demoMarkup .= '  });';
+$demoMarkup .= '});';
+$demoMarkup .= '</script>';
 
 $demoMarkup .= '<div class="builder-demo-panel">';
 $demoMarkup .= '<h3>Was diese Demo bewusst nicht macht</h3>';
