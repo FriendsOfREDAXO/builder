@@ -3,8 +3,8 @@
  * Starter Ueberschrift - bewusst minimal
  */
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Helper;
 
 $config = StarterConfig::class;
 $_ci = Helper::elementTranslator('starter_headline');

@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 /**
  * Zentrale Media-URL-Resolver für konsistente Media-Handhabung.

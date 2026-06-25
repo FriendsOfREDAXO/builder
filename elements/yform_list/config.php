@@ -1,7 +1,7 @@
 <?php
 
-use KLXM\YFormContentBuilder\ListProfiles;
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\ListProfiles;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 /**
  * YForm-Listen-Element
@@ -40,7 +40,7 @@ return [
                     ? $profileChoices
                     : ['' => '— Bitte zuerst Profile in den Addon-Einstellungen anlegen —'],
                 'notice' => 'Profile (Tabelle, Spalten, Filter, URL-Schema) werden zentral unter '
-                    . 'YForm Content Builder → Einstellungen verwaltet.',
+                    . 'Builder → Einstellungen verwaltet.',
                 'default' => '',
             ],
             'headline' => [

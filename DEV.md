@@ -1,20 +1,20 @@
-# Developer Guide – YForm Content Builder v3.1.0+
+# Developer Guide – Builder v3.1.0+
 
 Umfassender Guide für die Entwicklung mit dem Framework-agnostischen Content Builder System.
 
 ## 🧩 Begriffe im Gesamtsystem
 
-- **Core-Elemente**: Basis-Bausteine im Haupt-Addon `yform_content_builder`
-- **Starter-Elemente**: Demo-Bausteine im Haupt-Addon `yform_content_builder`
+- **Core-Elemente**: Basis-Bausteine im Haupt-Addon `builder`
+- **Starter-Elemente**: Demo-Bausteine im Haupt-Addon `builder`
 - **Projekt-Elemente**: Produktive externe Bausteine in Addons wie `klxm_elements`
-- **Modul-Erstellung**: Bleibt zentral auf `index.php?page=yform_content_builder/modules`
+- **Modul-Erstellung**: Bleibt zentral auf `index.php?page=builder/modules`
 
 ## MediaManager-Verantwortung
 
-- `yform_content_builder` legt nur den Basistyp `content_builder` an.
+- `builder` legt nur den Basistyp `content_builder` an.
 - Alle konkreten Ausgaben laufen über virtuelle Typen im Format `cb_<preset>__<width>`.
 - Die Auflösung erfolgt zentral über `MEDIA_MANAGER_FILTERSET` in `MediaManagerFilterset::apply()`.
-- Externe Addons registrieren Presets über `YFORM_CONTENT_BUILDER_MEDIA_TYPE_PRESETS` statt eigene statische MM-Typen in `install.php` anzulegen.
+- Externe Addons registrieren Presets über `BUILDER_MEDIA_TYPE_PRESETS` statt eigene statische MM-Typen in `install.php` anzulegen.
 - Wenn `media_negotiator` verfügbar ist, wird `negotiator` als letzter Effekt ergänzt; der Cache-Key wird über `MEDIA_MANAGER_INIT` erweitert.
 
 ### Wie virtuelle Bildtypen funktionieren
@@ -34,7 +34,7 @@ Kurzbeispiel:
 
 ### ResponsiveImage für Templates
 
-Für responsive Bildausgaben mit virtuellen Typen steht die Klasse `KLXM\YFormContentBuilder\Media\ResponsiveImage` bereit.
+Für responsive Bildausgaben mit virtuellen Typen steht die Klasse `FriendsOfREDAXO\Builder\Media\ResponsiveImage` bereit.
 
 Ziel:
 
@@ -45,7 +45,7 @@ Ziel:
 Beispiel:
 
 ```php
-use KLXM\YFormContentBuilder\Media\ResponsiveImage;
+use FriendsOfREDAXO\Builder\Media\ResponsiveImage;
 
 $markup = ResponsiveImage::forFile($image)
     ->withDesktopPreset('starter_cards_16_9')
@@ -96,9 +96,9 @@ Empfehlungen:
 Wenn du den Umgang mit Extension Points vermeiden willst, nutze direkt die Registry-Methoden:
 
 ```php
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
-if (rex_addon::get('yform_content_builder')->isAvailable()) {
+if (rex_addon::get('builder')->isAvailable()) {
     MediaTypeRegistry::registerPresets([
         'klxm_card_16_9' => [
             'ratio' => '16_9',
@@ -132,7 +132,7 @@ MediaTypeRegistry::registerPreset('klxm_teaser_4_3', [
 Für dynamische Anpassungen oder projektweite Merges ist der Extension Point verfügbar:
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_MEDIA_TYPE_PRESETS', static function (rex_extension_point $ep): array {
+rex_extension::register('BUILDER_MEDIA_TYPE_PRESETS', static function (rex_extension_point $ep): array {
     $presets = $ep->getSubject();
 
     $presets['klxm_card_16_9'] = [
@@ -162,6 +162,8 @@ Hinweis:
 - Das Backend lädt gemergtes Element-CSS automatisch über die API-Action `get_element_css`.
 - Das Frontend bindet der Integrator bewusst selbst ein:
     - `/index.php?rex-api-call=content_builder&action=get_element_css&framework=uikit`
+- Im Backend erfolgt der Request über den Backend-Controller (`/redaxo/index.php?...`), um relative Pfadprobleme zu vermeiden.
+- Optional können einzelne Elemente per CSV gefiltert werden, z. B. `&elements=starter_cards,starter_media_split`.
 
 ## 📚 Inhaltsverzeichnis
 
@@ -264,7 +266,7 @@ Hinweise zur Implementierung:
 
 ## Extension Points Referenz
 
-### YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS ⭐
+### BUILDER_FRAMEWORK_OPTIONS ⭐
 
 Registriert Framework-spezifische Optionen (Backgrounds, Paddings, Containers).
 
@@ -276,7 +278,7 @@ Registriert Framework-spezifische Optionen (Backgrounds, Paddings, Containers).
 ```php
 // In deinem Addon boot.php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS',
+    'BUILDER_FRAMEWORK_OPTIONS',
     function(rex_extension_point $ep) {
         $framework = $ep->getParam('framework');
         $optionType = $ep->getParam('option_type');
@@ -309,7 +311,7 @@ rex_extension::register(
 
 ---
 
-### YFORM_CONTENT_BUILDER_EDITOR_PROFILES ⭐
+### BUILDER_EDITOR_PROFILES ⭐
 
 Bestimmt Editor-Profil pro Element/Feld.
 
@@ -320,7 +322,7 @@ Bestimmt Editor-Profil pro Element/Feld.
 **Beispiel: Custom Editor-Profil pro Element**
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_EDITOR_PROFILES',
+    'BUILDER_EDITOR_PROFILES',
     function(rex_extension_point $ep) {
         $element = $ep->getParam('element');
         $field = $ep->getParam('field');
@@ -342,7 +344,7 @@ rex_extension::register(
 
 ---
 
-### YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS ⭐
+### BUILDER_BUNDLED_ELEMENTS ⭐
 
 Definiert welche Elemente als "bundled" (im Haupt-Addon) gelten.
 
@@ -352,7 +354,7 @@ Definiert welche Elemente als "bundled" (im Haupt-Addon) gelten.
 **Beispiel: Custom Element zum Bundle hinzufügen**
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS',
+    'BUILDER_BUNDLED_ELEMENTS',
     function(rex_extension_point $ep) {
         $bundled = $ep->getSubject() ?? [];
         
@@ -368,7 +370,7 @@ rex_extension::register(
 
 ---
 
-### YFORM_CONTENT_BUILDER_ELEMENT_PATHS ⭐
+### BUILDER_ELEMENT_PATHS ⭐
 
 Registriert Verzeichnisse mit Element-Ordnern.
 
@@ -379,7 +381,7 @@ Registriert Verzeichnisse mit Element-Ordnern.
 **Beispiel: Externen Element-Pfad registrieren**
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+    'BUILDER_ELEMENT_PATHS',
     function(rex_extension_point $ep) {
         $paths = $ep->getSubject() ?? [];
         
@@ -403,7 +405,7 @@ rex_extension::register(
 ### FrameworkConfig
 
 ```php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 // === In Element-Config ===
 $backgrounds = FrameworkConfig::getBackgroundChoices('uikit');
@@ -416,7 +418,7 @@ $prefix = FrameworkConfig::getCssPrefix('bootstrap'); // 'bs-'
 <?php
 $bg = $elementData['section_bg'] ?? '';
 $bgLabel = array_search($bg, 
-    \KLXM\YFormContentBuilder\Config\FrameworkConfig::getBackgroundChoices('uikit')
+    \FriendsOfREDAXO\Builder\Config\FrameworkConfig::getBackgroundChoices('uikit')
 );
 ?>
 <div class="<?= $bg ?>"><?= $bgLabel ?></div>
@@ -425,7 +427,7 @@ $bgLabel = array_search($bg,
 ### EditorConfig
 
 ```php
-use KLXM\YFormContentBuilder\Config\EditorConfig;
+use FriendsOfREDAXO\Builder\Config\EditorConfig;
 
 // Profil abrufen
 $profile = EditorConfig::getEditorProfile('starter_text', 'text');
@@ -443,7 +445,7 @@ $all = EditorConfig::getElementProfiles();
 ### ElementRegistry
 
 ```php
-use KLXM\YFormContentBuilder\Config\ElementRegistry;
+use FriendsOfREDAXO\Builder\Config\ElementRegistry;
 
 // Alle bundled Elements
 $bundled = ElementRegistry::getBundledElements();
@@ -473,7 +475,7 @@ $config = ElementRegistry::getElementConfig('starter_text');
 ### TemplateEngine
 
 ```php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 // Template mit Framework rendern
 $html = TemplateEngine::render('wrapper', [
@@ -529,7 +531,7 @@ $colClass = match($columns) {
 
 **Step 2: Framework-Optionen registrieren (boot.php)**
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS',
+rex_extension::register('BUILDER_FRAMEWORK_OPTIONS',
     function($ep) {
         if ('tailwind' !== $ep->getParam('framework')) {
             return $ep->getSubject();
@@ -611,7 +613,7 @@ my_addon/
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 return [
     'label' => 'Mein Element',
@@ -737,7 +739,7 @@ return [
 ```php
 // Externe Elemente registrieren
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+    'BUILDER_ELEMENT_PATHS',
     function($ep) {
         $paths = $ep->getSubject() ?? [];
         
@@ -760,7 +762,7 @@ rex_extension::register(
 
 ```php
 // In Provider-Addons via Extension Point
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_MODE', static function (): string {
+rex_extension::register('BUILDER_ELEMENT_MODE', static function (): string {
     return 'merge'; // oder 'replace'
 });
 ```
@@ -790,13 +792,13 @@ rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_MODE', static function ()
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 // Auto-Fallback zum bestmöglichen Framework
 $html = TemplateEngine::render('wrapper', $data, 'tailwind');
 // Falls tailwind.php nicht existiert → bootstrap.php → uikit.php → plain.php
 
-// Fragment aus yform_content_builder nutzen
+// Fragment aus builder nutzen
 $html = TemplateEngine::renderFragment('ycb_elements/wrapper', $data, 'uikit');
 ?>
 ```
@@ -805,7 +807,7 @@ $html = TemplateEngine::renderFragment('ycb_elements/wrapper', $data, 'uikit');
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 // Render mit Default-Fallback
 $framework = $GLOBALS['framework'] ?? 'uikit';
@@ -833,7 +835,7 @@ $backgrounds = [
 
 ✅ **Richtig:**
 ```php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 $backgrounds = FrameworkConfig::getBackgroundChoices('uikit');
 // → Erlaubt Extension Point Überrides
@@ -844,14 +846,14 @@ $backgrounds = FrameworkConfig::getBackgroundChoices('uikit');
 ❌ **Falsch:**
 ```php
 $elementPaths = [
-    rex_path::addon('yform_content_builder', 'elements'),
+    rex_path::addon('builder', 'elements'),
     rex_path::addon('klxm_elements', 'elements'),
 ];
 ```
 
 ✅ **Richtig:**
 ```php
-use KLXM\YFormContentBuilder\Config\ElementRegistry;
+use FriendsOfREDAXO\Builder\Config\ElementRegistry;
 
 $paths = ElementRegistry::getElementPaths();
 // → Dynamisch, Extension Point aware, skalierbar
@@ -866,7 +868,7 @@ $html = file_get_contents("templates/$framework.php");
 
 ✅ **Richtig:**
 ```php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 $html = TemplateEngine::render('element', $data, $framework);
 // → Sicherer, mit Fallbacks, Framework-aware
@@ -883,7 +885,7 @@ $html = TemplateEngine::render('element', $data, $framework);
 ✅ **Richtig:**
 ```php
 // Alle Addons registrieren via Extension Point
-rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', function($ep) {
+rex_extension::register('BUILDER_FRAMEWORK_OPTIONS', function($ep) {
     // Custom Styles hinzufügen
     return $ep->getSubject();
 });
@@ -898,7 +900,7 @@ $classes = 'uk-' . $elementData['padding'];
 
 ✅ **Richtig:**
 ```php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 $prefix = FrameworkConfig::getCssPrefix($framework);
 $classes = $prefix . $elementData['padding'];
@@ -941,7 +943,7 @@ Ja! TemplateEngine lädt automatisch das beste verfügbare Template:
 Nutze die ElementRegistry:
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS',
+    'BUILDER_BUNDLED_ELEMENTS',
     function($ep) {
         $bundled = $ep->getSubject() ?? [];
         // Element entfernen
@@ -953,10 +955,10 @@ rex_extension::register(
 
 ### Können externe Addons ihre eigenen Editor-Profile setzen?
 
-Ja! Via `YFORM_CONTENT_BUILDER_EDITOR_PROFILES` Extension Point:
+Ja! Via `BUILDER_EDITOR_PROFILES` Extension Point:
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_EDITOR_PROFILES',
+    'BUILDER_EDITOR_PROFILES',
     function($ep) {
         if ('my_element' === $ep->getParam('element')) {
             return 'custom_profile';
@@ -970,7 +972,7 @@ rex_extension::register(
 
 ```php
 // In einem Debug-Template
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 echo '<pre>';
 echo 'UIkit Backgrounds:';

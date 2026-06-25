@@ -3,7 +3,7 @@
  * Starter Cards – Demo-Element mit Bild, Titel, Text, Link und Card-Stil.
  */
 
-$config = \KLXM\YFormContentBuilder\Starter\StarterConfig::class;
+$config = \FriendsOfREDAXO\Builder\Starter\StarterConfig::class;
 
 return [
     'label' => 'Cards',

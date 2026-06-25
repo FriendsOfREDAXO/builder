@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_extension;
 use rex_extension_point;

@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex;
 use rex_addon;
@@ -15,9 +15,9 @@ use rex_response;
 use rex_sql;
 use rex_url;
 use Throwable;
-use KLXM\YFormContentBuilder\Config\ElementModeResolver;
-use KLXM\YFormContentBuilder\Config\ThemeProviderBridge;
-use KLXM\YFormContentBuilder\Starter\StarterConfig as Config;
+use FriendsOfREDAXO\Builder\Config\ElementModeResolver;
+use FriendsOfREDAXO\Builder\Config\ThemeProviderBridge;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig as Config;
 
 class ModuleBuilder
 {
@@ -58,7 +58,7 @@ class ModuleBuilder
         $instance->preventSelfNestingElements = $instance->normalizeElementKeyList($options['prevent_self_nesting'] ?? []);
         $instance->enableOnlineToggle = array_key_exists('enable_online_toggle', $options)
             ? (bool) $options['enable_online_toggle']
-            : (bool) rex_addon::get('yform_content_builder')->getConfig('enable_online_toggle', false);
+            : (bool) rex_addon::get('builder')->getConfig('enable_online_toggle', false);
         $instance->legacyCke5Enabled = array_key_exists('legacy_cke5_enabled', $options)
             ? $instance->normalizeBool($options['legacy_cke5_enabled'])
             : false;
@@ -105,7 +105,7 @@ class ModuleBuilder
 
         $instance->enableCopyPaste = array_key_exists('enable_copy_paste', $options)
             ? (bool) $options['enable_copy_paste']
-            : (bool) rex_addon::get('yform_content_builder')->getConfig('enable_copy_paste', false);
+            : (bool) rex_addon::get('builder')->getConfig('enable_copy_paste', false);
 
         $instance->slices = $instance->normalizeSlices($rawValue);
         if ($instance->slices === []) {
@@ -152,7 +152,7 @@ class ModuleBuilder
              data-online-toggle="<?= $this->enableOnlineToggle ? '1' : '0' ?>"
              data-legacy-mode="<?= $legacyActive ? '1' : '0' ?>"
              data-copy-paste="<?= $this->enableCopyPaste ? '1' : '0' ?>"
-             data-element-search="<?= (rex_addon::get('yform_content_builder')?->getConfig('enable_element_search', false)) ? '1' : '0' ?>"
+             data-element-search="<?= (rex_addon::get('builder')?->getConfig('enable_element_search', false)) ? '1' : '0' ?>"
              data-available-elements='<?= rex_escape(json_encode($availableElements, JSON_UNESCAPED_UNICODE)) ?>'
              <?php if ($this->elementDefaults !== []): ?>data-element-defaults='<?= rex_escape(json_encode($this->elementDefaults, JSON_UNESCAPED_UNICODE)) ?>'<?php endif; ?>>
             <?php if ($this->label !== ''): ?>
@@ -317,7 +317,7 @@ class ModuleBuilder
                 <div class="content-builder-add">
                     <div class="btn-group btn-block">
                         <button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-plus"></i> <?= rex_i18n::msg('yform_content_builder_element_add') ?>
+                            <i class="fa fa-plus"></i> <?= rex_i18n::msg('builder_element_add') ?>
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
@@ -334,14 +334,14 @@ class ModuleBuilder
                             foreach ($groupedAvailableElements as $elementsInCategory) {
                                 $totalElementsMain += count($elementsInCategory);
                             }
-                            $enableSearchMain = rex_addon::get('yform_content_builder')?->getConfig('enable_element_search', false);
+                            $enableSearchMain = rex_addon::get('builder')?->getConfig('enable_element_search', false);
                             ?>
                             <?php if ($enableSearchMain && $totalElementsMain >= 5): ?>
                                 <li class="yform-cb-search-item">
                                     <div class="yform-cb-search-wrapper">
                                         <input type="text" 
                                                class="yform-cb-element-search-input form-control input-sm" 
-                                               placeholder="<?= rex_i18n::msg('yform_content_builder_element_search_placeholder') ?>"
+                                               placeholder="<?= rex_i18n::msg('builder_element_search_placeholder') ?>"
                                                style="margin: 0; width: 100%;">
                                     </div>
                                 </li>
@@ -736,8 +736,8 @@ class ModuleBuilder
         $elements = [];
         $customPaths = ElementModeResolver::getCustomPaths();
 
-        $demoPath = rex_addon::get('yform_content_builder')->getPath('elements/');
-        $enableDemoElements = (bool) rex_addon::get('yform_content_builder')->getConfig('enable_demo_elements', true);
+        $demoPath = rex_addon::get('builder')->getPath('elements/');
+        $enableDemoElements = (bool) rex_addon::get('builder')->getConfig('enable_demo_elements', true);
         if (ElementModeResolver::shouldLoadBundledElements() && $enableDemoElements && is_dir($demoPath)) {
             $elements = array_replace($elements, $this->loadElementsFromBasePath($demoPath, 'demo'));
         }
@@ -819,7 +819,7 @@ class ModuleBuilder
             return [];
         }
 
-        $enableDemoElements = (bool) rex_addon::get('yform_content_builder')->getConfig('enable_demo_elements', true);
+        $enableDemoElements = (bool) rex_addon::get('builder')->getConfig('enable_demo_elements', true);
         $bundledDemoKeys = array_flip(Config::getBundledDemoElementKeys());
 
         /** @var array<string, array<string, mixed>> $elements */
@@ -938,7 +938,7 @@ class ModuleBuilder
         foreach ($availableElements as $elementType => $config) {
             $category = trim((string) ($config['category'] ?? ''));
             if ($category === '') {
-                $category = Helper::t('yform_content_builder_category_other', 'other');
+                $category = Helper::t('builder_category_other', 'other');
             }
 
             if (!isset($groupedAvailableElements[$category])) {
@@ -1040,7 +1040,7 @@ class ModuleBuilder
             <div class="slice-toolbar" data-element-name="<?= rex_escape($elementLabel) ?>">
                 <span class="slice-label"><i class="fa <?= rex_escape($elementIcon) ?>"></i><?= rex_escape($elementLabel) ?></span>
                 <div class="btn-group btn-group-insert">
-                    <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" title="<?= rex_i18n::msg('yform_content_builder_element_add') ?>">
+                    <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" title="<?= rex_i18n::msg('builder_element_add') ?>">
                         <i class="fa fa-plus"></i>
                     </button>
                     <ul class="dropdown-menu pull-right">
@@ -1059,14 +1059,14 @@ class ModuleBuilder
                             $totalElements += count($elementsInCategory);
                         }
                         // Suchbox anzeigen wenn aktiviert und mehr als 5 Elemente
-                        $enableSearch = rex_addon::get('yform_content_builder')?->getConfig('enable_element_search', false);
+                        $enableSearch = rex_addon::get('builder')?->getConfig('enable_element_search', false);
                         if ($enableSearch && $totalElements >= 5): 
                         ?>
                             <li class="yform-cb-search-item">
                                 <div class="yform-cb-search-wrapper">
                                     <input type="text" 
                                            class="yform-cb-element-search-input form-control input-sm" 
-                                           placeholder="<?= rex_i18n::msg('yform_content_builder_element_search_placeholder') ?>"
+                                           placeholder="<?= rex_i18n::msg('builder_element_search_placeholder') ?>"
                                            style="margin: 0; width: 100%;">
                                 </div>
                             </li>
@@ -1101,7 +1101,7 @@ class ModuleBuilder
                         <?php endforeach; ?>
                     </ul>
                 </div>
-                <button type="button" class="btn btn-xs btn-default btn-slice-edit" title="<?= rex_i18n::msg('yform_content_builder_element_edit') ?>">
+                <button type="button" class="btn btn-xs btn-default btn-slice-edit" title="<?= rex_i18n::msg('builder_element_edit') ?>">
                     <i class="fa fa-pencil"></i>
                 </button>
                 <?php if ($this->enableCopyPaste): ?>
@@ -1109,18 +1109,18 @@ class ModuleBuilder
                         <i class="fa fa-copy"></i>
                     </button>
                 <?php endif; ?>
-                <button type="button" class="btn btn-xs btn-default btn-slice-move-up" title="<?= rex_escape(Helper::t('yform_content_builder_element_move_up', 'Move up')) ?>">
+                <button type="button" class="btn btn-xs btn-default btn-slice-move-up" title="<?= rex_escape(Helper::t('builder_element_move_up', 'Move up')) ?>">
                     <i class="fa fa-arrow-up"></i>
                 </button>
-                <button type="button" class="btn btn-xs btn-default btn-slice-move-down" title="<?= rex_escape(Helper::t('yform_content_builder_element_move_down', 'Move down')) ?>">
+                <button type="button" class="btn btn-xs btn-default btn-slice-move-down" title="<?= rex_escape(Helper::t('builder_element_move_down', 'Move down')) ?>">
                     <i class="fa fa-arrow-down"></i>
                 </button>
                 <?php if ($this->enableOnlineToggle): ?>
-                    <button type="button" class="btn btn-xs btn-default btn-slice-toggle-online" title="<?= $sliceOnline ? rex_i18n::msg('yform_content_builder_element_set_offline') : rex_i18n::msg('yform_content_builder_element_set_online') ?>">
+                    <button type="button" class="btn btn-xs btn-default btn-slice-toggle-online" title="<?= $sliceOnline ? rex_i18n::msg('builder_element_set_offline') : rex_i18n::msg('builder_element_set_online') ?>">
                         <i class="fa <?= $sliceOnline ? 'fa-eye' : 'fa-eye-slash' ?>"></i>
                     </button>
                 <?php endif; ?>
-                <button type="button" class="btn btn-xs btn-danger btn-slice-delete" title="<?= rex_i18n::msg('yform_content_builder_element_delete') ?>">
+                <button type="button" class="btn btn-xs btn-danger btn-slice-delete" title="<?= rex_i18n::msg('builder_element_delete') ?>">
                     <i class="fa fa-trash"></i>
                 </button>
             </div>
@@ -1136,7 +1136,7 @@ class ModuleBuilder
                     include $templateFile;
                     ?>
                 <?php else: ?>
-                    <div class="alert alert-danger"><?= rex_escape(Helper::t('yform_content_builder_template_not_found', 'Template not found')) ?>: <?= rex_escape($sliceType) ?></div>
+                    <div class="alert alert-danger"><?= rex_escape(Helper::t('builder_template_not_found', 'Template not found')) ?>: <?= rex_escape($sliceType) ?></div>
                 <?php endif; ?>
             </div>
 
@@ -1150,7 +1150,7 @@ class ModuleBuilder
     /** @param array<string, mixed> $elementData */
     protected function renderSectionPreview(array $elementData): string
     {
-        $label = (string) ($elementData['label'] ?? Helper::t('yform_content_builder_section_unnamed', 'Unnamed'));
+        $label = (string) ($elementData['label'] ?? Helper::t('builder_section_unnamed', 'Unnamed'));
         $bgColor = (string) ($elementData['background_color'] ?? 'none');
         $bgImage = (string) ($elementData['background_image'] ?? '');
         $customId = (string) ($elementData['custom_id'] ?? '');
@@ -1159,7 +1159,7 @@ class ModuleBuilder
 
         $html = '<div class="section-backend-label">';
         $html .= '<i class="fa fa-object-group"></i>';
-        $html .= '<strong>' . rex_escape(Helper::t('yform_content_builder_section_label', 'Section')) . ':</strong> ' . rex_escape($label);
+        $html .= '<strong>' . rex_escape(Helper::t('builder_section_label', 'Section')) . ':</strong> ' . rex_escape($label);
         $html .= '<span class="section-info">';
 
         if ($bgColor !== '' && $bgColor !== 'none') {
@@ -1300,7 +1300,7 @@ class ModuleBuilder
             return (string) $availableElements[$elementType]['_path'];
         }
 
-        $fallbackPath = rex_path::addon('yform_content_builder', 'elements/' . $elementType);
+        $fallbackPath = rex_path::addon('builder', 'elements/' . $elementType);
         return is_dir($fallbackPath) ? $fallbackPath : null;
     }
 

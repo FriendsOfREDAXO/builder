@@ -1,0 +1,36 @@
+{
+  "key": "button",
+  "label": "Button / Link",
+  "icon": "fa-link",
+  "fields": [
+    {
+      "name": "label",
+      "type": "text",
+      "label": "Button Text",
+      "default": "Mehr erfahren"
+    },
+    {
+      "name": "link",
+      "type": "link",
+      "label": "Interne Seite",
+      "default": ""
+    },
+    {
+      "name": "external_url",
+      "type": "text",
+      "label": "Externe URL (falls kein interner Link)",
+      "default": ""
+    },
+    {
+      "name": "style",
+      "type": "select",
+      "label": "Stil",
+      "choices": {
+        "btn-primary": "Primär-Button",
+        "btn-default": "Standard-Button",
+        "btn-link": "Nur Text-Link"
+      },
+      "default": "btn-primary"
+    }
+  ]
+}

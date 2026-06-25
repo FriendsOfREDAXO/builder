@@ -11,10 +11,10 @@
  * @var string $framework
  */
 
-$elementKeys = \KLXM\YFormContentBuilder\Config\ElementRegistry::getAllElements();
+$elementKeys = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getAllElements();
 $available_elements = [];
 foreach ($elementKeys as $key) {
-    $config = \KLXM\YFormContentBuilder\Config\ElementRegistry::getElementConfig($key);
+    $config = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementConfig($key);
     if ($config !== null) {
         $config['type'] = $key;
         $config['key'] = $key;
@@ -29,7 +29,7 @@ foreach ($available_elements as $elementType => $config) {
     }
     $groupedAvailableElements[$category][$elementType] = $config;
 }
-$enableOnlineToggle = (bool) rex_addon::get('yform_content_builder')->getConfig('enable_online_toggle', false);
+$enableOnlineToggle = (bool) rex_addon::get('builder')->getConfig('enable_online_toggle', false);
 
 $backendRowClass = $rowClass . ' content-builder-columns-row';
 
@@ -66,11 +66,11 @@ if ($framework === 'uikit') {
 
     if ($enableSection) {
         if ($framework === 'bootstrap') {
-            $bgClass = \KLXM\YFormContentBuilder\Starter\StarterConfig::mapBg($sectionBg, 'bootstrap');
+            $bgClass = \FriendsOfREDAXO\Builder\Starter\StarterConfig::mapBg($sectionBg, 'bootstrap');
             if ($bgClass !== '') {
                 $sectionClasses[] = $bgClass;
             }
-            $paddingClass = \KLXM\YFormContentBuilder\Starter\StarterConfig::mapPadding($sectionPadding, 'bootstrap');
+            $paddingClass = \FriendsOfREDAXO\Builder\Starter\StarterConfig::mapPadding($sectionPadding, 'bootstrap');
             if ($paddingClass !== '') {
                 $sectionClasses[] = $paddingClass;
             }
@@ -79,8 +79,8 @@ if ($framework === 'uikit') {
             }
         } else {
             // plain
-            $sectionStyle = \KLXM\YFormContentBuilder\Starter\StarterConfig::mapBg($sectionBg, 'plain');
-            $sectionStyle .= \KLXM\YFormContentBuilder\Starter\StarterConfig::mapPadding($sectionPadding, 'plain');
+            $sectionStyle = \FriendsOfREDAXO\Builder\Starter\StarterConfig::mapBg($sectionBg, 'plain');
+            $sectionStyle .= \FriendsOfREDAXO\Builder\Starter\StarterConfig::mapPadding($sectionPadding, 'plain');
             if ($sectionLight) {
                 $sectionStyle .= 'color:#fff;';
             }
@@ -137,7 +137,7 @@ if ($framework === 'uikit') {
             <div class="content-builder-column-slices" data-column-index="<?= $i ?>"><?php
                 $colSlices = $columnsData[$i] ?? [];
                 foreach ($colSlices as $index => $slice) {
-                    echo \KLXM\YFormContentBuilder\Helper::renderSliceBackend(
+                    echo \FriendsOfREDAXO\Builder\Helper::renderSliceBackend(
                         $slice,
                         $index,
                         $available_elements,
@@ -153,7 +153,7 @@ if ($framework === 'uikit') {
                     <i class="fa fa-plus"></i> Element hinzufügen
                 </button>
                 <ul class="dropdown-menu">
-                    <?php if (rex_addon::get('yform_content_builder')->getConfig('enable_copy_paste')): ?>
+                    <?php if (rex_addon::get('builder')->getConfig('enable_copy_paste')): ?>
                         <li class="paste-slice-item" style="display: none;">
                             <a href="#" class="btn-paste-slice" data-insert-after="end">
                                 <i class="fa fa-clipboard"></i> <strong>Element einfügen</strong>
@@ -168,7 +168,7 @@ if ($framework === 'uikit') {
                         <?php endif; ?>
                         <li class="dropdown-header"><?= rex_escape(ucfirst(str_replace('_', ' ', (string) $category))) ?></li>
                         <?php foreach ($elementsInCategory as $elementType => $config): ?>
-                            <?php if (!\KLXM\YFormContentBuilder\Helper::isSelfNestingBlocked('columns', (string) $elementType, $available_elements)): ?>
+                            <?php if (!\FriendsOfREDAXO\Builder\Helper::isSelfNestingBlocked('columns', (string) $elementType, $available_elements)): ?>
                                 <li>
                                     <a href="#" class="btn-add-nested-slice" 
                                        data-element-type="<?= rex_escape($elementType) ?>"

@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex_extension;
 use rex_addon;
@@ -31,7 +31,7 @@ class EditorConfig
      * Liefert das Editor-Profil für ein Element
      * Default: 'default' (TinyMCE)
      * 
-     * Extension Point: YFORM_CONTENT_BUILDER_EDITOR_PROFILES
+     * Extension Point: BUILDER_EDITOR_PROFILES
      *
      * @param string $elementKey z.B. 'starter_text'
      * @param string $fieldName z.B. 'text'
@@ -57,7 +57,7 @@ class EditorConfig
         $defaultProfile = $defaults[$elementKey] ?? 'default';
 
         // Extension Point für Custom-Profile
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_EDITOR_PROFILES', $defaultProfile, [
+        $result = self::applyExtensionPoint('BUILDER_EDITOR_PROFILES', $defaultProfile, [
             'element' => $elementKey,
             'field' => $fieldName,
         ]);
@@ -101,7 +101,7 @@ class EditorConfig
             'starter_callout' => 'default',
         ];
 
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_ELEMENT_PROFILES', $default);
+        $result = self::applyExtensionPoint('BUILDER_ELEMENT_PROFILES', $default);
 
         self::$cache['element_profiles'] = $result;
         return $result;

@@ -48,7 +48,7 @@ if (rex::isBackend()) {
         if ($function === 'renderSliceBackend' || 
             $function === 'renderEditorSlice' || 
             $function === 'ajaxRenderSlice' || 
-            ($function === 'renderSlice' && $class === 'KLXM\YFormContentBuilder\Api\ContentBuilderApi') || 
+            ($function === 'renderSlice' && $class === 'FriendsOfREDAXO\Builder\Api\ContentBuilderApi') || 
             strpos($file, 'value.content_builder.tpl.php') !== false) {
             $isBackendEditMode = true;
             break;
@@ -70,7 +70,7 @@ $sectionLight = !empty($elementData['section_light']);
 $enableSection = !isset($elementData['enable_section']) || !empty($elementData['enable_section']);
 $enableContainer = !isset($elementData['enable_container']) || !empty($elementData['enable_container']);
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 $sectionStyle = StarterConfig::mapBg($sectionBg, 'plain');
 $sectionStyle .= StarterConfig::mapPadding($sectionPadding, 'plain');
@@ -111,7 +111,7 @@ if ($enableSection && $sectionBgImage !== '') {
                 $styleAttr = isset($styles[$i]) ? ' style="' . $styles[$i] . '"' : '';
                 ?>
                 <div class="<?= $classes[$i] ?>"<?= $styleAttr ?>>
-                    <?= \KLXM\YFormContentBuilder\Helper::renderNestedSlices($columnsData[$i] ?? [], $framework) ?>
+                    <?= \FriendsOfREDAXO\Builder\Helper::renderNestedSlices($columnsData[$i] ?? [], $framework) ?>
                 </div>
             <?php endfor; ?>
         </div>

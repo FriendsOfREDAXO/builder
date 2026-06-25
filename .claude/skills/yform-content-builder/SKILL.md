@@ -1,13 +1,13 @@
 ---
 name: yform-content-builder
-description: Entwicklungshilfe fuer das REDAXO Addon yform_content_builder mit Fokus auf Element-Configs, Feldtypen, Rendering und Datenintegritaet.
+description: Entwicklungshilfe fuer das REDAXO Addon builder mit Fokus auf Element-Configs, Feldtypen, Rendering und Datenintegritaet.
 ---
 
-# Skill: YForm Content Builder
+# Skill: Builder
 
 ## Wann nutzen
 
-Nutze diesen Skill, wenn du im Addon `yform_content_builder` arbeitest und mindestens eines davon anfasst:
+Nutze diesen Skill, wenn du im Addon `builder` arbeitest und mindestens eines davon anfasst:
 
 - `lib/rex_yform_value_content_builder.php`
 - `lib/Module.php`, `lib/ModuleBuilder.php`, `lib/Helper.php`

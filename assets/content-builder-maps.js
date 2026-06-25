@@ -249,8 +249,8 @@
         var script = document.createElement('script');
         // Versuche lokale Version aus dem Addon-Assets-Pfad zu laden
         // Der Pfad muss relativ zum aktuellen Dokument oder absolut sein.
-        // Im REDAXO-Kontext ist /assets/addons/yform_content_builder/vendor/openlayers/ol.js oft sicher.
-        script.src = '/assets/addons/yform_content_builder/vendor/openlayers/ol.js';
+        // Im REDAXO-Kontext ist /assets/addons/builder/vendor/openlayers/ol.js oft sicher.
+        script.src = '/assets/addons/builder/vendor/openlayers/ol.js';
         script.onerror = function() {
             // Fallback auf CDN falls lokal nicht gefunden
             console.warn('Local OpenLayers not found, falling back to CDN');
@@ -264,7 +264,7 @@
         
         var link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = '/assets/addons/yform_content_builder/vendor/openlayers/ol.css';
+        link.href = '/assets/addons/builder/vendor/openlayers/ol.css';
         document.head.appendChild(link);
     } else {
         initMaps();

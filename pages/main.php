@@ -1,18 +1,10 @@
 <?php
 
 /**
- * YForm Content Builder - Übersicht
+ * Builder - Übersicht
  */
 
-$addon = rex_addon::get('yform_content_builder');
-
-// Kurze Übersicht/Intro anzeigen
-$content = '<p>' . $addon->i18n('intro') . '</p>';
-
-$fragment = new rex_fragment();
-$fragment->setVar('title', $addon->i18n('title'), false);
-$fragment->setVar('body', $content, false);
-echo $fragment->parse('core/page/section.php');
+$addon = rex_addon::get('builder');
 
 // Verfügbare Elemente inkl. Metadaten laden
 $elementsDir = $addon->getPath('elements');
@@ -94,16 +86,50 @@ usort($categoryKeys, static function (string $a, string $b): int {
 	return strcasecmp($a, $b);
 });
 
+$totalElements = count($elements);
+$totalCategories = count($groupedElements);
+$totalVersions = count($versionMap);
+
+$hero = '';
+$hero .= '<section class="builder-hero">';
+$hero .= '<div class="builder-hero__bg" aria-hidden="true">';
+$hero .= '<span class="builder-hero__block builder-hero__block--a"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--b"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--c"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--d"></span>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__content">';
+$hero .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
+$hero .= '<div class="builder-hero__copy">';
+$hero .= '<p class="builder-hero__kicker">Builder 1.0.0</p>';
+$hero .= '<h2 class="builder-hero__title">Page und Contentbuilder für REDAXO</h2>';
+$hero .= '<p class="builder-hero__lead">Modular, visuell und erweiterbar. Komplexe Layouts und Datenstrukturen lassen sich direkt im Backend gestalten.</p>';
+$hero .= '<div class="builder-hero__chips">';
+$hero .= '<span class="builder-chip">YForm</span>';
+$hero .= '<span class="builder-chip">Module</span>';
+$hero .= '<span class="builder-chip">Media Manager</span>';
+$hero .= '<span class="builder-chip">Extension Points</span>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__stats">';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalElements) . '</strong><span>Elemente</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalCategories) . '</strong><span>Kategorien</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalVersions) . '</strong><span>Versionen</span></div>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '</section>';
+
+$fragment = new rex_fragment();
+$fragment->setVar('title', 'Builder', false);
+$fragment->setVar('body', $hero, false);
+echo $fragment->parse('core/page/section.php');
+
 $listBody = '';
 $listBody .= '<p class="help-block">Schneller Überblick über alle verfügbaren Content-Builder-Elemente mit Metadaten.</p>';
 
 if ($elements === []) {
 	$listBody .= rex_view::info('Keine Elemente gefunden.');
 } else {
-	$totalElements = count($elements);
-	$totalCategories = count($groupedElements);
-	$totalVersions = count($versionMap);
-
 	$listBody .= '<div class="row" style="margin-bottom: 18px;">';
 	$listBody .= '<div class="col-sm-4"><div style="background:#f7f9fb; border:1px solid #e2e8ef; border-radius:6px; padding:10px 12px; margin-bottom:10px;"><div style="font-size:20px; font-weight:700; line-height:1.1; color:#2b3a4d;">' . rex_escape((string) $totalElements) . '</div><div style="color:#65758a; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">Elemente</div></div></div>';
 	$listBody .= '<div class="col-sm-4"><div style="background:#f7f9fb; border:1px solid #e2e8ef; border-radius:6px; padding:10px 12px; margin-bottom:10px;"><div style="font-size:20px; font-weight:700; line-height:1.1; color:#2b3a4d;">' . rex_escape((string) $totalCategories) . '</div><div style="color:#65758a; font-size:12px; text-transform:uppercase; letter-spacing:.04em;">Kategorien</div></div></div>';

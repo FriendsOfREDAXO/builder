@@ -1,8 +1,8 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 use rex_config;
 use rex_extension_point;
 
@@ -26,7 +26,7 @@ class MediaNegotiatorBridge
         $type = (string) $ep->getParam('type');
         $parsed = MediaTypeRegistry::parseVirtualType($type);
 
-        $isYcbType = $parsed !== null || in_array($type, ['content_builder', 'content_slideshow', 'yform_content_builder_preview'], true);
+        $isYcbType = $parsed !== null || in_array($type, ['content_builder', 'content_slideshow', 'builder_preview'], true);
         if (!$isYcbType) {
             return;
         }

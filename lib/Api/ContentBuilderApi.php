@@ -1,10 +1,10 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Api;
+namespace FriendsOfREDAXO\Builder\Api;
 
-use KLXM\YFormContentBuilder\Fields\FieldRegistry;
-use KLXM\YFormContentBuilder\Helper;
-use KLXM\YFormContentBuilder\ModalHelper;
+use FriendsOfREDAXO\Builder\Fields\FieldRegistry;
+use FriendsOfREDAXO\Builder\Helper;
+use FriendsOfREDAXO\Builder\ModalHelper;
 use rex;
 use rex_addon;
 use rex_api_function;
@@ -128,8 +128,10 @@ class ContentBuilderApi extends rex_api_function
         }
 
         $output = implode("\n\n", $css);
+        rex_response::setStatus(rex_response::HTTP_OK);
         rex_response::setHeader('Cache-Control', 'public, max-age=3600');
         rex_response::sendContent($output, 'text/css; charset=UTF-8');
+        exit;
     }
 
     /**
@@ -140,7 +142,7 @@ class ContentBuilderApi extends rex_api_function
         $sources = [];
 
         $customPaths = \rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             ['']
         ));
         foreach ((array) $customPaths as $customPath) {
@@ -155,12 +157,12 @@ class ContentBuilderApi extends rex_api_function
             $sources[] = rtrim($projectPath, '/\\');
         }
 
-        $dataPath = rex_addon::get('yform_content_builder')->getDataPath('elements');
+        $dataPath = rex_addon::get('builder')->getDataPath('elements');
         if (is_dir($dataPath)) {
             $sources[] = rtrim($dataPath, '/\\');
         }
 
-        $addonPath = rex_addon::get('yform_content_builder')->getPath('elements');
+        $addonPath = rex_addon::get('builder')->getPath('elements');
         if (is_dir($addonPath)) {
             $sources[] = rtrim($addonPath, '/\\');
         }
@@ -360,7 +362,7 @@ class ContentBuilderApi extends rex_api_function
     protected function getElementPath(string $elementType): string
     {
         $customPaths = \rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             ['']
         ));
 
@@ -381,14 +383,14 @@ class ContentBuilderApi extends rex_api_function
             return $projectPath;
         }
 
-        // Dann in data/addons/yform_content_builder/elements (User-Override)
-        $dataPath = rex_addon::get('yform_content_builder')->getDataPath('elements/' . $elementType);
+        // Dann in data/addons/builder/elements (User-Override)
+        $dataPath = rex_addon::get('builder')->getDataPath('elements/' . $elementType);
         if (is_dir($dataPath)) {
             return $dataPath;
         }
 
         // Standard: Addon-Pfad
-        return rex_addon::get('yform_content_builder')->getPath('elements/' . $elementType);
+        return rex_addon::get('builder')->getPath('elements/' . $elementType);
     }
 
     /**

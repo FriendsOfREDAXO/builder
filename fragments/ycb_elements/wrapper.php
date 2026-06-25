@@ -90,7 +90,7 @@ if ($enableSection && '' !== $sectionBgImage) {
 if ($enableSection && !$hasBackgroundVideo && '' === $sectionBgImage && rex::isBackend() && '' !== $sectionBg && 'uk-background-transparent' !== $sectionBg) {
     $previewColor = '';
 
-    $themeBackgrounds = \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::getBackgroundOptions('uikit');
+    $themeBackgrounds = \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::getBackgroundOptions('uikit');
     if (is_array($themeBackgrounds) && isset($themeBackgrounds[$sectionBg]) && is_array($themeBackgrounds[$sectionBg])) {
         $themeColor = $themeBackgrounds[$sectionBg]['color'] ?? '';
         if (is_string($themeColor) && '' !== trim($themeColor)) {

@@ -1,8 +1,8 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Media;
+namespace FriendsOfREDAXO\Builder\Media;
 
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
 final class ResponsiveImage
 {

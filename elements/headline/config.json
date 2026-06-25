@@ -1,0 +1,25 @@
+{
+  "key": "headline",
+  "label": "Überschrift",
+  "icon": "fa-header",
+  "fields": [
+    {
+      "name": "text",
+      "type": "text",
+      "label": "Überschrift Text",
+      "default": ""
+    },
+    {
+      "name": "tag",
+      "type": "select",
+      "label": "Größe / HTML-Tag",
+      "choices": {
+        "h1": "H1 (Hauptüberschrift)",
+        "h2": "H2 (Bereichsüberschrift)",
+        "h3": "H3 (Unterüberschrift)",
+        "h4": "H4 (Detailüberschrift)"
+      },
+      "default": "h2"
+    }
+  ]
+}

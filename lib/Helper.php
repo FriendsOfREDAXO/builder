@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_addon;
 use rex_escape;
@@ -324,7 +324,7 @@ class Helper
     protected static function resolveElementPath(string $elementType): ?string
     {
         $customPaths = \rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             ['']
         ));
 
@@ -346,12 +346,12 @@ class Helper
             }
         }
 
-        $dataPath = rex_addon::get('yform_content_builder')->getDataPath('elements/' . $elementType);
+        $dataPath = rex_addon::get('builder')->getDataPath('elements/' . $elementType);
         if (is_dir($dataPath)) {
             return $dataPath;
         }
 
-        $addonPath = rex_addon::get('yform_content_builder')->getPath('elements/' . $elementType);
+        $addonPath = rex_addon::get('builder')->getPath('elements/' . $elementType);
         return is_dir($addonPath) ? $addonPath : null;
     }
 
@@ -727,7 +727,7 @@ class Helper
                         <i class="fa fa-plus"></i>
                     </button>
                     <ul class="dropdown-menu pull-right">
-                        <?php if (rex_addon::get('yform_content_builder')->getConfig('enable_copy_paste')): ?>
+                        <?php if (rex_addon::get('builder')->getConfig('enable_copy_paste')): ?>
                             <li class="paste-slice-item" style="display: none;">
                                 <a href="#" class="btn-paste-slice" data-insert-after="<?= $index ?>">
                                     <i class="fa fa-clipboard"></i> <strong>Element einfügen</strong>
@@ -769,7 +769,7 @@ class Helper
                 <button type="button" class="btn btn-xs btn-default btn-slice-edit" title="Bearbeiten">
                     <i class="fa fa-pencil"></i>
                 </button>
-                <?php if (rex_addon::get('yform_content_builder')->getConfig('enable_copy_paste')): ?>
+                <?php if (rex_addon::get('builder')->getConfig('enable_copy_paste')): ?>
                 <button type="button" class="btn btn-xs btn-default btn-slice-copy" title="Kopieren">
                     <i class="fa fa-copy"></i>
                 </button>

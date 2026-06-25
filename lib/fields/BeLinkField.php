@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_article;
 use rex_clang;

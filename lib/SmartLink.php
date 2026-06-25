@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_addon;
 use rex_escape;

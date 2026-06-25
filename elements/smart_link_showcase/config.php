@@ -1,7 +1,7 @@
 <?php
 
-use KLXM\YFormContentBuilder\Helper;
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Helper;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 /**
  * Smart-Link Showcase - Demo-Element

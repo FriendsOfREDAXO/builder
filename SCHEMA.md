@@ -1,18 +1,18 @@
-# YForm Content Builder - JSON Schema
+# Builder - JSON Schema
 
 This addon includes a formal JSON Schema to validate Element Configurations.
 
 ## 📋 Schema File
 
 **File:** `element-config.schema.json`  
-**Path:** `redaxo/src/addons/yform_content_builder/element-config.schema.json`
+**Path:** `redaxo/src/addons/builder/element-config.schema.json`
 
 ## 🤖 Usage for AI Agents
 
 When asking an AI to generate a new element, you can provide this schema to ensure the output is valid.
 
 **Prompt Example:**
-> "Create a new YForm Content Builder element for a 'Testimonial Slider'. Please follow the structure defined in `element-config.schema.json`."
+> "Create a new Builder element for a 'Testimonial Slider'. Please follow the structure defined in `element-config.schema.json`."
 
 ## 🔧 Usage in IDEs (VS Code)
 
@@ -57,10 +57,10 @@ In current element configs you will also see newer field types such as `cke5`, `
 
 ## 🧩 Terminologie im Gesamtsystem
 
-- **Core-Elemente**: Basis-Bausteine im Haupt-Addon `yform_content_builder`
-- **Starter-Elemente**: Demo-Bausteine im Haupt-Addon `yform_content_builder`
+- **Core-Elemente**: Basis-Bausteine im Haupt-Addon `builder`
+- **Starter-Elemente**: Demo-Bausteine im Haupt-Addon `builder`
 - **Projekt-Elemente**: Produktive externe Bausteine in Addons wie `klxm_elements`
-- **Modul-Erstellung**: Bleibt zentral im Haupt-Addon auf `index.php?page=yform_content_builder/modules`
+- **Modul-Erstellung**: Bleibt zentral im Haupt-Addon auf `index.php?page=builder/modules`
 
 ## 🖼️ Media-Output-Konvention
 
@@ -74,15 +74,15 @@ Beispiel:
 
 ```php
 <?php
-$type = \KLXM\YFormContentBuilder\Config\MediaTypeRegistry::buildVirtualType('starter_cards_16_9', 1200);
+$type = \FriendsOfREDAXO\Builder\Config\MediaTypeRegistry::buildVirtualType('starter_cards_16_9', 1200);
 echo rex_media_manager::getUrl($type, $image);
 ```
 
-Externe Addons erweitern Presets über den Extension Point `YFORM_CONTENT_BUILDER_MEDIA_TYPE_PRESETS`.
+Externe Addons erweitern Presets über den Extension Point `BUILDER_MEDIA_TYPE_PRESETS`.
 
 ### ResponsiveImage Helper (Template-API)
 
-Für die Template-Ausgabe kann zusätzlich `KLXM\YFormContentBuilder\Media\ResponsiveImage` verwendet werden.
+Für die Template-Ausgabe kann zusätzlich `FriendsOfREDAXO\Builder\Media\ResponsiveImage` verwendet werden.
 
 - erzeugt zentral `src`, `srcset`, `sizes`
 - unterstützt optional Mobile-Art-Direction (`<picture>/<source>`)
@@ -96,7 +96,7 @@ Wichtig für Schema-Verständnis:
 
 ### Legacy Editor & Migration
 
-For YForm value-based content builders, the following configuration fields control Legacy-HTML handling:
+For YForm value-based builder fields, the following configuration fields control Legacy-HTML handling:
 
 - **`legacy_cke5_enabled`** (choice): Enable legacy HTML editing (fallback if no modern content exists).
 - **`legacy_editor_attributes`** (text): Free attribute string for legacy textarea (e.g., `class="form-control tiny-editor" data-profile="default" rows="14"`). Supports both CKE5 (`cke5-editor` class) and TinyMCE (`tiny-editor` class).
@@ -184,7 +184,7 @@ $headline = $elementData['headline'] ?? '';
 </div>
 ```
 
-## 🏗️ Configuration Architecture (v3.1.0+)
+## 🏗️ Configuration Architecture
 
 ### Config-Klassen (Framework-Abstraktion)
 
@@ -194,7 +194,7 @@ $headline = $elementData['headline'] ?? '';
 Zentralisiert Framework-spezifische CSS-Klassen und Optionen.
 
 ```php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 // Hintergrund-Optionen pro Framework
 FrameworkConfig::getBackgroundChoices('uikit');
@@ -222,7 +222,7 @@ FrameworkConfig::getCssPrefix('bootstrap');
 
 **Registrierbar via Extension Point:**
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', 
+rex_extension::register('BUILDER_FRAMEWORK_OPTIONS', 
     function($ep) {
         if ('custom' === $ep->getParam('framework')) {
             return ['my-option' => 'Custom Option'];
@@ -236,7 +236,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS',
 Verwaltet Editor-Profile pro Element/Feld (TinyMCE vs CKE5).
 
 ```php
-use KLXM\YFormContentBuilder\Config\EditorConfig;
+use FriendsOfREDAXO\Builder\Config\EditorConfig;
 
 // Profil pro Element
 EditorConfig::getEditorProfile('starter_text', 'text');
@@ -253,7 +253,7 @@ EditorConfig::getElementProfiles();
 
 **Registrierbar via Extension Point:**
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_EDITOR_PROFILES',
+rex_extension::register('BUILDER_EDITOR_PROFILES',
     function($ep) {
         if ('my_element' === $ep->getParam('element')) {
             return 'minimal'; // Custom profil
@@ -267,7 +267,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_EDITOR_PROFILES',
 Verwaltet Element-Pfade und Bundled-Elements.
 
 ```php
-use KLXM\YFormContentBuilder\Config\ElementRegistry;
+use FriendsOfREDAXO\Builder\Config\ElementRegistry;
 
 // Alle bundled Elements
 ElementRegistry::getBundledElements();
@@ -296,7 +296,7 @@ ElementRegistry::getElementConfig('starter_text');
 
 **Registrierbar via Extension Point:**
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+rex_extension::register('BUILDER_ELEMENT_PATHS',
     function($ep) {
         $paths = $ep->getSubject() ?? [];
         $paths['my_addon'] = rex_path::addon('my_addon', 'elements/');
@@ -309,7 +309,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
 Framework-Dispatch für Templates.
 
 ```php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 // Template mit Framework
 TemplateEngine::render('wrapper', $data, 'bootstrap');
@@ -332,10 +332,10 @@ TemplateEngine::getAvailableFrameworks();
 
 | Extension Point | Parameter | Return | Zweck |
 |-----------------|-----------|--------|-------|
-| `YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS` | `framework`, `option_type` | `array` \| `string` | Framework-spezifische Optionen |
-| `YFORM_CONTENT_BUILDER_EDITOR_PROFILES` | `element`, `field` | `string` | Editor-Profile pro Element |
-| `YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS` | — | `array` | Bundled Element-Keys |
-| `YFORM_CONTENT_BUILDER_ELEMENT_PATHS` | — | `array` | Pfade zu Element-Verzeichnissen |
+| `BUILDER_FRAMEWORK_OPTIONS` | `framework`, `option_type` | `array` \| `string` | Framework-spezifische Optionen |
+| `BUILDER_EDITOR_PROFILES` | `element`, `field` | `string` | Editor-Profile pro Element |
+| `BUILDER_BUNDLED_ELEMENTS` | — | `array` | Bundled Element-Keys |
+| `BUILDER_ELEMENT_PATHS` | — | `array` | Pfade zu Element-Verzeichnissen |
 
 Hinweise zur Mode-Semantik:
 
@@ -350,9 +350,9 @@ Vollständige Dokumentation der Extension Points: [DEV.md](DEV.md)
 
 If you want to feed this context to an AI, you can copy the following block:
 
-> **YForm Content Builder Context:**
+> **Builder Context:**
 > 1. **Structure**: Elements are folders in `elements/{key}/`.
 > 2. **Config**: `config.php` returns a PHP array defining fields (text, textarea, be_media, repeater, etc.).
 > 3. **Templates**: `templates/bootstrap.php` is the default output. Use `$elementData['fieldname']` to access values.
 > 4. **Schema**: Follow the `element-config.schema.json` for field definitions.
-> 5. **Config Classes (v3.1.0+)**: FrameworkConfig, EditorConfig, ElementRegistry, TemplateEngine for framework-agnostic configuration.
+> 5. **Config Classes**: FrameworkConfig, EditorConfig, ElementRegistry, TemplateEngine for framework-agnostic configuration.

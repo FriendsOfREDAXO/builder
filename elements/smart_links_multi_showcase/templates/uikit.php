@@ -24,8 +24,8 @@ $sectionLight = (bool) ($elementData['section_light'] ?? false);
 $enableSection = !isset($elementData['enable_section']) || !empty($elementData['enable_section']);
 $enableContainer = !isset($elementData['enable_container']) || !empty($elementData['enable_container']);
 
-$smartLinkClass = \KLXM\YFormContentBuilder\SmartLink::class;
-$smartLinkViewClass = \KLXM\YFormContentBuilder\SmartLinkView::class;
+$smartLinkClass = \FriendsOfREDAXO\Builder\SmartLink::class;
+$smartLinkViewClass = \FriendsOfREDAXO\Builder\SmartLinkView::class;
 $links = $smartLinkClass::normalize($rawLinks, true);
 
 if ($links === []) {

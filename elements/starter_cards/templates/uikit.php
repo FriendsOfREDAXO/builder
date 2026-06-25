@@ -1,5 +1,5 @@
 <?php
-use KLXM\YFormContentBuilder\Media\ResponsiveImage;
+use FriendsOfREDAXO\Builder\Media\ResponsiveImage;
 
 $headline    = (string) ($elementData['headline'] ?? '');
 $items       = $elementData['items'] ?? [];
@@ -85,7 +85,7 @@ $gapClass   = $gap === 'collapse' ? '' : 'uk-grid-' . $gap;
         $link      = $resolveLink($item);
         $fallback  = $headline !== '' ? $headline . ' ' . ($index + 1) : 'Karte ' . ($index + 1);
         $imageFile = (string) ($item['image'] ?? '');
-        $imageAlt  = \KLXM\YFormContentBuilder\MediaAltResolver::resolve($imageFile, '', $itemTitle !== '' ? $itemTitle : $fallback);
+        $imageAlt  = \FriendsOfREDAXO\Builder\MediaAltResolver::resolve($imageFile, '', $itemTitle !== '' ? $itemTitle : $fallback);
 
         $imageBuilder = ResponsiveImage::forFile($imageFile)
             ->withDesktopPreset('starter_cards_' . $imageRatio)

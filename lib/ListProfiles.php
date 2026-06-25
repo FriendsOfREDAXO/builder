@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_addon;
 use rex_sql;
@@ -8,7 +8,7 @@ use rex_yform_manager_table;
 use Throwable;
 
 /**
- * YForm-Listen-Profile fuer das yform_content_builder-Addon.
+ * YForm-Listen-Profile fuer das builder-Addon.
  *
  * Profile werden zentral in den Addon-Einstellungen verwaltet
  * (Config-Schluessel `yform_list_profiles`, JSON). Im Element waehlt der
@@ -40,7 +40,7 @@ final class ListProfiles
      */
     public static function getAll(): array
     {
-        $raw = (string) rex_addon::get('yform_content_builder')->getConfig(self::CONFIG_KEY, '');
+        $raw = (string) rex_addon::get('builder')->getConfig(self::CONFIG_KEY, '');
         if ('' === $raw) {
             return [];
         }
@@ -84,7 +84,7 @@ final class ListProfiles
             }
             $clean[$id] = self::normalize($id, $cfg);
         }
-        rex_addon::get('yform_content_builder')->setConfig(
+        rex_addon::get('builder')->setConfig(
             self::CONFIG_KEY,
             json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '',
         );

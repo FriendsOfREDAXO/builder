@@ -6,40 +6,40 @@
  */
 
 // === PHASE 1: Config-Klassen registrieren ===
-require_once rex_path::addon('yform_content_builder', 'lib/config/FrameworkConfig.php');
-require_once rex_path::addon('yform_content_builder', 'lib/config/EditorConfig.php');
-require_once rex_path::addon('yform_content_builder', 'lib/config/ElementRegistry.php');
-require_once rex_path::addon('yform_content_builder', 'lib/config/ElementModeResolver.php');
-require_once rex_path::addon('yform_content_builder', 'lib/config/MediaTypeRegistry.php');
-require_once rex_path::addon('yform_content_builder', 'lib/config/ThemeProviderBridge.php');
-require_once rex_path::addon('yform_content_builder', 'lib/MediaNegotiatorBridge.php');
+require_once rex_path::addon('builder', 'lib/config/FrameworkConfig.php');
+require_once rex_path::addon('builder', 'lib/config/EditorConfig.php');
+require_once rex_path::addon('builder', 'lib/config/ElementRegistry.php');
+require_once rex_path::addon('builder', 'lib/config/ElementModeResolver.php');
+require_once rex_path::addon('builder', 'lib/config/MediaTypeRegistry.php');
+require_once rex_path::addon('builder', 'lib/config/ThemeProviderBridge.php');
+require_once rex_path::addon('builder', 'lib/MediaNegotiatorBridge.php');
 
 // API-Klassen registrieren (namespaced, via rex_api_function::register)
-rex_api_function::register('content_builder', \KLXM\YFormContentBuilder\Api\ContentBuilderApi::class);
-rex_api_function::register('yform_list_columns', \KLXM\YFormContentBuilder\Api\ListColumnsApi::class);
+rex_api_function::register('content_builder', \FriendsOfREDAXO\Builder\Api\ContentBuilderApi::class);
+rex_api_function::register('yform_list_columns', \FriendsOfREDAXO\Builder\Api\ListColumnsApi::class);
 
 if (rex_addon::get('yform')->isAvailable()) {
     rex_extension::register('MEDIA_IS_IN_USE', static function (rex_extension_point $ep) {
-        return \KLXM\YFormContentBuilder\MediaInUse::isMediaInUse($ep);
+        return \FriendsOfREDAXO\Builder\MediaInUse::isMediaInUse($ep);
     });
 }
 
 if (rex_addon::get('media_manager')->isAvailable()) {
     rex_media_manager::addEffect(rex_effect_content_builder::class);
     rex_extension::register('MEDIA_MANAGER_FILTERSET', static function (rex_extension_point $ep): array {
-        return \KLXM\YFormContentBuilder\MediaManagerFilterset::apply($ep);
+        return \FriendsOfREDAXO\Builder\MediaManagerFilterset::apply($ep);
     }, rex_extension::EARLY);
     rex_extension::register('MEDIA_MANAGER_INIT', static function (rex_extension_point $ep): void {
-        \KLXM\YFormContentBuilder\MediaNegotiatorBridge::adjustCachePath($ep);
+        \FriendsOfREDAXO\Builder\MediaNegotiatorBridge::adjustCachePath($ep);
     }, rex_extension::EARLY);
 }
 
 // Theme-Provider Integration: konfiguriertes Backend-Theme anwenden
 if (rex::isBackend()) {
-    $configuredTheme = (string) rex_addon::get('yform_content_builder')->getConfig('theme', '');
+    $configuredTheme = (string) rex_addon::get('builder')->getConfig('theme', '');
     if ($configuredTheme !== '') {
-        \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::resetThemeContext();
-        \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::setTheme($configuredTheme);
+        \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::resetThemeContext();
+        \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::setTheme($configuredTheme);
     }
 }
 
@@ -50,7 +50,7 @@ if (rex::isBackend() && rex_addon::get('focuspoint')->isAvailable()) {
             return $subject;
         }
 
-        $labelMap = rex_addon::get('yform_content_builder')->getConfig('focuspoint_ratio_type_labels', []);
+        $labelMap = rex_addon::get('builder')->getConfig('focuspoint_ratio_type_labels', []);
         if (!is_array($labelMap) || $labelMap === []) {
             return $subject;
         }
@@ -81,12 +81,12 @@ if (rex::isBackend() && rex_addon::get('focuspoint')->isAvailable()) {
 // Extension Points registrieren
 rex_extension::register('PACKAGES_INCLUDED', function() {
     // Templates registrieren
-    rex_yform::addTemplatePath(rex_path::addon('yform_content_builder', 'ytemplates'));
+    rex_yform::addTemplatePath(rex_path::addon('builder', 'ytemplates'));
 });
 
 // Assets für Backend einbinden
 if (rex::isBackend()) {
-    $addon = rex_addon::get('yform_content_builder');
+    $addon = rex_addon::get('builder');
     $assetUrl = static function (string $assetPath) use ($addon): string {
         $url = $addon->getAssetsUrl($assetPath);
         $file = $addon->getAssetsPath($assetPath);
@@ -100,20 +100,31 @@ if (rex::isBackend()) {
         return $url;
     };
 
+    $backendApiUrl = static function (array $params): string {
+        return rex_url::backendController($params, false);
+    };
+
+    if (rex_be_controller::getCurrentPagePart(1) === 'builder') {
+        rex_extension::register('PAGE_TITLE', static function (rex_extension_point $ep) {
+            return '<i class="builder-icon-logo"></i> ' . $ep->getSubject();
+        }, rex_extension::EARLY);
+    }
+
+    rex_view::addCssFile($assetUrl('css/builder-brand.css'));
     rex_view::addCssFile($assetUrl('content-builder.css'));
     rex_view::addCssFile($assetUrl('content-builder-dark.css'));
     rex_view::addCssFile($assetUrl('divider.css'));
     rex_view::addCssFile($assetUrl('cards.css'));
-    rex_view::addCssFile(rex_url::frontendController([
+    rex_view::addCssFile($backendApiUrl([
         'rex-api-call' => 'content_builder',
         'action' => 'get_element_css',
         'framework' => 'uikit',
-    ], false));
-    rex_view::addCssFile(rex_url::frontendController([
+    ]));
+    rex_view::addCssFile($backendApiUrl([
         'rex-api-call' => 'content_builder',
         'action' => 'get_element_css',
         'framework' => 'bootstrap',
-    ], false));
+    ]));
     rex_view::addJsFile($assetUrl('content-builder.js'));
     rex_view::addJsFile($assetUrl('media-browser.js'));
     rex_view::addJsFile($assetUrl('field-widgets.js'));
@@ -125,7 +136,7 @@ if (rex::isBackend()) {
     }
 
     // YForm-Listen-Profile: AJAX-Spaltenlader nur auf der Settings-Subseite laden.
-    if ('yform_content_builder/settings' === rex_be_controller::getCurrentPage()) {
+    if ('builder/settings' === rex_be_controller::getCurrentPage()) {
         rex_view::addJsFile($assetUrl('yform_list_profiles.js'));
         rex_view::setJsProperty('YFL_API_URL', rex_url::backendController([
             'rex-api-call' => 'yform_list_columns',
@@ -135,7 +146,7 @@ if (rex::isBackend()) {
 
 // Assets für Frontend einbinden (CSS für Elemente)
 if (!rex::isBackend()) {
-    rex_view::addCssFile(rex_addon::get('yform_content_builder')->getAssetsUrl('divider.css'));
-    rex_view::addCssFile(rex_addon::get('yform_content_builder')->getAssetsUrl('cards.css'));
+    rex_view::addCssFile(rex_addon::get('builder')->getAssetsUrl('divider.css'));
+    rex_view::addCssFile(rex_addon::get('builder')->getAssetsUrl('cards.css'));
 }
 

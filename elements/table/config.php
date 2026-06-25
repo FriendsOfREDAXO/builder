@@ -3,7 +3,7 @@
  * Table Element - Barrierefreier Tabelleneditor mit CSV-Import.
  */
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 return [
     'label' => 'Tabelle',

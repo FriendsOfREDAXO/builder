@@ -1,6 +1,6 @@
 <?php
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
-use KLXM\YFormContentBuilder\Svg;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Svg;
 
 $elementConfig = StarterConfig::class;
 

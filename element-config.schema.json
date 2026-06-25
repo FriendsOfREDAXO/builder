@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "YForm Content Builder Element Configuration",
-  "description": "Schema for validating YForm Content Builder element configuration files (config.php return arrays)",
+  "title": "Builder Element Configuration",
+  "description": "Schema for validating Builder element configuration files (config.php return arrays)",
   "type": "object",
   "required": [
     "label",

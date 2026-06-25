@@ -12,7 +12,7 @@ if (trim(strip_tags($text)) === '') {
     return;
 }
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 $sectionStyle = StarterConfig::mapBg($sectionBg, 'plain');
 $sectionStyle .= StarterConfig::mapPadding($sectionPadding, 'plain');

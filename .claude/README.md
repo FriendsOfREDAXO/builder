@@ -1,4 +1,4 @@
-# Claude Setup fuer yform_content_builder
+# Claude Setup fuer builder
 
 Dieser Ordner enthaelt projektlokale Agent-Hinweise fuer die Arbeit am Addon.
 

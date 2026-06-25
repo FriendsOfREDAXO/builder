@@ -1,11 +1,11 @@
-# Copilot Instructions fuer yform_content_builder
+# Copilot Instructions für builder
 
 Diese Hinweise gelten nur innerhalb dieses Addons.
 
-## Fokus
+## Fokus (Release 1.0.0)
 
-- REDAXO Addon `yform_content_builder` stabil erweitern.
-- Rueckwaertskompatibilitaet beachten.
+- REDAXO Addon `builder` stabil erweitern.
+- Rückwärtskompatibilität beachten.
 - Konfigurationen und Doku synchron halten.
 
 ## Coding-Regeln

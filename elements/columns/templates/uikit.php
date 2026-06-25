@@ -36,7 +36,7 @@ if (rex::isBackend()) {
         if ($function === 'renderSliceBackend' || 
             $function === 'renderEditorSlice' || 
             $function === 'ajaxRenderSlice' || 
-            ($function === 'renderSlice' && $class === 'KLXM\YFormContentBuilder\Api\ContentBuilderApi') || 
+            ($function === 'renderSlice' && $class === 'FriendsOfREDAXO\Builder\Api\ContentBuilderApi') || 
             strpos($file, 'value.content_builder.tpl.php') !== false) {
             $isBackendEditMode = true;
             break;
@@ -78,7 +78,7 @@ $wrapperClose->setVar('container_width', $containerWidth, false);
 <div class="<?= $rowClass ?>"<?= $rowAttrs ?>>
     <?php for ($i = 0; $i < $numCols; $i++): ?>
         <div class="<?= $classes[$i] ?>">
-            <?= \KLXM\YFormContentBuilder\Helper::renderNestedSlices($columnsData[$i] ?? [], $framework) ?>
+            <?= \FriendsOfREDAXO\Builder\Helper::renderNestedSlices($columnsData[$i] ?? [], $framework) ?>
         </div>
     <?php endfor; ?>
 </div>

@@ -1,6 +1,6 @@
 <?php
 
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 /**
  * Beispiel: Frontend-Ausgabe von Content Builder Slices

@@ -1,0 +1,30 @@
+{
+  "key": "image",
+  "label": "Bild",
+  "icon": "fa-picture-o",
+  "fields": [
+    {
+      "name": "media",
+      "type": "media",
+      "label": "Bilddatei",
+      "default": ""
+    },
+    {
+      "name": "alt",
+      "type": "text",
+      "label": "Alternativtext (Alt-Tag)",
+      "default": ""
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "label": "Ausrichtung",
+      "choices": {
+        "left": "Links",
+        "center": "Zentriert",
+        "right": "Rechts"
+      },
+      "default": "center"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_path;
 use rex_fragment;
@@ -89,12 +89,12 @@ class TemplateEngine
         // Interne Addon-Pfade
         $possiblePaths = [
             // Framework-spezifische Pfade
-            rex_path::addon('yform_content_builder', "elements/{$templateName}/templates/{$framework}.php"),
-            rex_path::addon('yform_content_builder', "fragments/{$framework}/{$templateName}.php"),
+            rex_path::addon('builder', "elements/{$templateName}/templates/{$framework}.php"),
+            rex_path::addon('builder', "fragments/{$framework}/{$templateName}.php"),
             
             // Generic Element-Pfade (ohne Framework-Suffix)
-            rex_path::addon('yform_content_builder', "elements/{$templateName}/template.php"),
-            rex_path::addon('yform_content_builder', "fragments/{$templateName}.php"),
+            rex_path::addon('builder', "elements/{$templateName}/template.php"),
+            rex_path::addon('builder', "fragments/{$templateName}.php"),
         ];
 
         foreach ($possiblePaths as $path) {
@@ -125,7 +125,7 @@ class TemplateEngine
 
     /**
      * Registriert ein Custom-Template-Verzeichnis
-     * Extension Point: YFORM_CONTENT_BUILDER_TEMPLATE_PATHS
+     * Extension Point: BUILDER_TEMPLATE_PATHS
      *
      * @param string $framework Framework-Name
      * @param string $path Verzeichnispfad

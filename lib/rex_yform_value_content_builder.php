@@ -1,10 +1,10 @@
 <?php
 
-use KLXM\YFormContentBuilder\Helper;
-use KLXM\YFormContentBuilder\ModalHelper;
-use KLXM\YFormContentBuilder\Config\ElementModeResolver;
-use KLXM\YFormContentBuilder\Config\ThemeProviderBridge;
-use KLXM\YFormContentBuilder\Starter\StarterConfig as Config;
+use FriendsOfREDAXO\Builder\Helper;
+use FriendsOfREDAXO\Builder\ModalHelper;
+use FriendsOfREDAXO\Builder\Config\ElementModeResolver;
+use FriendsOfREDAXO\Builder\Config\ThemeProviderBridge;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig as Config;
 
 /**
  * YForm Content Builder Field
@@ -75,7 +75,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
 
     private function applyThemeContext(): void
     {
-        $addon = rex_addon::get('yform_content_builder');
+        $addon = rex_addon::get('builder');
 
         $tableTheme = $this->resolveThemeForCurrentTable($addon);
         $fallbackTheme = trim((string) $addon->getConfig('theme', ''));
@@ -512,7 +512,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                     if ($isImage && file_exists($mediaPath)) {
                         $mediaUrl = rex_url::media($value);
                         if (rex_addon::get('media_manager')->isAvailable()) {
-                            $mediaUrl = rex_media_manager::getUrl('yform_content_builder_preview', $value);
+                            $mediaUrl = rex_media_manager::getUrl('builder_preview', $value);
                         }
                         echo '<div class="cb-media-preview-item">';
                         echo '<div class="cb-media-container">';
@@ -1132,7 +1132,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             $elementDefaultsJson = '{}';
         }
         
-        $addon = rex_addon::get('yform_content_builder');
+        $addon = rex_addon::get('builder');
         
         return [
             'value' => $value,
@@ -1478,13 +1478,13 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
      */
     protected function getAllElementsForDefinition(): array
     {
-        $addon = rex_addon::get('yform_content_builder');
+        $addon = rex_addon::get('builder');
         $enableDemoElements = (bool) $addon->getConfig('enable_demo_elements', true);
         $bundledDemoKeys = array_flip(Config::getBundledDemoElementKeys());
         $elements = [];
         $customPaths = ElementModeResolver::getCustomPaths();
         
-        // Replace ist nur das Signal, die mitgelieferten yform_content_builder-Elemente
+        // Replace ist nur das Signal, die mitgelieferten builder-Elemente
         // nicht zu laden. Externe AddOn-/Projekt-Elemente bleiben immer verfügbar.
         $demoPath = $addon->getPath('elements/');
         if (ElementModeResolver::shouldLoadBundledElements() && is_dir($demoPath)) {
@@ -1696,7 +1696,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         }
 
         $customPaths = rex_extension::registerPoint(new rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             ['']
         ));
 
@@ -1718,13 +1718,13 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             }
         }
 
-        $dataPath = rex_addon::get('yform_content_builder')->getDataPath('elements/' . $elementType);
+        $dataPath = rex_addon::get('builder')->getDataPath('elements/' . $elementType);
         if (is_dir($dataPath)) {
             return $dataPath;
         }
         
         // Fallback: Original Pfad
-        $addonPath = rex_addon::get('yform_content_builder')->getPath('elements/' . $elementType);
+        $addonPath = rex_addon::get('builder')->getPath('elements/' . $elementType);
         return is_dir($addonPath) ? $addonPath : null;
     }
 

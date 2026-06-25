@@ -3898,7 +3898,7 @@
                 var mediaUrl = '/media/' + mediaFile;
                 // Versuche Media Manager URL wenn verfügbar
                 if (typeof rex !== 'undefined' && rex.media_manager) {
-                    mediaUrl = rex.media_manager.getUrl('yform_content_builder_preview', mediaFile);
+                    mediaUrl = rex.media_manager.getUrl('builder_preview', mediaFile);
                 }
                 html = '<div class="cb-media-preview-item">';
                 html += '<div class="cb-media-container">';

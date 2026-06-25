@@ -1,8 +1,8 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 use rex_extension_point;
 
 class MediaManagerFilterset
@@ -18,7 +18,7 @@ class MediaManagerFilterset
 
         $aliasMap = [
             'content_slideshow' => ['preset' => 'section_background', 'width' => 1920],
-            'yform_content_builder_preview' => ['preset' => 'backend_preview', 'width' => 800],
+            'builder_preview' => ['preset' => 'backend_preview', 'width' => 800],
         ];
         if (isset($aliasMap[$mediaType])) {
             $parsed = $aliasMap[$mediaType];
@@ -56,7 +56,7 @@ class MediaManagerFilterset
      */
     private static function getOptionalEffects(): array
     {
-        if (!\KLXM\YFormContentBuilder\MediaNegotiatorBridge::isEnabled() || !class_exists('rex_effect_negotiator')) {
+        if (!\FriendsOfREDAXO\Builder\MediaNegotiatorBridge::isEnabled() || !class_exists('rex_effect_negotiator')) {
             return [];
         }
 

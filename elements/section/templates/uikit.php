@@ -8,7 +8,7 @@
 // Theme Override: Falls gesetzt, Theme-Provider Kontext anpassen
 $themeOverride = $elementData['theme_override'] ?? '';
 if (!empty($themeOverride)) {
-    \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::setTheme((string) $themeOverride);
+    \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::setTheme((string) $themeOverride);
 }
 
 $label = $elementData['label'] ?? '';

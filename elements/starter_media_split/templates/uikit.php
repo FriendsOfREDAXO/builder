@@ -20,7 +20,7 @@ if ($headline === '' && trim(strip_tags($text)) === '' && $mediaFile === '') {
 $ext = strtolower((string) pathinfo($mediaFile, PATHINFO_EXTENSION));
 $isVideo = in_array($ext, ['mp4', 'webm', 'ogg'], true);
 
-$mediaLabel = \KLXM\YFormContentBuilder\MediaAltResolver::resolve($mediaFile, $mediaAlt, $headline);
+$mediaLabel = \FriendsOfREDAXO\Builder\MediaAltResolver::resolve($mediaFile, $mediaAlt, $headline);
 
 $wrapper = new rex_fragment();
 $wrapper->setVar('enable_section', $enableSection, false);

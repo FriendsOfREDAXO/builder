@@ -1,10 +1,10 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Starter;
+namespace FriendsOfREDAXO\Builder\Starter;
 
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
-use KLXM\YFormContentBuilder\Config\ElementRegistry;
-use KLXM\YFormContentBuilder\Config\ThemeProviderBridge;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\ElementRegistry;
+use FriendsOfREDAXO\Builder\Config\ThemeProviderBridge;
 
 /**
  * Konfigurationshelfer ausschließlich für die mitgelieferten Starter/Demo-Elemente.

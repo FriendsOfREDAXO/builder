@@ -1,8 +1,8 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
-use KLXM\YFormContentBuilder\SmartLink;
+use FriendsOfREDAXO\Builder\SmartLink;
 use rex_escape;
 use rex_media;
 use rex_sql;
@@ -86,7 +86,7 @@ class SmartLinkField extends FieldAbstract
         echo '</div>';
 
         if ($multiple) {
-            echo '<button type="button" class="btn btn-default btn-sm cb-smart-link-add"><i class="fa fa-plus"></i> ' . $this->t('yform_content_builder_smart_link_add_link', 'Link hinzufügen') . '</button>';
+            echo '<button type="button" class="btn btn-default btn-sm cb-smart-link-add"><i class="fa fa-plus"></i> ' . $this->t('builder_smart_link_add_link', 'Link hinzufügen') . '</button>';
         }
 
         echo '</div>';
@@ -158,16 +158,16 @@ class SmartLinkField extends FieldAbstract
 
         echo '<div class="row cb-smart-link-main-row">';
         echo '<div class="col-md-2 col-sm-3">';
-        echo '<label>' . $this->t('yform_content_builder_smart_link_type_label', 'Typ') . '</label>';
+        echo '<label>' . $this->t('builder_smart_link_type_label', 'Typ') . '</label>';
         echo '<select class="form-control cb-smart-link-select cb-smart-link-type">';
 
         $allTypes = [
-            'auto' => $this->t('yform_content_builder_smart_link_type_auto', 'Auto'),
-            'url' => $this->t('yform_content_builder_smart_link_type_url', 'URL'),
-            'intern' => $this->t('yform_content_builder_smart_link_type_intern', 'Intern'),
-            'media' => $this->t('yform_content_builder_smart_link_type_media', 'Media'),
-            'tel' => $this->t('yform_content_builder_smart_link_type_tel', 'Telefon'),
-            'mail' => $this->t('yform_content_builder_smart_link_type_mail', 'E-Mail'),
+            'auto' => $this->t('builder_smart_link_type_auto', 'Auto'),
+            'url' => $this->t('builder_smart_link_type_url', 'URL'),
+            'intern' => $this->t('builder_smart_link_type_intern', 'Intern'),
+            'media' => $this->t('builder_smart_link_type_media', 'Media'),
+            'tel' => $this->t('builder_smart_link_type_tel', 'Telefon'),
+            'mail' => $this->t('builder_smart_link_type_mail', 'E-Mail'),
             'yform' => 'YForm',
         ];
 
@@ -183,13 +183,13 @@ class SmartLinkField extends FieldAbstract
         echo '</div>';
 
         echo '<div class="col-md-6 col-sm-5">';
-    echo '<label>' . $this->t('yform_content_builder_smart_link_target_label', 'Ziel') . '</label>';
+    echo '<label>' . $this->t('builder_smart_link_target_label', 'Ziel') . '</label>';
         echo $widgetHtml;
         echo '<div class="cb-smart-link-preview text-muted small">' . $preview . '</div>';
         echo '</div>';
 
         echo '<div class="col-md-4 col-sm-4">';
-    echo '<label>' . $this->t('yform_content_builder_smart_link_custom_label', 'Label (optional)') . '</label>';
+    echo '<label>' . $this->t('builder_smart_link_custom_label', 'Label (optional)') . '</label>';
         echo '<input type="text" class="form-control cb-smart-link-input cb-smart-link-label" value="' . rex_escape($label) . '">';
         echo '</div>';
         echo '</div>';
@@ -202,32 +202,32 @@ class SmartLinkField extends FieldAbstract
             if ($yformStatus === 'unconfigured') {
                 echo '<div class="alert alert-info cb-smart-link-yform-info" style="margin:6px 0 0;padding:8px 12px;font-size:12px;">';
                 echo '<i class="fa fa-info-circle"></i> ';
-                echo '<strong>' . $this->t('yform_content_builder_smart_link_yform_dataset_label', 'YForm-Datensatz:') . '</strong> ';
-                echo $this->t('yform_content_builder_smart_link_yform_unconfigured', 'Kein Typ konfiguriert. Demo-Modus - konfigurieren Sie yform_table und yform_field im Element.');
+                echo '<strong>' . $this->t('builder_smart_link_yform_dataset_label', 'YForm-Datensatz:') . '</strong> ';
+                echo $this->t('builder_smart_link_yform_unconfigured', 'Kein Typ konfiguriert. Demo-Modus - konfigurieren Sie yform_table und yform_field im Element.');
                 echo '</div>';
             } elseif (str_starts_with($yformStatus, 'missing:')) {
                 $missingTable = rex_escape(substr($yformStatus, 8));
                 echo '<div class="alert alert-warning cb-smart-link-yform-info" style="margin:6px 0 0;padding:8px 12px;font-size:12px;">';
                 echo '<i class="fa fa-exclamation-triangle"></i> ';
-                echo $this->t('yform_content_builder_smart_link_yform_missing_prefix', 'Tabelle') . ' <code>' . $missingTable . '</code> ' . $this->t('yform_content_builder_smart_link_yform_missing_suffix', 'nicht gefunden. Bitte yform_table im Element konfigurieren oder die Tabelle in YForm anlegen.');
+                echo $this->t('builder_smart_link_yform_missing_prefix', 'Tabelle') . ' <code>' . $missingTable . '</code> ' . $this->t('builder_smart_link_yform_missing_suffix', 'nicht gefunden. Bitte yform_table im Element konfigurieren oder die Tabelle in YForm anlegen.');
                 echo '</div>';
             } elseif (str_starts_with($yformStatus, 'error:')) {
                 $errTable = rex_escape(substr($yformStatus, 6));
                 echo '<div class="alert alert-danger cb-smart-link-yform-info" style="margin:6px 0 0;padding:8px 12px;font-size:12px;">';
-                echo '<i class="fa fa-times-circle"></i> ' . $this->t('yform_content_builder_smart_link_yform_error_prefix', 'Fehler beim Laden der Tabelle') . ' <code>' . $errTable . '</code>.';
+                echo '<i class="fa fa-times-circle"></i> ' . $this->t('builder_smart_link_yform_error_prefix', 'Fehler beim Laden der Tabelle') . ' <code>' . $errTable . '</code>.';
                 echo '</div>';
             } elseif ($yformStatus === 'noyform') {
                 echo '<div class="alert alert-warning cb-smart-link-yform-info" style="margin:6px 0 0;padding:8px 12px;font-size:12px;">';
-                echo '<i class="fa fa-exclamation-triangle"></i> ' . $this->t('yform_content_builder_smart_link_yform_addon_missing', 'YForm-Addon nicht verfügbar.');
+                echo '<i class="fa fa-exclamation-triangle"></i> ' . $this->t('builder_smart_link_yform_addon_missing', 'YForm-Addon nicht verfügbar.');
                 echo '</div>';
             } else {
-                echo '<label>' . $this->t('yform_content_builder_smart_link_yform_entry_label', 'YForm-Eintrag');
+                echo '<label>' . $this->t('builder_smart_link_yform_entry_label', 'YForm-Eintrag');
                 if ($yformTable !== '') {
                     echo ' <small class="text-muted">(' . rex_escape($yformTable) . '.' . rex_escape($yformField) . ')</small>';
                 }
                 echo '</label>';
                 echo '<select class="form-control cb-smart-link-select cb-smart-link-yform">';
-                echo '<option value="">' . $this->t('yform_content_builder_smart_link_yform_select', '-- auswählen --') . '</option>';
+                echo '<option value="">' . $this->t('builder_smart_link_yform_select', '-- auswählen --') . '</option>';
                 foreach ($yformChoices as $choiceValue => $choiceLabel) {
                     $choiceId = (string) $choiceValue;
                     $tableAlias = $this->normalizeYformTableName($yformTable);
@@ -250,10 +250,10 @@ class SmartLinkField extends FieldAbstract
 
         echo '<div class="col-sm-5">';
         echo '<div class="cb-smart-link-toolbar">';
-        echo '<label class="cb-smart-link-pdfjs-label"><input type="checkbox" class="cb-smart-link-pdfjs" value="1"' . ($pdfjs ? ' checked' : '') . '> ' . $this->t('yform_content_builder_smart_link_pdfjs_label', 'PDF.js Lightbox') . '</label>';
-        echo '<div class="btn-group btn-group-sm cb-smart-link-actions" role="group" aria-label="' . $this->t('yform_content_builder_smart_link_actions_aria', 'Smart-Link Aktionen') . '">';
-        echo '<button type="button" class="btn btn-default cb-smart-link-btn cb-smart-link-btn-secondary cb-smart-link-detect" title="' . $this->t('yform_content_builder_smart_link_detect_title', 'Typ automatisch erkennen') . '"><i class="fa fa-magic"></i></button>';
-        echo '<button type="button" class="btn btn-danger cb-smart-link-btn cb-smart-link-btn-danger cb-smart-link-remove" title="' . $this->t('yform_content_builder_smart_link_remove_title', 'Link entfernen') . '"><i class="fa fa-trash"></i></button>';
+        echo '<label class="cb-smart-link-pdfjs-label"><input type="checkbox" class="cb-smart-link-pdfjs" value="1"' . ($pdfjs ? ' checked' : '') . '> ' . $this->t('builder_smart_link_pdfjs_label', 'PDF.js Lightbox') . '</label>';
+        echo '<div class="btn-group btn-group-sm cb-smart-link-actions" role="group" aria-label="' . $this->t('builder_smart_link_actions_aria', 'Smart-Link Aktionen') . '">';
+        echo '<button type="button" class="btn btn-default cb-smart-link-btn cb-smart-link-btn-secondary cb-smart-link-detect" title="' . $this->t('builder_smart_link_detect_title', 'Typ automatisch erkennen') . '"><i class="fa fa-magic"></i></button>';
+        echo '<button type="button" class="btn btn-danger cb-smart-link-btn cb-smart-link-btn-danger cb-smart-link-remove" title="' . $this->t('builder_smart_link_remove_title', 'Link entfernen') . '"><i class="fa fa-trash"></i></button>';
         echo '</div>';
         echo '</div>';
         echo '</div>';
@@ -281,7 +281,7 @@ class SmartLinkField extends FieldAbstract
         $html = '<div class="custom-link cb-smart-link-target-wrap" data-link-widget-id="' . rex_escape($widgetId) . '" data-clang="' . rex_escape($clang) . '" data-extern-link-prefix="https://">';
         $html .= '<input class="form-control cb-smart-link-input cb-smart-link-target-display" type="text" id="REX_LINK_' . rex_escape($widgetId) . '_NAME" value="' . rex_escape($display) . '" readonly="readonly">';
         $html .= '<input type="hidden" class="cb-smart-link-target" name="' . rex_escape($fieldName) . '" id="REX_LINK_' . rex_escape($widgetId) . '" value="' . rex_escape($value) . '">';
-        $html .= '<div class="btn-group btn-group-sm cb-smart-link-target-actions" role="group" aria-label="' . $this->t('yform_content_builder_smart_link_target_actions_aria', 'Smart-Link Zielauswahl') . '">';
+        $html .= '<div class="btn-group btn-group-sm cb-smart-link-target-actions" role="group" aria-label="' . $this->t('builder_smart_link_target_actions_aria', 'Smart-Link Zielauswahl') . '">';
 
         if (in_array('intern', $allowedTypes, true) || in_array('auto', $allowedTypes, true)) {
             $html .= '<a href="#" class="btn btn-popup cb-smart-link-btn cb-smart-link-btn-picker intern_link" title="' . rex_escape(\rex_i18n::msg('var_link_open')) . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>';

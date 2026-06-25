@@ -1,6 +1,6 @@
 <?php
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
 $headline    = (string) ($elementData['headline'] ?? '');
 $items       = $elementData['items'] ?? [];
@@ -112,7 +112,7 @@ $resolveImage = static function (string $image, string $ratio): array {
             $itemText  = (string) ($item['text'] ?? '');
             $link      = $resolveLink($item);
             $fallback  = $headline !== '' ? $headline . ' ' . ($index + 1) : 'Karte ' . ($index + 1);
-            $imageAlt  = \KLXM\YFormContentBuilder\MediaAltResolver::resolve((string) ($item['image'] ?? ''), '', $itemTitle !== '' ? $itemTitle : $fallback);
+            $imageAlt  = \FriendsOfREDAXO\Builder\MediaAltResolver::resolve((string) ($item['image'] ?? ''), '', $itemTitle !== '' ? $itemTitle : $fallback);
             $imageInfo = $resolveImage((string) ($item['image'] ?? ''), $imageRatio);
             $imageInfoMobile = $mobileArtDirectionActive
                 ? $resolveImage((string) ($item['image'] ?? ''), $imageRatioMobile)

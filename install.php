@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Install-Script für YForm Content Builder
+ * Install-Script für Builder
  */
 
 if (!rex_addon::get('yform')->isInstalled()) {
@@ -14,8 +14,8 @@ if (!rex_addon::get('focuspoint')->isInstalled()) {
 
 if (rex_addon::get('media_manager')->isAvailable()) {
     rex_media_manager::addEffect(rex_effect_content_builder::class);
-    $mm = \KLXM\YFormContentBuilder\MediaManagerHelper::factory();
-    $mm->addType('content_builder', 'YForm Content Builder: zentraler Medientyp für cb_* Ableitungen');
+    $mm = \FriendsOfREDAXO\Builder\MediaManagerHelper::factory();
+    $mm->addType('content_builder', 'Builder: zentraler Medientyp für cb_* Ableitungen');
     $mm->addEffect('content_builder', 'content_builder', [
         'preset' => 'starter_cards_16_9',
         'ratio' => '16_9',

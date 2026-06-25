@@ -1,11 +1,11 @@
 <?php
 
 /**
- * YForm Content Builder - Modul-Generator
- * Erstelle automatisch REDAXO-Module für deine Content Builder Elemente
+ * Builder - Modul-Generator
+ * Erstelle automatisch REDAXO-Module für deine Builder-Elemente
  */
 
-$addon = rex_addon::get('yform_content_builder');
+$addon = rex_addon::get('builder');
 
 /**
  * Liefert den Config-Pfad für einen Element-Key über alle registrierten Element-Pfade.
@@ -17,7 +17,7 @@ function resolveElementConfigPath(string $elementKey): ?string
         return null;
     }
 
-    $paths = \KLXM\YFormContentBuilder\Config\ElementRegistry::getElementPaths();
+    $paths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
     foreach ($paths as $basePath) {
         $configPath = rtrim((string) $basePath, '/') . '/' . $elementKey . '/config.php';
         if (is_file($configPath)) {
@@ -33,7 +33,7 @@ function resolveElementConfigPath(string $elementKey): ?string
  */
 function loadElementLanguageDirectories(): void
 {
-    $paths = \KLXM\YFormContentBuilder\Config\ElementRegistry::getElementPaths();
+    $paths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
     foreach ($paths as $basePath) {
         $basePath = rtrim((string) $basePath, '/');
         if (!is_dir($basePath)) {
@@ -75,7 +75,7 @@ function generateModuleCode(string $elementKey, string $framework, int $valueId 
     
     $code = <<<PHP
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 /**
  * Modul: {$label}
  * Element: {$elementKey}
@@ -113,7 +113,7 @@ function generateFullBuilderInputCode(string $framework, int $valueId, array $al
 
     return <<<PHP
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 /**
  * Modul: Full Builder
  * Typ: Full Builder
@@ -125,8 +125,8 @@ use KLXM\YFormContentBuilder\Module;
 
 \$builder = Module::createWithValue({$valueId}, null, [
     'framework' => '{$framework}',
-    'label' => rex_i18n::msg('yform_content_builder_title'),
-    'description' => rex_i18n::msg('yform_content_builder_intro'),
+    'label' => rex_i18n::msg('builder_title'),
+    'description' => rex_i18n::msg('builder_intro'),
     'allowed_elements' => {$allowedElementsCode},
 ]);
 
@@ -144,7 +144,7 @@ function generateFullBuilderOutputCode(string $framework, int $valueId, array $a
 
     return <<<PHP
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 
 
@@ -178,7 +178,7 @@ if (rex_post('update_all_modules', 'bool')) {
     $valueId = rex_post('value_id', 'int', 1);
     $selectedElements = rex_post('elements', 'array', []);
     $fullModuleKey = trim(rex_post('full_module_key', 'string', 'yfcb_builder'));
-    $fullModuleName = trim(rex_post('full_module_name', 'string', 'Content Builder'));
+    $fullModuleName = trim(rex_post('full_module_name', 'string', 'Builder'));
     if ($valueId < 1 || $valueId > 20) {
         $valueId = 1;
     }
@@ -192,7 +192,7 @@ if (rex_post('update_all_modules', 'bool')) {
     }
 
     if ($fullModuleName === '') {
-        $fullModuleName = 'Content Builder';
+        $fullModuleName = 'Builder';
     }
 
     $updatedModules = [];
@@ -244,7 +244,7 @@ if (rex_post('update_all_modules', 'bool')) {
                 $inputCode = generateModuleCode($elementKey, $framework, $valueId);
                 $outputCode = <<<PHP
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 \$rawValue = 'REX_VALUE[id={$valueId} output=html]';
 try {
     \$slice = \$this->getCurrentSlice();
@@ -296,7 +296,7 @@ if (rex_post('create_modules', 'bool')) {
     $framework = rex_post('framework', 'string', 'uikit');
     $valueId = rex_post('value_id', 'int', 1);
     $fullModuleKey = trim(rex_post('full_module_key', 'string', 'yfcb_builder'));
-    $fullModuleName = trim(rex_post('full_module_name', 'string', 'Content Builder'));
+    $fullModuleName = trim(rex_post('full_module_name', 'string', 'Builder'));
     if ($valueId < 1 || $valueId > 20) {
         $valueId = 1;
     }
@@ -310,7 +310,7 @@ if (rex_post('create_modules', 'bool')) {
     }
 
     if ($fullModuleName === '') {
-        $fullModuleName = 'Content Builder';
+        $fullModuleName = 'Builder';
     }
     
     if ($moduleMode === 'full') {
@@ -369,7 +369,7 @@ if (rex_post('create_modules', 'bool')) {
             
             $outputCode = <<<PHP
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 \$rawValue = 'REX_VALUE[id={$valueId} output=html]';
 try {
     \$slice = \$this->getCurrentSlice();
@@ -438,8 +438,8 @@ PHP;
 $elements = [];
 $elementsByCategory = [];
 $elementSourceMeta = [];
-$elementPaths = \KLXM\YFormContentBuilder\Config\ElementRegistry::getElementPaths();
-$coreElementsPath = realpath(rex_path::addon('yform_content_builder', 'elements')) ?: '';
+$elementPaths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
+$coreElementsPath = realpath(rex_path::addon('builder', 'elements')) ?: '';
 foreach ($elementPaths as $pathKey => $basePath) {
     $basePath = rtrim((string) $basePath, '/');
     if (!is_dir($basePath)) {
@@ -538,7 +538,7 @@ $content .= '<div class="row">';
 $content .= '<div class="col-sm-6">';
 $content .= '<div class="form-group">';
 $content .= '<label for="full_module_name"><strong>Full-Builder Modulname</strong></label>';
-$content .= '<input class="form-control" id="full_module_name" name="full_module_name" value="Content Builder">';
+$content .= '<input class="form-control" id="full_module_name" name="full_module_name" value="Builder">';
 $content .= '</div>';
 $content .= '</div>';
 $content .= '<div class="col-sm-6">';
@@ -576,7 +576,7 @@ $content .= '</div>';
 $content .= '<div class="form-group">';
 $content .= '<label><strong>Elemente auswählen</strong></label>';
 $content .= '<p class="help-block">Im Einzelmodus werden dafür einzelne REDAXO-Module erzeugt. Im Full-Builder-Modus dient die Auswahl als erlaubte Elementliste.</p>';
-$content .= '<p class="help-block"><span class="label label-success">intern</span> aus yform_content_builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
+$content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
 $content .= '<div style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; max-height: 400px; overflow-y: auto; background: #f9f9f9;">';
 
 if (empty($elements)) {

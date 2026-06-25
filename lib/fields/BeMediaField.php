@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_addon;
 use rex_escape;
@@ -8,7 +8,7 @@ use rex_i18n;
 use rex_media_manager;
 use rex_path;
 use rex_url;
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 /**
  * REDAXO Backend Media Widget
@@ -103,7 +103,7 @@ class BeMediaField extends FieldAbstract
         if ($isImage && file_exists($mediaPath)) {
             $mediaUrl = rex_url::media($value);
             if (rex_addon::get('media_manager')->isAvailable()) {
-                $mediaUrl = rex_media_manager::getUrl('yform_content_builder_preview', $value);
+                $mediaUrl = rex_media_manager::getUrl('builder_preview', $value);
             }
             echo '<div class="cb-media-preview-item">';
             echo '<div class="cb-media-container">';

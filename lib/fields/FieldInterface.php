@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 /**
  * Interface für Content Builder Feldtypen

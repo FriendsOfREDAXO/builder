@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_escape;
 
@@ -59,17 +59,17 @@ class RichHeadlineField extends FieldAbstract
         echo '<div class="row" style="margin-left:-5px;margin-right:-5px;">';
 
         echo '<div class="col-sm-3" style="padding-left:5px;padding-right:5px;">';
-        echo '<label for="' . rex_escape($id . '_eyebrow') . '">' . rex_escape($this->t('yform_content_builder_rich_headline_eyebrow_label', 'Eyebrow')) . '</label>';
-        echo '<input id="' . rex_escape($id . '_eyebrow') . '" type="text" class="form-control" name="' . $baseName . '[eyebrow]" value="' . rex_escape((string) $data['eyebrow']) . '" placeholder="' . rex_escape($this->t('yform_content_builder_rich_headline_eyebrow_placeholder', 'z. B. Kategorie')) . '">';
+        echo '<label for="' . rex_escape($id . '_eyebrow') . '">' . rex_escape($this->t('builder_rich_headline_eyebrow_label', 'Eyebrow')) . '</label>';
+        echo '<input id="' . rex_escape($id . '_eyebrow') . '" type="text" class="form-control" name="' . $baseName . '[eyebrow]" value="' . rex_escape((string) $data['eyebrow']) . '" placeholder="' . rex_escape($this->t('builder_rich_headline_eyebrow_placeholder', 'z. B. Kategorie')) . '">';
         echo '</div>';
 
         echo '<div class="col-sm-5" style="padding-left:5px;padding-right:5px;">';
-        echo '<label for="' . rex_escape($id . '_text') . '">' . rex_escape($this->t('yform_content_builder_rich_headline_text_label', 'Ueberschrift')) . '</label>';
+        echo '<label for="' . rex_escape($id . '_text') . '">' . rex_escape($this->t('builder_rich_headline_text_label', 'Ueberschrift')) . '</label>';
         echo '<input id="' . rex_escape($id . '_text') . '" type="text" class="form-control" name="' . $baseName . '[text]" value="' . rex_escape((string) $data['text']) . '" required>';
         echo '</div>';
 
         echo '<div class="col-sm-4" style="padding-left:5px;padding-right:5px;">';
-        echo '<label for="' . rex_escape($id . '_tag') . '">' . rex_escape($this->t('yform_content_builder_rich_headline_tag_label', 'Tag')) . '</label>';
+        echo '<label for="' . rex_escape($id . '_tag') . '">' . rex_escape($this->t('builder_rich_headline_tag_label', 'Tag')) . '</label>';
         echo '<select id="' . rex_escape($id . '_tag') . '" class="form-control" name="' . $baseName . '[tag]">';
         foreach ($allowedTags as $tag) {
             $selected = $data['tag'] === $tag ? ' selected' : '';
@@ -82,17 +82,17 @@ class RichHeadlineField extends FieldAbstract
         echo '<div class="row" style="margin-top:8px;margin-left:-5px;margin-right:-5px;">';
 
         echo '<div class="col-sm-6" style="padding-left:5px;padding-right:5px;">';
-        echo '<label for="' . rex_escape($id . '_highlight') . '">' . rex_escape($this->t('yform_content_builder_rich_headline_highlight_label', 'Highlight-Teil (optional)')) . '</label>';
-        echo '<input id="' . rex_escape($id . '_highlight') . '" type="text" class="form-control" name="' . $baseName . '[highlight]" value="' . rex_escape((string) $data['highlight']) . '" placeholder="' . rex_escape($this->t('yform_content_builder_rich_headline_highlight_placeholder', 'Wort in der Ueberschrift markieren')) . '">';
+        echo '<label for="' . rex_escape($id . '_highlight') . '">' . rex_escape($this->t('builder_rich_headline_highlight_label', 'Highlight-Teil (optional)')) . '</label>';
+        echo '<input id="' . rex_escape($id . '_highlight') . '" type="text" class="form-control" name="' . $baseName . '[highlight]" value="' . rex_escape((string) $data['highlight']) . '" placeholder="' . rex_escape($this->t('builder_rich_headline_highlight_placeholder', 'Wort in der Ueberschrift markieren')) . '">';
         echo '</div>';
 
         echo '<div class="col-sm-6" style="padding-left:5px;padding-right:5px;">';
-        echo '<label for="' . rex_escape($id . '_subline') . '">' . rex_escape($this->t('yform_content_builder_rich_headline_subline_label', 'Subline (optional)')) . '</label>';
+        echo '<label for="' . rex_escape($id . '_subline') . '">' . rex_escape($this->t('builder_rich_headline_subline_label', 'Subline (optional)')) . '</label>';
         echo '<input id="' . rex_escape($id . '_subline') . '" type="text" class="form-control" name="' . $baseName . '[subline]" value="' . rex_escape((string) $data['subline']) . '">';
         echo '</div>';
 
         echo '</div>';
-        echo '<p id="' . rex_escape($id . '_help') . '" class="help-block" style="margin-top:8px;">' . rex_escape($this->t('yform_content_builder_rich_headline_help', 'H1 nur einmal pro Seite verwenden und die Reihenfolge H1 bis H6 sauber einhalten.')) . '</p>';
+        echo '<p id="' . rex_escape($id . '_help') . '" class="help-block" style="margin-top:8px;">' . rex_escape($this->t('builder_rich_headline_help', 'H1 nur einmal pro Seite verwenden und die Reihenfolge H1 bis H6 sauber einhalten.')) . '</p>';
         echo '</fieldset>';
 
         $this->closeFormGroup($notice);

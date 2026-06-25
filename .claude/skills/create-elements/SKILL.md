@@ -1,6 +1,6 @@
 ---
 name: create-elements
-description: Verbindliche Regeln und Schrittfolge zum Erstellen neuer yform_content_builder Elemente.
+description: Verbindliche Regeln und Schrittfolge zum Erstellen neuer builder Elemente.
 ---
 
 # Skill: Elemente erstellen

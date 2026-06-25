@@ -1,5 +1,5 @@
-package: yform_content_builder
-version: '3.2.1'
+package: builder
+version: '1.0.0'
 author: 'Friends of REDAXO'
 supportpage: 'https://klxm.de'
 license: MIT
@@ -13,31 +13,31 @@ requires:
         version: '^8.1'
 
 page:
-    title: 'translate:yform_content_builder_title'
-    icon: rex-icon fa-puzzle-piece
+    title: 'Builder'
+    icon: builder-icon-logo
     perm: admin
     subpages:
         main:
-            title: 'translate:yform_content_builder_overview'
+            title: 'translate:builder_overview'
             icon: rex-icon fa-info-circle
         modules:
-            title: 'translate:yform_content_builder_modules'
+            title: 'translate:builder_modules'
             icon: rex-icon fa-code
         media_types_preview:
-            title: 'translate:yform_content_builder_media_types_preview'
+            title: 'translate:builder_media_types_preview'
             icon: rex-icon fa-image
         settings:
-            title: 'translate:yform_content_builder_settings'
+            title: 'translate:builder_settings'
             icon: rex-icon fa-cog
         docs:
-            title: 'translate:yform_content_builder_docs'
+            title: 'translate:builder_docs'
             icon: rex-icon fa-book
         dev:
-            title: 'translate:yform_content_builder_dev'
+            title: 'translate:builder_dev'
             icon: rex-icon fa-code
         api:
-            title: 'translate:yform_content_builder_api'
+            title: 'translate:builder_api'
             icon: rex-icon fa-code-fork
         tutorial:
-            title: 'translate:yform_content_builder_tutorial'
+            title: 'translate:builder_tutorial'
             icon: rex-icon fa-graduation-cap

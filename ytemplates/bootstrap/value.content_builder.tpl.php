@@ -28,7 +28,7 @@ if ($required) {
 }
 
 // Kompaktmodus aus Addon-Config laden
-$addon = rex_addon::get('yform_content_builder');
+$addon = rex_addon::get('builder');
 if ($addon->getConfig('compact_mode')) {
     $fieldClass .= ' compact-mode';
 }
@@ -136,7 +136,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
 
     <?php if (!$legacy_is_active): ?>
         <div class="alert alert-info yform-cb-start-separator" style="margin-bottom: 12px; border-left: 4px solid #1b809e;">
-            <strong><i class="fa fa-cubes" aria-hidden="true"></i> Content-Builder-Bereich</strong><br>
+            <strong class="yform-cb-start-separator__title"><i class="builder-icon-logo yform-cb-start-logo" aria-hidden="true"></i> Content-Builder-Bereich</strong><br>
             <span>Ab hier beginnt der modulare Seiteninhalt.</span>
         </div>
 
@@ -193,7 +193,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                     // Section-Element?
                     $isSection = ($sliceType === 'section');
                     
-                    $addon = rex_addon::get('yform_content_builder');
+                    $addon = rex_addon::get('builder');
                     $elementPath = '';
 
                     if (isset($available_elements[$sliceType]['_path']) && is_string($available_elements[$sliceType]['_path'])) {
@@ -205,7 +205,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
 
                     if ($elementPath === '') {
                         $customPaths = rex_extension::registerPoint(new rex_extension_point(
-                            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+                            'BUILDER_ELEMENT_PATHS',
                             ['']
                         ));
 
@@ -264,7 +264,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                         <div class="slice-toolbar" data-element-name="<?= rex_escape($sliceToolbarLabel) ?>">
                             <span class="slice-label"><i class="fa <?= rex_escape($sliceToolbarIcon) ?>"></i><?= rex_escape($sliceToolbarLabel) ?></span>
                             <div class="btn-group btn-group-insert">
-                                <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" title="<?= rex_i18n::msg('yform_content_builder_element_add') ?>">
+                                <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" title="<?= rex_i18n::msg('builder_element_add') ?>">
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 <ul class="dropdown-menu pull-right">
@@ -289,7 +289,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                                             <div class="yform-cb-search-wrapper">
                                                 <input type="text" 
                                                        class="yform-cb-element-search-input form-control input-sm" 
-                                                       placeholder="<?= rex_i18n::msg('yform_content_builder_element_search_placeholder') ?>"
+                                                       placeholder="<?= rex_i18n::msg('builder_element_search_placeholder') ?>"
                                                        style="margin: 0; width: 100%;">
                                             </div>
                                         </li>
@@ -324,7 +324,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
-                            <button type="button" class="btn btn-xs btn-default btn-slice-edit" title="<?= rex_i18n::msg('yform_content_builder_element_edit') ?>">
+                            <button type="button" class="btn btn-xs btn-default btn-slice-edit" title="<?= rex_i18n::msg('builder_element_edit') ?>">
                                 <i class="fa fa-pencil"></i>
                             </button>
                             <?php if ($addon->getConfig('enable_copy_paste')): ?>
@@ -339,11 +339,11 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                                 <i class="fa fa-arrow-down"></i>
                             </button>
                             <?php if ($enableOnlineToggle): ?>
-                            <button type="button" class="btn btn-xs btn-default btn-slice-toggle-online" title="<?= $sliceOnline ? rex_i18n::msg('yform_content_builder_element_set_offline') : rex_i18n::msg('yform_content_builder_element_set_online') ?>">
+                            <button type="button" class="btn btn-xs btn-default btn-slice-toggle-online" title="<?= $sliceOnline ? rex_i18n::msg('builder_element_set_offline') : rex_i18n::msg('builder_element_set_online') ?>">
                                 <i class="fa <?= $sliceOnline ? 'fa-eye' : 'fa-eye-slash' ?>"></i>
                             </button>
                             <?php endif; ?>
-                            <button type="button" class="btn btn-xs btn-danger btn-slice-delete" title="<?= rex_i18n::msg('yform_content_builder_element_delete') ?>">
+                            <button type="button" class="btn btn-xs btn-danger btn-slice-delete" title="<?= rex_i18n::msg('builder_element_delete') ?>">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
@@ -401,7 +401,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
     <div class="content-builder-add"<?= $modernHiddenStyle ?>>
             <div class="btn-group btn-block">
                 <button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-plus"></i> <?= rex_i18n::msg('yform_content_builder_element_add') ?>
+                    <i class="fa fa-plus"></i> <?= rex_i18n::msg('builder_element_add') ?>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -428,7 +428,7 @@ $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
                             <div class="yform-cb-search-wrapper">
                                 <input type="text" 
                                        class="yform-cb-element-search-input form-control input-sm" 
-                                       placeholder="<?= rex_i18n::msg('yform_content_builder_element_search_placeholder') ?>"
+                                       placeholder="<?= rex_i18n::msg('builder_element_search_placeholder') ?>"
                                        style="margin: 0; width: 100%;">
                             </div>
                         </li>

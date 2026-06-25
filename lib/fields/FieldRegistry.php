@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_extension;
 use rex_extension_point;
@@ -220,7 +220,7 @@ class FieldRegistry
 
         // Extension Point für zusätzliche Feldtypen
         rex_extension::registerPoint(new rex_extension_point(
-            'YFORM_CONTENT_BUILDER_FIELDS',
+            'BUILDER_FIELDS',
             self::$fields
         ));
     }

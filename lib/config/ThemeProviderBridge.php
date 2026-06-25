@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex_extension;
 
@@ -18,7 +18,7 @@ class ThemeProviderBridge
     public static function getThemeChoices(): array
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_CHOICES',
+            'BUILDER_THEME_CHOICES',
             []
         ));
 
@@ -47,7 +47,7 @@ class ThemeProviderBridge
     public static function isProviderAvailable(): bool
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_PROVIDER_AVAILABLE',
+            'BUILDER_THEME_PROVIDER_AVAILABLE',
             false
         ));
 
@@ -61,7 +61,7 @@ class ThemeProviderBridge
     public static function resetThemeContext(): void
     {
         rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_CONTEXT_RESET',
+            'BUILDER_THEME_CONTEXT_RESET',
             null
         ));
     }
@@ -69,7 +69,7 @@ class ThemeProviderBridge
     public static function setTheme(string $themeName): void
     {
         rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_CONTEXT_SET',
+            'BUILDER_THEME_CONTEXT_SET',
             $themeName
         ));
     }
@@ -80,7 +80,7 @@ class ThemeProviderBridge
     public static function getBackgroundOptions(string $framework = 'uikit'): array
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_BACKGROUND_OPTIONS',
+            'BUILDER_THEME_BACKGROUND_OPTIONS',
             [],
             ['framework' => $framework]
         ));
@@ -94,7 +94,7 @@ class ThemeProviderBridge
     public static function getTextColorOptions(string $framework = 'uikit'): array
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_TEXT_COLOR_OPTIONS',
+            'BUILDER_THEME_TEXT_COLOR_OPTIONS',
             [],
             ['framework' => $framework]
         ));
@@ -108,7 +108,7 @@ class ThemeProviderBridge
     public static function getCardStyleOptions(string $framework = 'uikit'): array
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_THEME_CARD_STYLE_OPTIONS',
+            'BUILDER_THEME_CARD_STYLE_OPTIONS',
             [],
             ['framework' => $framework]
         ));
@@ -119,7 +119,7 @@ class ThemeProviderBridge
     public static function normalizeFramework(string $framework): string
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_FRAMEWORK_NORMALIZE',
+            'BUILDER_FRAMEWORK_NORMALIZE',
             $framework,
             ['framework' => $framework]
         ));

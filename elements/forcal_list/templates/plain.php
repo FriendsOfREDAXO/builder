@@ -2,8 +2,8 @@
 
 /** @var array<string,mixed> $elementData */
 
-use KLXM\YFormContentBuilder\ForcalRenderer;
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\ForcalRenderer;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 if (!class_exists(ForcalRenderer::class)) {
     return;

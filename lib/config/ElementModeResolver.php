@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex;
 use rex_addon;
@@ -20,7 +20,7 @@ final class ElementModeResolver
     public static function getCustomPaths(): array
     {
         $customPaths = rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             []
         ));
 
@@ -47,7 +47,7 @@ final class ElementModeResolver
     public static function getElementMode(): string
     {
         $elementMode = (string) rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_MODE',
+            'BUILDER_ELEMENT_MODE',
             'replace'
         ));
 
@@ -108,7 +108,7 @@ final class ElementModeResolver
      */
     public static function getEnabledElementAddons(): array
     {
-        $raw = rex_addon::get('yform_content_builder')->getConfig(self::CONFIG_KEY_ENABLED_ELEMENT_ADDONS, []);
+        $raw = rex_addon::get('builder')->getConfig(self::CONFIG_KEY_ENABLED_ELEMENT_ADDONS, []);
 
         if (is_string($raw)) {
             $decoded = json_decode($raw, true);
@@ -163,7 +163,7 @@ final class ElementModeResolver
 
                 // Explizite Ausnahmen für mitgelieferte Core-Elemente müssen auch dann sichtbar
                 // bleiben, wenn das eigene AddOn in der AddOn-Auswahl nicht aktiviert ist.
-                if ($addonKey === 'yform_content_builder') {
+                if ($addonKey === 'builder') {
                     $elementKey = trim((string) ($config['key'] ?? $config['type'] ?? ''));
                     if ($elementKey !== '' && isset($replaceKeepCoreElements[$elementKey])) {
                         return true;
@@ -182,7 +182,7 @@ final class ElementModeResolver
     public static function getAddonChoices(array $customPaths): array
     {
         $choices = [
-            'yform_content_builder' => self::resolveAddonLabel('yform_content_builder'),
+            'builder' => self::resolveAddonLabel('builder'),
         ];
 
         foreach ($customPaths as $customPath) {
@@ -218,7 +218,7 @@ final class ElementModeResolver
     public static function resolveAddonKeyByPath(string $basePath, string $source = 'custom'): string
     {
         if ($source === 'demo') {
-            return 'yform_content_builder';
+            return 'builder';
         }
 
         $normalized = str_replace('\\', '/', trim($basePath));
@@ -248,7 +248,7 @@ final class ElementModeResolver
      */
     public static function getReplaceKeepCoreElements(): array
     {
-        $raw = rex_addon::get('yform_content_builder')->getConfig(self::CONFIG_KEY_REPLACE_KEEP_CORE_ELEMENTS, []);
+        $raw = rex_addon::get('builder')->getConfig(self::CONFIG_KEY_REPLACE_KEEP_CORE_ELEMENTS, []);
 
         if (is_string($raw)) {
             $decoded = json_decode($raw, true);

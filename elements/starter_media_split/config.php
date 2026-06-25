@@ -3,7 +3,7 @@
  * Starter Media Split - Bild/Video links oder rechts
  */
 
-$config = \KLXM\YFormContentBuilder\Starter\StarterConfig::class;
+$config = \FriendsOfREDAXO\Builder\Starter\StarterConfig::class;
 
 return [
     'label' => 'Bild oder Video + Text',

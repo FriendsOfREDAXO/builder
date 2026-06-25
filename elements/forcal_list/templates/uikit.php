@@ -5,7 +5,7 @@
  * @var array<string,mixed> $elementData
  */
 
-use KLXM\YFormContentBuilder\ForcalRenderer;
+use FriendsOfREDAXO\Builder\ForcalRenderer;
 
 if (!class_exists(ForcalRenderer::class)) {
     return;

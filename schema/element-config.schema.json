@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://redaxo.org/schemas/yform_content_builder_element.json",
-  "title": "YForm Content Builder Element Configuration",
-  "description": "Schema for validating YForm Content Builder element config.php files",
+  "$id": "https://redaxo.org/schemas/builder_element.json",
+  "title": "Builder Element Configuration",
+  "description": "Schema for validating Builder element config.php files",
   "type": "object",
   "required": ["name", "title", "fields"],
   "properties": {

@@ -7,14 +7,14 @@
  */
 
 // Prüfen ob Theme-Provider verfügbar ist
-$hasThemeProvider = \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::isProviderAvailable()
-    || \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::getThemeChoices() !== [];
+$hasThemeProvider = \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::isProviderAvailable()
+    || \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::getThemeChoices() !== [];
 
 // Theme-Auswahl Optionen (nur wenn Theme-Provider verfügbar)
 $themeChoices = [];
 if ($hasThemeProvider) {
     $themeChoices = ['' => '-- Automatisch (Domain) --'];
-    $availableThemes = \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::getThemeChoices();
+    $availableThemes = \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::getThemeChoices();
     $themeChoices = array_merge($themeChoices, $availableThemes);
 }
 
@@ -28,7 +28,7 @@ $backgroundOptions = [
 ];
 
 if ($hasThemeProvider) {
-    $themeBackgrounds = \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::getBackgroundOptions('uikit');
+    $themeBackgrounds = \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::getBackgroundOptions('uikit');
     if (is_array($themeBackgrounds) && [] !== $themeBackgrounds) {
         foreach ($themeBackgrounds as $class => $data) {
             if (!is_string($class) || '' === trim($class)) {

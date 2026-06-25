@@ -1,9 +1,9 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
-use KLXM\YFormContentBuilder\Config\ThemeProviderBridge;
-use KLXM\YFormContentBuilder\Fields\FieldRegistry;
+use FriendsOfREDAXO\Builder\Config\ThemeProviderBridge;
+use FriendsOfREDAXO\Builder\Fields\FieldRegistry;
 use rex;
 use rex_addon;
 use rex_escape;
@@ -751,7 +751,7 @@ class Module
         $hasSettingsModal = isset($config['settings_modal']) && is_array($config['settings_modal']);
         $elementDir = $this->resolveElementPath();
         if ($elementDir === null) {
-            $elementDir = rex_path::addon('yform_content_builder', 'elements/' . $this->elementType . '/');
+            $elementDir = rex_path::addon('builder', 'elements/' . $this->elementType . '/');
         }
         $helpModalConfig = ModalHelper::buildConfigForElementDir($elementDir);
 
@@ -964,7 +964,7 @@ class Module
     protected function resolveElementPath(): ?string
     {
         $customPaths = \rex_extension::registerPoint(new \rex_extension_point(
-            'YFORM_CONTENT_BUILDER_ELEMENT_PATHS',
+            'BUILDER_ELEMENT_PATHS',
             ['']
         ));
 
@@ -986,12 +986,12 @@ class Module
             }
         }
 
-        $dataPath = rex_addon::get('yform_content_builder')->getDataPath('elements/' . $this->elementType);
+        $dataPath = rex_addon::get('builder')->getDataPath('elements/' . $this->elementType);
         if (is_dir($dataPath)) {
             return $dataPath;
         }
 
-        $addonPath = rex_addon::get('yform_content_builder')->getPath('elements/' . $this->elementType);
+        $addonPath = rex_addon::get('builder')->getPath('elements/' . $this->elementType);
         return is_dir($addonPath) ? $addonPath : null;
     }
 }

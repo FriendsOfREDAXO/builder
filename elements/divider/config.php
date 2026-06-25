@@ -4,7 +4,7 @@
  */
 
 // Zentrale Konfigurationsklasse
-$config = \KLXM\YFormContentBuilder\Starter\StarterConfig::class;
+$config = \FriendsOfREDAXO\Builder\Starter\StarterConfig::class;
 $hasThemeBuilder = $config::hasThemeBuilder();
 
 // Dynamische Farboptionen
@@ -19,7 +19,7 @@ $colorOptions = [
 
 // Theme-Provider Farben nur als Strings hinzufügen
 if ($hasThemeBuilder) {
-    $themeColors = \KLXM\YFormContentBuilder\Config\ThemeProviderBridge::getTextColorOptions('uikit');
+    $themeColors = \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::getTextColorOptions('uikit');
     if (is_array($themeColors)) {
         foreach ($themeColors as $key => $value) {
             // Nur hinzufügen wenn Wert ein String ist, nicht array

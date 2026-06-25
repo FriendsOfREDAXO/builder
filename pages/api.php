@@ -1,6 +1,6 @@
 <?php
 
-$addon = rex_addon::get('yform_content_builder');
+$addon = rex_addon::get('builder');
 
 $content = '';
 

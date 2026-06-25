@@ -1,6 +1,6 @@
 # Lizenz / License
 
-## YForm Content Builder für REDAXO
+## Builder für REDAXO
 
 Copyright (c) 2024–2026 Friends of REDAXO
 

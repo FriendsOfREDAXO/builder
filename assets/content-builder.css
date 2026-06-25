@@ -545,6 +545,29 @@ body.rex-theme-dark .slice-edit-form .cb-slice-action-group .cb-btn-cancel:focus
     background: linear-gradient(180deg, #f9fbfd 0%, #f2f7fb 100%);
 }
 
+.yform-cb-start-separator__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yform-cb-start-separator__title .yform-cb-start-logo {
+    margin-left: 0;
+    width: 18px;
+    height: 18px;
+    background-size: 18px 18px;
+}
+
+body.rex-theme-dark .yform-cb-start-separator__title .yform-cb-start-logo {
+    background-image: url(images/builder-logo-mark-light.svg);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .yform-cb-start-separator__title .yform-cb-start-logo {
+        background-image: url(images/builder-logo-mark-light.svg);
+    }
+}
+
 .yform-cb-persist-status .yform-cb-persist-row {
     display: flex;
     align-items: center;

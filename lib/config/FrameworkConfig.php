@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex_extension;
 
@@ -29,7 +29,7 @@ class FrameworkConfig
 
     /**
      * Liefert Hintergrund-Optionen für ein Framework
-     * Extension Point: YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS
+     * Extension Point: BUILDER_FRAMEWORK_OPTIONS
      *
      * @param string $framework z.B. 'uikit', 'bootstrap', 'plain', 'custom'
      * @return array<string, string> Assoziatives Array: klasse => label
@@ -105,7 +105,7 @@ class FrameworkConfig
             }
         }
 
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
+        $result = self::applyExtensionPoint('BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
             'framework' => $framework,
             'option_type' => 'backgrounds',
         ]);
@@ -151,7 +151,7 @@ class FrameworkConfig
 
         $defaultChoices = $defaults[$framework] ?? $defaults['uikit'];
 
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
+        $result = self::applyExtensionPoint('BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
             'framework' => $framework,
             'option_type' => 'paddings',
         ]);
@@ -201,7 +201,7 @@ class FrameworkConfig
 
         $defaultChoices = $defaults[$framework] ?? $defaults['uikit'];
 
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
+        $result = self::applyExtensionPoint('BUILDER_FRAMEWORK_OPTIONS', $defaultChoices, [
             'framework' => $framework,
             'option_type' => 'containers',
         ]);
@@ -277,7 +277,7 @@ class FrameworkConfig
             }
         }
 
-        $result = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', $defaultColors, [
+        $result = self::applyExtensionPoint('BUILDER_FRAMEWORK_OPTIONS', $defaultColors, [
             'framework' => $framework,
             'option_type' => 'background_colors',
         ]);
@@ -298,7 +298,7 @@ class FrameworkConfig
             'plain' => '',
         ];
 
-        return self::applyExtensionPoint('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', $prefixes[$framework] ?? 'uk-', [
+        return self::applyExtensionPoint('BUILDER_FRAMEWORK_OPTIONS', $prefixes[$framework] ?? 'uk-', [
             'framework' => $framework,
             'option_type' => 'css_prefix',
         ]);

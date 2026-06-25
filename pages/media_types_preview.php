@@ -1,8 +1,8 @@
 <?php
 
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
-$addon = rex_addon::get('yform_content_builder');
+$addon = rex_addon::get('builder');
 $selectedMedia = trim(rex_request('media_file', 'string', ''));
 $currentPage = rex_be_controller::getCurrentPage();
 $installCsrf = rex_csrf_token::factory('ycb_focuspoint_ratio_types_install');
@@ -60,11 +60,11 @@ if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
     if (!$installCsrf->isValid()) {
         $installMessage .= rex_view::warning(rex_i18n::msg('csrf_token_invalid'));
     } elseif (!$mediaManagerAvailable || !$focuspointAvailable) {
-        $installMessage .= rex_view::warning(rex_i18n::msg('yform_content_builder_media_types_preview_install_requires'));
+        $installMessage .= rex_view::warning(rex_i18n::msg('builder_media_types_preview_install_requires'));
     } else {
         $ratioTypes = $collectFocuspointRatioTypes($presets);
         if ($ratioTypes === []) {
-            $installMessage .= rex_view::info(rex_i18n::msg('yform_content_builder_media_types_preview_install_no_ratios'));
+            $installMessage .= rex_view::info(rex_i18n::msg('builder_media_types_preview_install_no_ratios'));
         } else {
             $installWithTexts = rex_post('install_with_texts', 'bool', true);
             $installed = 0;
@@ -170,11 +170,11 @@ if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
                 rex_media_manager::deleteCache();
 
                 $installMessage .= rex_view::success(
-                    rex_i18n::msg('yform_content_builder_media_types_preview_install_success', (string) $installed, (string) $updated, (string) $effectsWritten)
+                    rex_i18n::msg('builder_media_types_preview_install_success', (string) $installed, (string) $updated, (string) $effectsWritten)
                 );
             } catch (Throwable $e) {
                 $installMessage .= rex_view::warning(
-                    rex_i18n::msg('yform_content_builder_media_types_preview_install_error', $e->getMessage())
+                    rex_i18n::msg('builder_media_types_preview_install_error', $e->getMessage())
                 );
             }
         }
@@ -187,17 +187,17 @@ if ($selectedMedia !== '') {
 }
 
 $content = '';
-$content .= '<p class="help-block">' . rex_i18n::msg('yform_content_builder_media_types_preview_intro') . '</p>';
+$content .= '<p class="help-block">' . rex_i18n::msg('builder_media_types_preview_intro') . '</p>';
 
 $formContent = '';
 $formContent .= '<form method="get" action="' . rex_escape(rex_url::currentBackendPage()) . '" class="form-horizontal">';
 $formContent .= '<input type="hidden" name="page" value="' . rex_escape($currentPage) . '">';
 $formContent .= '<div class="form-group">';
-$formContent .= '<label class="col-sm-2 control-label">' . rex_i18n::msg('yform_content_builder_media_types_preview_select_image') . '</label>';
+$formContent .= '<label class="col-sm-2 control-label">' . rex_i18n::msg('builder_media_types_preview_select_image') . '</label>';
 $formContent .= '<div class="col-sm-10">';
 $formContent .= rex_var_media::getWidget(1, 'media_file', $selectedMedia);
-$formContent .= '<p class="help-block">' . rex_i18n::msg('yform_content_builder_media_types_preview_note') . '</p>';
-$formContent .= '<button class="btn btn-primary" type="submit">' . rex_i18n::msg('yform_content_builder_media_types_preview_show') . '</button>';
+$formContent .= '<p class="help-block">' . rex_i18n::msg('builder_media_types_preview_note') . '</p>';
+$formContent .= '<button class="btn btn-primary" type="submit">' . rex_i18n::msg('builder_media_types_preview_show') . '</button>';
 $formContent .= '</div>';
 $formContent .= '</div>';
 $formContent .= '</form>';
@@ -221,10 +221,10 @@ $installForm .= '<div class="form-group">';
 $installForm .= '<label class="col-sm-2 control-label">Focuspoint</label>';
 $installForm .= '<div class="col-sm-10">';
 $installForm .= '<div class="checkbox" style="margin-top:0;">';
-$installForm .= '<label><input type="checkbox" name="install_with_texts" value="1" checked> ' . rex_i18n::msg('yform_content_builder_media_types_preview_install_with_texts') . '</label>';
+$installForm .= '<label><input type="checkbox" name="install_with_texts" value="1" checked> ' . rex_i18n::msg('builder_media_types_preview_install_with_texts') . '</label>';
 $installForm .= '</div>';
-$installForm .= '<button class="btn btn-default" type="submit"' . ((!$mediaManagerAvailable || !$focuspointAvailable) ? ' disabled' : '') . '>' . rex_i18n::msg('yform_content_builder_media_types_preview_install_button') . '</button>';
-$installForm .= '<p class="help-block" style="margin-top:8px;">' . rex_i18n::msg('yform_content_builder_media_types_preview_install_hint') . '</p>';
+$installForm .= '<button class="btn btn-default" type="submit"' . ((!$mediaManagerAvailable || !$focuspointAvailable) ? ' disabled' : '') . '>' . rex_i18n::msg('builder_media_types_preview_install_button') . '</button>';
+$installForm .= '<p class="help-block" style="margin-top:8px;">' . rex_i18n::msg('builder_media_types_preview_install_hint') . '</p>';
 $installForm .= '</div>';
 $installForm .= '</div>';
 $installForm .= '</form>';
@@ -238,11 +238,11 @@ $fragment->setVar('elements', [[
 $content .= $fragment->parse('core/form/form.php');
 
 if ($selectedMedia === '') {
-    $content .= rex_view::info(rex_i18n::msg('yform_content_builder_media_types_preview_no_image'));
+    $content .= rex_view::info(rex_i18n::msg('builder_media_types_preview_no_image'));
 } elseif (!$media instanceof rex_media) {
-    $content .= rex_view::warning(rex_i18n::msg('yform_content_builder_media_types_preview_invalid_image'));
+    $content .= rex_view::warning(rex_i18n::msg('builder_media_types_preview_invalid_image'));
 } elseif ($presets === []) {
-    $content .= rex_view::info(rex_i18n::msg('yform_content_builder_media_types_preview_no_presets'));
+    $content .= rex_view::info(rex_i18n::msg('builder_media_types_preview_no_presets'));
 } else {
     $mediaMime = strtolower((string) $media->getType());
     $mediaFilename = strtolower((string) $media->getFileName());
@@ -265,7 +265,7 @@ if ($selectedMedia === '') {
     $meta[] = rex_escape(rex_formatter::bytes((int) $media->getSize()));
 
     $content .= '<div class="alert alert-success" style="margin-top:15px;">';
-    $content .= '<strong>' . rex_i18n::msg('yform_content_builder_media_types_preview_original') . ':</strong> ';
+    $content .= '<strong>' . rex_i18n::msg('builder_media_types_preview_original') . ':</strong> ';
     $content .= rex_escape($selectedMedia) . ' <span class="text-muted">(' . implode(' | ', $meta) . ')</span>';
     $content .= '</div>';
 
@@ -301,9 +301,9 @@ if ($selectedMedia === '') {
         $content .= '<header class="ycb-media-type-card-header">';
         $content .= '<h4 class="ycb-media-type-card-title">' . rex_escape($presetName) . '</h4>';
         $content .= '<p class="ycb-media-type-card-meta">';
-        $content .= rex_i18n::msg('yform_content_builder_media_types_preview_ratio') . ': <strong>' . rex_escape($ratio) . '</strong> | ';
-        $content .= rex_i18n::msg('yform_content_builder_media_types_preview_mode') . ': <strong>' . rex_escape($mode) . '</strong> | ';
-        $content .= rex_i18n::msg('yform_content_builder_media_types_preview_columns') . ': <strong>' . rex_escape((string) count($widths)) . '</strong>';
+        $content .= rex_i18n::msg('builder_media_types_preview_ratio') . ': <strong>' . rex_escape($ratio) . '</strong> | ';
+        $content .= rex_i18n::msg('builder_media_types_preview_mode') . ': <strong>' . rex_escape($mode) . '</strong> | ';
+        $content .= rex_i18n::msg('builder_media_types_preview_columns') . ': <strong>' . rex_escape((string) count($widths)) . '</strong>';
         $content .= '</p>';
         $content .= '</header>';
 
@@ -313,8 +313,8 @@ if ($selectedMedia === '') {
 
             $content .= '<div class="ycb-media-type-item">';
             $content .= '<div class="ycb-media-type-label">';
-            $content .= rex_i18n::msg('yform_content_builder_media_types_preview_width') . ': ' . rex_escape((string) $width) . 'px | ';
-            $content .= rex_i18n::msg('yform_content_builder_media_types_preview_type') . ': <code>' . rex_escape($virtualType) . '</code>';
+            $content .= rex_i18n::msg('builder_media_types_preview_width') . ': ' . rex_escape((string) $width) . 'px | ';
+            $content .= rex_i18n::msg('builder_media_types_preview_type') . ': <code>' . rex_escape($virtualType) . '</code>';
             $content .= '</div>';
             $content .= '<div class="ycb-media-type-image-wrap">';
             if ($isPdf && !$pdfoutAvailable) {
@@ -331,10 +331,10 @@ if ($selectedMedia === '') {
     }
 
     $content .= '</div>';
-    $content .= '<p style="margin-top:18px;"><a class="btn btn-default" href="' . rex_escape($originalUrl) . '" target="_blank" rel="noopener">' . rex_i18n::msg('yform_content_builder_media_types_preview_original') . ' öffnen</a></p>';
+    $content .= '<p style="margin-top:18px;"><a class="btn btn-default" href="' . rex_escape($originalUrl) . '" target="_blank" rel="noopener">' . rex_i18n::msg('builder_media_types_preview_original') . ' öffnen</a></p>';
 }
 
 $fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('yform_content_builder_media_types_preview'), false);
+$fragment->setVar('title', rex_i18n::msg('builder_media_types_preview'), false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');

@@ -3,7 +3,7 @@
  * Starter Text - sehr einfaches Textelement
  */
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 $elementConfig = StarterConfig::class;
 

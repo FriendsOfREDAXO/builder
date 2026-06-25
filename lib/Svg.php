@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder;
+namespace FriendsOfREDAXO\Builder;
 
 use rex_addon;
 use rex_escape;
@@ -19,7 +19,7 @@ class Svg
      */
     public static function iconUrl(string $name): string
     {
-        return rex_addon::get('yform_content_builder')->getAssetsUrl('icons/' . $name . '.svg');
+        return rex_addon::get('builder')->getAssetsUrl('icons/' . $name . '.svg');
     }
 
     /**

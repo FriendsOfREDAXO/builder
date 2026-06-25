@@ -1,0 +1,13 @@
+{
+  "key": "text",
+  "label": "Textblock (WYSIWYG)",
+  "icon": "fa-align-left",
+  "fields": [
+    {
+      "name": "content",
+      "type": "wysiwyg",
+      "label": "Inhalt",
+      "default": ""
+    }
+  ]
+}

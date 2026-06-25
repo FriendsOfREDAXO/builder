@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_escape;
 
@@ -64,8 +64,8 @@ class TableEditorField extends FieldAbstract
         echo '<div class="panel panel-default">';
         echo '<div class="panel-heading">';
         echo '<div class="form-group" style="margin-bottom:0;">';
-        echo '<label for="' . rex_escape($id . '_caption') . '">' . rex_escape($this->t('yform_content_builder_table_editor_caption_label', 'Tabellen-Überschrift (Caption)')) . '</label>';
-        echo '<input type="text" class="form-control cb-table-editor-caption" id="' . rex_escape($id . '_caption') . '" value="' . rex_escape((string) ($editorData['caption'] ?? '')) . '" placeholder="' . rex_escape($this->t('yform_content_builder_table_editor_caption_placeholder', 'Beschriftung für Screenreader (wichtig für Barrierefreiheit)')) . '">';
+        echo '<label for="' . rex_escape($id . '_caption') . '">' . rex_escape($this->t('builder_table_editor_caption_label', 'Tabellen-Überschrift (Caption)')) . '</label>';
+        echo '<input type="text" class="form-control cb-table-editor-caption" id="' . rex_escape($id . '_caption') . '" value="' . rex_escape((string) ($editorData['caption'] ?? '')) . '" placeholder="' . rex_escape($this->t('builder_table_editor_caption_placeholder', 'Beschriftung für Screenreader (wichtig für Barrierefreiheit)')) . '">';
         echo '</div>';
         echo '</div>';
 
@@ -75,7 +75,7 @@ class TableEditorField extends FieldAbstract
         if ($headerRowPolicy === 'user') {
             echo '<label class="checkbox-inline" style="margin-left:0;">';
             echo '<input type="checkbox" class="cb-table-editor-config" data-config="has_header_row"' . ((bool) ($editorData['has_header_row'] ?? false) ? ' checked' : '') . '> ';
-            echo rex_escape($this->t('yform_content_builder_table_editor_header_row', 'Erste Zeile ist Kopfzeile'));
+            echo rex_escape($this->t('builder_table_editor_header_row', 'Erste Zeile ist Kopfzeile'));
             echo '</label>';
         } else {
             echo '<input type="hidden" class="cb-table-editor-config" data-config="has_header_row" value="' . ((bool) ($editorData['has_header_row'] ?? false) ? '1' : '0') . '">';
@@ -84,7 +84,7 @@ class TableEditorField extends FieldAbstract
         if ($headerColPolicy === 'user') {
             echo '<label class="checkbox-inline" style="margin-left:15px;">';
             echo '<input type="checkbox" class="cb-table-editor-config" data-config="has_header_col"' . ((bool) ($editorData['has_header_col'] ?? false) ? ' checked' : '') . '> ';
-            echo rex_escape($this->t('yform_content_builder_table_editor_header_col', 'Erste Spalte ist Kopfspalte'));
+            echo rex_escape($this->t('builder_table_editor_header_col', 'Erste Spalte ist Kopfspalte'));
             echo '</label>';
         } else {
             echo '<input type="hidden" class="cb-table-editor-config" data-config="has_header_col" value="' . ((bool) ($editorData['has_header_col'] ?? false) ? '1' : '0') . '">';
@@ -98,8 +98,8 @@ class TableEditorField extends FieldAbstract
         echo '</table>';
 
         echo '<div class="btn-group">';
-        echo '<button type="button" class="btn btn-default btn-xs cb-table-editor-add-row"><i class="rex-icon fa-plus"></i> ' . rex_escape($this->t('yform_content_builder_table_editor_add_row', 'Zeile +')) . '</button>';
-        echo '<button type="button" class="btn btn-default btn-xs cb-table-editor-add-col"><i class="rex-icon fa-plus"></i> ' . rex_escape($this->t('yform_content_builder_table_editor_add_col', 'Spalte +')) . '</button>';
+        echo '<button type="button" class="btn btn-default btn-xs cb-table-editor-add-row"><i class="rex-icon fa-plus"></i> ' . rex_escape($this->t('builder_table_editor_add_row', 'Zeile +')) . '</button>';
+        echo '<button type="button" class="btn btn-default btn-xs cb-table-editor-add-col"><i class="rex-icon fa-plus"></i> ' . rex_escape($this->t('builder_table_editor_add_col', 'Spalte +')) . '</button>';
         echo '</div>';
 
         echo '</div>';

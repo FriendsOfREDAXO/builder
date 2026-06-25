@@ -4,7 +4,7 @@
  * YForm Content Builder - Hauptseite
  */
 
-$addon = rex_addon::get('yform_content_builder');
+$addon = rex_addon::get('builder');
 
 echo rex_view::title($addon->i18n('title'));
 

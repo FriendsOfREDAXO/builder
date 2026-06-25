@@ -1,8 +1,8 @@
 <?php
 
-use KLXM\YFormContentBuilder\SmartLink;
-use KLXM\YFormContentBuilder\SmartLinkView;
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\SmartLink;
+use FriendsOfREDAXO\Builder\SmartLinkView;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 $headline = trim((string) ($elementData['headline'] ?? ''));
 $intro = trim((string) ($elementData['intro'] ?? ''));

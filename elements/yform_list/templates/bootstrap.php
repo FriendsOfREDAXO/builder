@@ -2,8 +2,8 @@
 
 /** @var array<string,mixed> $elementData */
 
-use KLXM\YFormContentBuilder\ListRenderer;
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\ListRenderer;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 if (!class_exists(ListRenderer::class)) {
     return;

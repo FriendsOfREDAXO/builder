@@ -1,0 +1,350 @@
+/* REDAXO Page Builder Workspace CSS */
+
+.builder-editor-wrapper {
+    margin: 15px 0 30px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Editor Container */
+.builder-editor-container {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Header Panel */
+.builder-header {
+    background: #2b3e50;
+    color: #fff;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1e2c3a;
+}
+.builder-header-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+.builder-header-title i {
+    margin-right: 8px;
+    color: #38b0de;
+}
+
+/* Workspace Layout */
+.builder-workspace-layout {
+    display: flex;
+    min-height: 550px;
+}
+
+/* Sidebar Elements Library */
+.builder-sidebar {
+    width: 260px;
+    background-color: #f7f9fa;
+    border-right: 1px solid #dcdcdc;
+    padding: 15px;
+    flex-shrink: 0;
+}
+.sidebar-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+    letter-spacing: 0.8px;
+    border-bottom: 1px dashed #dcdcdc;
+    padding-bottom: 5px;
+}
+.sidebar-item {
+    background: #fff;
+    border: 1px solid #c8d3db;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: grab;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+.sidebar-item:hover {
+    border-color: #38b0de;
+    box-shadow: 0 2px 5px rgba(56, 176, 222, 0.15);
+    background-color: #fafdfd;
+}
+.sidebar-item i {
+    width: 20px;
+    margin-right: 8px;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+.sidebar-item:hover i {
+    color: #38b0de;
+}
+
+/* Canvas Area */
+.builder-canvas-area {
+    flex-grow: 1;
+    background-color: #f0f3f5;
+    padding: 20px;
+    position: relative;
+    overflow-y: auto;
+}
+.builder-canvas {
+    min-height: 500px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Canvas Empty State */
+.canvas-empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #95a5a6;
+    z-index: 1;
+    pointer-events: none;
+    width: 80%;
+    max-width: 400px;
+}
+.canvas-empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #bdc3c7;
+}
+.canvas-empty-state p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Visual Canvas Layout Nodes (Row Containers) */
+.node-grid-row {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: border-color 0.2s ease;
+    position: relative;
+}
+.node-grid-row:hover {
+    border-color: #94a3b8;
+}
+
+/* Row Header Panel */
+.row-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.row-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+.row-actions, .element-actions {
+    display: flex;
+    gap: 5px;
+}
+.row-btn, .element-btn {
+    border: none;
+    background: none;
+    padding: 4px 6px;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 3px;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+.row-btn:hover, .element-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+.row-btn.btn-delete:hover, .element-btn.btn-delete:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Row Columns Grid Layout */
+.grid-cols-wrapper {
+    display: grid;
+    gap: 15px;
+    padding: 15px;
+}
+
+/* Column Canvas Area */
+.grid-column-canvas {
+    border: 2px dashed #e2e8f0;
+    border-radius: 4px;
+    min-height: 120px;
+    background: #fdfdfd;
+    padding: 10px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.grid-column-canvas.drag-over {
+    border-color: #38b0de;
+    background-color: #f0faff;
+}
+
+/* Visual Canvas Element Nodes (Widgets) */
+.node-element {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.node-element:hover {
+    border-color: #38b0de;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+.element-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab;
+    width: 100%;
+}
+.element-preview {
+    padding: 12px;
+    width: 100%;
+    background: #ffffff;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.element-info {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+.element-info i {
+    margin-right: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+.element-info span {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-left: 6px;
+    font-weight: 400;
+}
+
+/* Settings Modal Dialog styling */
+.builder-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.builder-modal-dialog {
+    width: 90%;
+    max-width: 600px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalReveal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.builder-modal-content {
+    display: flex;
+    flex-direction: column;
+}
+.builder-modal-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.builder-modal-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+.builder-modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #64748b;
+}
+.builder-modal-body {
+    padding: 18px;
+    max-height: 450px;
+    overflow-y: auto;
+}
+.builder-modal-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@keyframes modalReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Form controls styling inside Modal */
+.builder-modal-body .form-group {
+    margin-bottom: 15px;
+}
+.builder-modal-body .form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 6px;
+}
+.builder-modal-body .help-block {
+    margin-top: 5px;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* Media/Link widget design inside editor modal */
+.builder-widget-wrapper {
+    display: flex;
+    gap: 5px;
+}
+.builder-widget-wrapper input {
+    background: #f1f5f9;
+}

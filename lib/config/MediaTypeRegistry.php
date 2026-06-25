@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex_extension;
 use rex_extension_point;
@@ -132,7 +132,7 @@ class MediaTypeRegistry
 
         /** @var array<string, array{ratio: string, mode?: string, widths?: list<int>, default_width?: int}> $presets */
         $presets = rex_extension::registerPoint(new rex_extension_point(
-            'YFORM_CONTENT_BUILDER_MEDIA_TYPE_PRESETS',
+            'BUILDER_MEDIA_TYPE_PRESETS',
             $presets
         ));
 

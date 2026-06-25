@@ -67,14 +67,14 @@ $wrapperClose->setVar('container_width', $containerWidth, false);
             <?php
             $title = trim((string) ($item['title'] ?? ''));
             $text = trim((string) ($item['text'] ?? ''));
-            $resolved = \KLXM\YFormContentBuilder\SmartLinkView::resolveSingle($item['link'] ?? '', $title);
-            $previewData = \KLXM\YFormContentBuilder\SmartLinkView::resolvePreview($item['link'] ?? '');
+            $resolved = \FriendsOfREDAXO\Builder\SmartLinkView::resolveSingle($item['link'] ?? '', $title);
+            $previewData = \FriendsOfREDAXO\Builder\SmartLinkView::resolvePreview($item['link'] ?? '');
 
             if ($resolved === null) {
                 continue;
             }
 
-            $typeMeta = \KLXM\YFormContentBuilder\SmartLinkView::getTypeMeta($resolved['type']);
+            $typeMeta = \FriendsOfREDAXO\Builder\SmartLinkView::getTypeMeta($resolved['type']);
             $target = $resolved['is_external'] ? ' target="_blank" rel="noopener"' : '';
             ?>
             <div>

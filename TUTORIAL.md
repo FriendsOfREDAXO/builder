@@ -1,6 +1,6 @@
 # 🚀 Einsteiger-Tutorial: Dein erstes Content-Element
 
-Willkommen! In diesem Tutorial erstellen wir **Schritt für Schritt** dein erstes eigenes Element für den YForm Content Builder.
+Willkommen! In diesem Tutorial erstellen wir **Schritt für Schritt** dein erstes eigenes Element für den Builder.
 
 Wir bauen eine **„Team-Box"** (Bild, Name, Jobtitel).
 
@@ -10,7 +10,7 @@ Wir bauen eine **„Team-Box"** (Bild, Name, Jobtitel).
 
 ## 📋 Vorbereitung
 
-1. Stelle sicher, dass das Addon **YForm Content Builder** installiert und aktiviert ist.
+1. Stelle sicher, dass das Addon **Builder** installiert und aktiviert ist.
 2. Wir arbeiten im Dateisystem. Du brauchst Zugriff auf deine REDAXO-Installation (per FTP oder VS Code).
 
 ---
@@ -107,7 +107,7 @@ In `config.php` nutzt du dann statt fixer Texte Uebersetzungskeys.
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 $_ci = Helper::elementTranslator('team_member');
 
@@ -126,15 +126,15 @@ Der `lang`-Ordner wird beim Laden des Elements automatisch eingebunden.
 
 Wenn du direkt in bestehende Elemente schauen willst, nutze diese Referenzen im Addon:
 
-1. `redaxo/src/addons/yform_content_builder/elements/cards/config.php`
-2. `redaxo/src/addons/yform_content_builder/elements/cards/lang/de_de.lang`
-3. `redaxo/src/addons/yform_content_builder/elements/cards/lang/en_gb.lang`
-4. `redaxo/src/addons/yform_content_builder/elements/smart_link_showcase/config.php`
-5. `redaxo/src/addons/yform_content_builder/elements/smart_link_showcase/lang/de_de.lang`
-6. `redaxo/src/addons/yform_content_builder/elements/smart_link_showcase/lang/en_gb.lang`
-7. `redaxo/src/addons/yform_content_builder/elements/smart_links_multi_showcase/config.php`
-8. `redaxo/src/addons/yform_content_builder/elements/smart_links_multi_showcase/lang/de_de.lang`
-9. `redaxo/src/addons/yform_content_builder/elements/smart_links_multi_showcase/lang/en_gb.lang`
+1. `redaxo/src/addons/builder/elements/cards/config.php`
+2. `redaxo/src/addons/builder/elements/cards/lang/de_de.lang`
+3. `redaxo/src/addons/builder/elements/cards/lang/en_gb.lang`
+4. `redaxo/src/addons/builder/elements/smart_link_showcase/config.php`
+5. `redaxo/src/addons/builder/elements/smart_link_showcase/lang/de_de.lang`
+6. `redaxo/src/addons/builder/elements/smart_link_showcase/lang/en_gb.lang`
+7. `redaxo/src/addons/builder/elements/smart_links_multi_showcase/config.php`
+8. `redaxo/src/addons/builder/elements/smart_links_multi_showcase/lang/de_de.lang`
+9. `redaxo/src/addons/builder/elements/smart_links_multi_showcase/lang/en_gb.lang`
 
 ---
 
@@ -186,7 +186,7 @@ Beispiel im Template:
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Config\MediaTypeRegistry;
+use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
 $photoUrl = '';
 if ($photo !== '') {
@@ -210,7 +210,7 @@ Du möchtest dieses Element nun in einem REDAXO-Modul verwenden, damit Redakteur
 **Eingabe (Input):**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 // Wir rufen unser Element 'team_member' auf.
 // 'bootstrap' sorgt dafür, dass es im Backend hübsch aussieht.
@@ -221,7 +221,7 @@ echo Module::createByValueId('team_member', 1, 'bootstrap')->renderInput();
 **Ausgabe (Output):**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 // Hier geben wir das Element aus.
 // Du kannst hier auch 'uikit' oder 'tailwind' angeben, wenn du dafür Templates angelegt hast.
@@ -248,7 +248,7 @@ Du kannst das Element auch in einer YForm-Tabelle (z.B. für News oder Produkte)
 **Frontend Ausgabe (PHP):**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 // A) Datensatz ist bereits vorhanden
 echo Helper::outputDataset($dataset, 'mein_content_feld', 'bootstrap');
@@ -646,7 +646,7 @@ Das Addon liefert viele fertige Elemente mit, die fast alles im Alltag abdecken:
 
 Schau dir an, wie diese Elemente gebaut sind im Ordner:
 
-`redaxo/src/addons/yform_content_builder/elements/`
+`redaxo/src/addons/builder/elements/`
 
 **Pro-Tipp:**
 Wenn du ein Element brauchst, das fast zu deinem Ziel passt:

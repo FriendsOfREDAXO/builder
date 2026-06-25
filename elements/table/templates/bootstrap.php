@@ -1,6 +1,6 @@
 <?php
 
-use KLXM\YFormContentBuilder\Starter\StarterConfig;
+use FriendsOfREDAXO\Builder\Starter\StarterConfig;
 
 $tableData = $elementData['table_data'] ?? '';
 $tableCaption = '';

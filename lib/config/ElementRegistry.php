@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\YFormContentBuilder\Config;
+namespace FriendsOfREDAXO\Builder\Config;
 
 use rex_addon;
 use rex_extension;
@@ -8,8 +8,8 @@ use rex_path;
 
 /**
  * Element Registry - Zentrale Verwaltung aller verfügbaren Elemente
- * Extension Point: YFORM_CONTENT_BUILDER_ELEMENTS
- * Extension Point: YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS
+ * Extension Point: BUILDER_ELEMENTS
+ * Extension Point: BUILDER_BUNDLED_ELEMENTS
  */
 class ElementRegistry
 {
@@ -61,7 +61,7 @@ class ElementRegistry
         ];
 
         // Extension Point für Custom-Bundled-Elemente
-        self::$bundledElements = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS', $default);
+        self::$bundledElements = self::applyExtensionPoint('BUILDER_BUNDLED_ELEMENTS', $default);
 
         return self::$bundledElements;
     }
@@ -88,7 +88,7 @@ class ElementRegistry
 
         // Default: Haupt-Addon + Externe
         $default = [
-            'core' => rex_path::addon('yform_content_builder', 'elements'),
+            'core' => rex_path::addon('builder', 'elements'),
         ];
 
         // Prüfe externe Addons
@@ -97,7 +97,7 @@ class ElementRegistry
         }
 
         // Extension Point für weitere Addons
-        $resolvedPaths = self::applyExtensionPoint('YFORM_CONTENT_BUILDER_ELEMENT_PATHS', $default);
+        $resolvedPaths = self::applyExtensionPoint('BUILDER_ELEMENT_PATHS', $default);
 
         // Normalisieren: numerische Keys in stabile Namen überführen
         $normalizedPaths = [];
@@ -120,7 +120,7 @@ class ElementRegistry
         }
 
         // Core-Pfad immer sicherstellen, damit Starter/Demo verfügbar bleiben
-        $corePath = rex_path::addon('yform_content_builder', 'elements');
+        $corePath = rex_path::addon('builder', 'elements');
         if (!isset($normalizedPaths['core'])) {
             $normalizedPaths = ['core' => $corePath] + $normalizedPaths;
         }
@@ -208,7 +208,7 @@ class ElementRegistry
 
     /**
      * Registriert einen neuen Element-Pfad (für externe Addons in boot.php)
-     * Extension Point-Alternative zu YFORM_CONTENT_BUILDER_ELEMENT_PATHS
+     * Extension Point-Alternative zu BUILDER_ELEMENT_PATHS
      */
     public static function registerPath(string $key, string $path): void
     {

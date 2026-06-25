@@ -1,6 +1,6 @@
-# YForm Content Builder API
+# Builder API
 
-Diese Dokumentation beschreibt die API des YForm Content Builders, wie man eigene Elemente erstellt und das System mit eigenen Feldtypen erweitert.
+Diese Dokumentation beschreibt die API des Builders, wie man eigene Elemente erstellt und das System mit eigenen Feldtypen erweitert.
 
 ## 📚 Inhaltsverzeichnis
 
@@ -98,8 +98,9 @@ Optional nur für bestimmte Elemente:
 
 Hinweise:
 
-- Das Backend bindet diese CSS-Ausgabe automatisch ein.
+- Das Backend bindet diese CSS-Ausgabe automatisch über den Backend-Controller ein (z. B. `/redaxo/index.php?...`).
 - Im Frontend bleibt die Einbindung bewusst bei der integrativen Seite bzw. beim Projekt.
+- Die API-Action unterstützt `framework` (`uikit` oder `bootstrap`) und optional `elements` als CSV-Filter.
 - Gesucht werden pro Element in dieser Reihenfolge: `assets/<framework>.css`, `templates/<framework>.css`, `assets/common.css`, `templates/common.css`.
 
 ---
@@ -115,7 +116,7 @@ Verwende den kompletten Content Builder mit mehreren Elementen und Drag & Drop.
 **INPUT:**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 // Wert aus Slice holen
 $currentValue = $this->getCurrentSlice()->getValue(1);
@@ -139,7 +140,7 @@ echo $contentBuilder->getEditor();
 **OUTPUT:**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 // Wert aus Slice holen
 $currentValue = $this->getCurrentSlice()->getValue(1);
@@ -163,7 +164,7 @@ Empfohlen ist die Slot-basierte Schreibweise mit `createByValueId(...)`.
 **INPUT:**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 echo Module::createByValueId('gallery', 1, 'bootstrap')->renderInput();
 ?>
@@ -172,7 +173,7 @@ echo Module::createByValueId('gallery', 1, 'bootstrap')->renderInput();
 **OUTPUT:**
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 echo Module::createByValueId('gallery', 1, 'uikit')->renderOutput();
 ?>
@@ -184,7 +185,7 @@ Die alte Schreibweise bleibt gültig:
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Module;
+use FriendsOfREDAXO\Builder\Module;
 
 echo Module::create('gallery', 'REX_VALUE[1]', 'uikit')->renderOutput();
 ?>
@@ -270,7 +271,7 @@ Der Builder nutzt ein zentrales virtuelles Typschema:
 
 ```php
 <?php
-$type = \KLXM\YFormContentBuilder\Config\MediaTypeRegistry::buildVirtualType('starter_cards_16_9', 1200);
+$type = \FriendsOfREDAXO\Builder\Config\MediaTypeRegistry::buildVirtualType('starter_cards_16_9', 1200);
 $url = rex_media_manager::getUrl($type, $file);
 ```
 
@@ -278,7 +279,7 @@ $url = rex_media_manager::getUrl($type, $file);
 
 ```php
 rex_extension::register(
-    'YFORM_CONTENT_BUILDER_MEDIA_TYPE_PRESETS',
+    'BUILDER_MEDIA_TYPE_PRESETS',
     static function (rex_extension_point $ep): array {
         $presets = (array) $ep->getSubject();
 
@@ -363,7 +364,7 @@ project/elements/mein_element/templates/tailwind.php
 
 ## Frontend-Output API
 
-Die empfohlene Frontend-Ausgabe fuer YForm-Datensaetze laeuft ueber `KLXM\YFormContentBuilder\Helper`.
+Die empfohlene Frontend-Ausgabe fuer YForm-Datensaetze laeuft ueber `FriendsOfREDAXO\Builder\Helper`.
 
 ### Methoden
 
@@ -377,7 +378,7 @@ Die empfohlene Frontend-Ausgabe fuer YForm-Datensaetze laeuft ueber `KLXM\YFormC
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 // Einzeiler mit vorhandenem Datensatz
 echo Helper::outputDataset($dataset, 'content_builder', 'bootstrap');
@@ -393,7 +394,7 @@ YORM mit `where`-Bedingungen:
 
 ```php
 <?php
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 $item = \Project\Model\ContentPage::query()
     ->where('status', 1)
@@ -410,7 +411,7 @@ if ($item !== null) {
 
 ## Feldtypen-System
 
-Das Addon nutzt ein **Plugin-System für Feldtypen**. Jeder Feldtyp ist eine eigene Klasse im Namespace `KLXM\YFormContentBuilder\Fields`.
+Das Addon nutzt ein **Plugin-System für Feldtypen**. Jeder Feldtyp ist eine eigene Klasse im Namespace `FriendsOfREDAXO\Builder\Fields`.
 
 ### Architektur
 
@@ -506,14 +507,14 @@ Ausgabe im Template (Outputfilter-Äquivalent):
 
 `smart_link` arbeitet nicht mit einem separaten String-Outputfilter wie bei mform, sondern mit PHP-Helpern:
 
-- `KLXM\YFormContentBuilder\SmartLinkView::resolveSingle(...)` für die direkte Ausgabe eines Links (inkl. finaler `href`)
-- `KLXM\YFormContentBuilder\SmartLink::normalize(...)` + `KLXM\YFormContentBuilder\SmartLink::buildHref(...)` für eigene Render-Logik
+- `FriendsOfREDAXO\Builder\SmartLinkView::resolveSingle(...)` für die direkte Ausgabe eines Links (inkl. finaler `href`)
+- `FriendsOfREDAXO\Builder\SmartLink::normalize(...)` + `FriendsOfREDAXO\Builder\SmartLink::buildHref(...)` für eigene Render-Logik
 
 Beispiel Single-Link:
 
 ```php
 <?php
-$resolved = \KLXM\YFormContentBuilder\SmartLinkView::resolveSingle($data['link'] ?? null, 'Mehr erfahren');
+$resolved = \FriendsOfREDAXO\Builder\SmartLinkView::resolveSingle($data['link'] ?? null, 'Mehr erfahren');
 if (is_array($resolved)) {
     $target = $resolved['is_external'] ? ' target="_blank" rel="noopener"' : '';
     echo '<a href="' . rex_escape($resolved['href']) . '"' . $target . '>' . rex_escape($resolved['label']) . '</a>';
@@ -524,14 +525,14 @@ Beispiel Multiple-Link:
 
 ```php
 <?php
-$items = \KLXM\YFormContentBuilder\SmartLink::normalize($data['links'] ?? null, true);
+$items = \FriendsOfREDAXO\Builder\SmartLink::normalize($data['links'] ?? null, true);
 foreach ($items as $item) {
-    $href = \KLXM\YFormContentBuilder\SmartLink::buildHref($item);
+    $href = \FriendsOfREDAXO\Builder\SmartLink::buildHref($item);
     if ($href === '') {
         continue;
     }
 
-    $label = \KLXM\YFormContentBuilder\SmartLink::linkLabel($item);
+    $label = \FriendsOfREDAXO\Builder\SmartLink::linkLabel($item);
     if ($label === '') {
         $label = $href;
     }
@@ -823,8 +824,8 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
 Elemente können an drei Orten definiert werden (Priorität von oben nach unten):
 
 1. **project Addon**: `redaxo/src/addons/project/elements/`
-2. **data Ordner**: `redaxo/data/addons/yform_content_builder/elements/`
-3. **Addon selbst**: `redaxo/src/addons/yform_content_builder/elements/`
+2. **data Ordner**: `redaxo/data/addons/builder/elements/`
+3. **Addon selbst**: `redaxo/src/addons/builder/elements/`
 
 ### Minimales Element
 
@@ -1157,14 +1158,14 @@ Bei Namensgleichheit gewinnt im `merge`-Modus immer das eigene Element.
 In `boot.php` eines beliebigen AddOns:
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_PATHS', function($ep) {
+rex_extension::register('BUILDER_ELEMENT_PATHS', function($ep) {
     $paths = $ep->getSubject();
     $paths[] = rex_addon::get('mein_addon')->getPath('content_elements/');
     return $paths;
 });
 
 // Optional: Ladeverhalten steuern
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_MODE', static function(): string {
+rex_extension::register('BUILDER_ELEMENT_MODE', static function(): string {
     return 'merge'; // 'merge' oder 'replace'
 });
 ```
@@ -1179,7 +1180,7 @@ Jeder Feldtyp muss das `FieldInterface` implementieren:
 
 ```php
 <?php
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 interface FieldInterface
 {
@@ -1218,7 +1219,7 @@ Die `FieldAbstract` Klasse bietet hilfreiche Methoden:
 
 ```php
 <?php
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_escape;
 
@@ -1261,7 +1262,7 @@ class EmailField extends FieldAbstract
 
 ```php
 <?php
-namespace KLXM\YFormContentBuilder\Fields;
+namespace FriendsOfREDAXO\Builder\Fields;
 
 use rex_escape;
 
@@ -1346,9 +1347,9 @@ class IconPickerField extends FieldAbstract
 
 ```php
 // In boot.php deines Addons
-use KLXM\YFormContentBuilder\Fields\FieldRegistry;
+use FriendsOfREDAXO\Builder\Fields\FieldRegistry;
 
-if (rex_addon::get('yform_content_builder')->isAvailable()) {
+if (rex_addon::get('builder')->isAvailable()) {
     FieldRegistry::register(new EmailField());
     FieldRegistry::register(new IconPickerField());
 }
@@ -1357,7 +1358,7 @@ if (rex_addon::get('yform_content_builder')->isAvailable()) {
 #### Option 2: Per Extension Point
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FIELDS', function(rex_extension_point $ep) {
+rex_extension::register('BUILDER_FIELDS', function(rex_extension_point $ep) {
     $fields = $ep->getSubject();
     
     // Neues Feld hinzufügen
@@ -1377,7 +1378,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_FIELDS', function(rex_extension_p
 <?php
 namespace MyAddon\Fields;
 
-use KLXM\YFormContentBuilder\Fields\BeMediaField;
+use FriendsOfREDAXO\Builder\Fields\BeMediaField;
 
 /**
  * Erweitertes Media-Feld mit Drag & Drop
@@ -1406,24 +1407,24 @@ class EnhancedMediaField extends BeMediaField
 
 ## Extension Points
 
-### YFORM_CONTENT_BUILDER_FIELDS
+### BUILDER_FIELDS
 
 Wird aufgerufen wenn die Feldtypen initialisiert werden.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FIELDS', function(rex_extension_point $ep) {
+rex_extension::register('BUILDER_FIELDS', function(rex_extension_point $ep) {
     $fields = $ep->getSubject();
     // $fields ist ein Array: ['type' => FieldInstance, ...]
     return $fields;
 });
 ```
 
-### YFORM_CONTENT_BUILDER_ELEMENTS
+### BUILDER_ELEMENTS
 
 Wird aufgerufen beim Laden der verfügbaren Elemente.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENTS', function(rex_extension_point $ep) {
+rex_extension::register('BUILDER_ELEMENTS', function(rex_extension_point $ep) {
     $elements = $ep->getSubject();
     
     // Element hinzufügen
@@ -1440,31 +1441,31 @@ rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENTS', function(rex_extension
 });
 ```
 
-### YFORM_CONTENT_BUILDER_ELEMENT_PATHS
+### BUILDER_ELEMENT_PATHS
 
 Wird aufgerufen um zusätzliche Pfade für Elemente zu registrieren.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_PATHS', function($ep) {
+rex_extension::register('BUILDER_ELEMENT_PATHS', function($ep) {
     $paths = $ep->getSubject();
     $paths['my_addon'] = rex_path::addon('my_addon', 'elements/');
     return $paths;
 });
 ```
 
-### YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS
+### BUILDER_BUNDLED_ELEMENTS
 
 Registriert, welche Elemente als "bundled" (Haupt-Addon) gelten. Standard: Core + Starter-Elemente.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_BUNDLED_ELEMENTS', function($ep) {
+rex_extension::register('BUILDER_BUNDLED_ELEMENTS', function($ep) {
     $bundled = $ep->getSubject() ?? [];
     $bundled[] = 'my_custom_element'; // Diese Ele wird Teil des bundles
     return $bundled;
 });
 ```
 
-### YFORM_CONTENT_BUILDER_ELEMENT_MODE
+### BUILDER_ELEMENT_MODE
 
 Steuert, ob mitgelieferte Elemente zusätzlich zu externen Pfaden geladen werden.
 
@@ -1476,12 +1477,12 @@ Priorität:
 - Sobald mindestens ein registrierter Provider `replace` meldet, ist der effektive Modus `replace`.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_ELEMENT_MODE', static function(): string {
+rex_extension::register('BUILDER_ELEMENT_MODE', static function(): string {
     return 'merge';
 });
 ```
 
-### YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS ⭐ *NEU (v3.1.0)*
+### BUILDER_FRAMEWORK_OPTIONS ⭐ *NEU (v3.1.0)*
 
 Framework-agnostische Optionen für Hintergründe, Padding, Container etc.
 Ermöglicht es, UIkit/Bootstrap/Plain/Custom-Frameworks zu unterstützen.
@@ -1491,7 +1492,7 @@ Ermöglicht es, UIkit/Bootstrap/Plain/Custom-Frameworks zu unterstützen.
 - `option_type`: 'backgrounds', 'paddings', 'containers', 'background_colors', 'css_prefix'
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', function($ep) {
+rex_extension::register('BUILDER_FRAMEWORK_OPTIONS', function($ep) {
     $framework = $ep->getParam('framework');
     $optionType = $ep->getParam('option_type');
     
@@ -1515,7 +1516,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_OPTIONS', function($ep)
 - `containers` → Array [class => label]
 - `css_prefix` → String (z.B. 'uk-', 'bs-')
 
-### YFORM_CONTENT_BUILDER_EDITOR_PROFILES ⭐ *NEU (v3.1.0)*
+### BUILDER_EDITOR_PROFILES ⭐ *NEU (v3.1.0)*
 
 Editor-Profile pro Element-Feld. Erlaubt verschiedene TinyMCE/CKE5-Profile.
 
@@ -1524,7 +1525,7 @@ Editor-Profile pro Element-Feld. Erlaubt verschiedene TinyMCE/CKE5-Profile.
 - `field`: Feld-Name (z.B. 'text')
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_EDITOR_PROFILES', function($ep) {
+rex_extension::register('BUILDER_EDITOR_PROFILES', function($ep) {
     $element = $ep->getParam('element');
     $field = $ep->getParam('field');
     
@@ -1540,22 +1541,22 @@ rex_extension::register('YFORM_CONTENT_BUILDER_EDITOR_PROFILES', function($ep) {
 
 Diese Hooks entkoppeln Theme-Integration vollständig vom Content Builder. Jeder Provider (z. B. UIkit, Bootstrap, Design-System-Addon) kann sie registrieren.
 
-#### YFORM_CONTENT_BUILDER_THEME_PROVIDER_AVAILABLE
+#### BUILDER_THEME_PROVIDER_AVAILABLE
 
 Signalisiert, dass ein Theme-Provider aktiv ist.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_PROVIDER_AVAILABLE', static function(rex_extension_point $ep): bool {
+rex_extension::register('BUILDER_THEME_PROVIDER_AVAILABLE', static function(rex_extension_point $ep): bool {
     return true;
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_THEME_CHOICES
+#### BUILDER_THEME_CHOICES
 
 Liefert auswählbare Themes als Array `theme_key => label`.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_CHOICES', static function(rex_extension_point $ep): array {
+rex_extension::register('BUILDER_THEME_CHOICES', static function(rex_extension_point $ep): array {
     return [
         'default' => 'Default',
         'dark' => 'Dark',
@@ -1563,23 +1564,23 @@ rex_extension::register('YFORM_CONTENT_BUILDER_THEME_CHOICES', static function(r
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_THEME_CONTEXT_RESET
+#### BUILDER_THEME_CONTEXT_RESET
 
 Setzt den Theme-Kontext zurück, bevor ein neues Theme angewendet wird.
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_CONTEXT_RESET', static function(rex_extension_point $ep) {
+rex_extension::register('BUILDER_THEME_CONTEXT_RESET', static function(rex_extension_point $ep) {
     // Provider-interner Reset
     return $ep->getSubject();
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_THEME_CONTEXT_SET
+#### BUILDER_THEME_CONTEXT_SET
 
 Setzt den Theme-Kontext auf den übergebenen Theme-Key (`$ep->getSubject()`).
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_CONTEXT_SET', static function(rex_extension_point $ep) {
+rex_extension::register('BUILDER_THEME_CONTEXT_SET', static function(rex_extension_point $ep) {
     $theme = (string) $ep->getSubject();
     if ($theme !== '') {
         // Provider-interne Aktivierung
@@ -1588,7 +1589,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_THEME_CONTEXT_SET', static functi
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_THEME_BACKGROUND_OPTIONS
+#### BUILDER_THEME_BACKGROUND_OPTIONS
 
 Liefert Theme-Hintergrundoptionen (für `section_bg`, Color-Preview etc.).
 
@@ -1597,7 +1598,7 @@ Parameter:
 - `framework` (string), z. B. `uikit`
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_BACKGROUND_OPTIONS', static function(rex_extension_point $ep): array {
+rex_extension::register('BUILDER_THEME_BACKGROUND_OPTIONS', static function(rex_extension_point $ep): array {
     if ((string) $ep->getParam('framework', 'uikit') !== 'uikit') {
         return (array) $ep->getSubject();
     }
@@ -1609,7 +1610,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_THEME_BACKGROUND_OPTIONS', static
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_THEME_TEXT_COLOR_OPTIONS
+#### BUILDER_THEME_TEXT_COLOR_OPTIONS
 
 Liefert Textfarben für Elemente wie Divider.
 
@@ -1618,7 +1619,7 @@ Parameter:
 - `framework` (string), z. B. `uikit`
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_THEME_TEXT_COLOR_OPTIONS', static function(rex_extension_point $ep): array {
+rex_extension::register('BUILDER_THEME_TEXT_COLOR_OPTIONS', static function(rex_extension_point $ep): array {
     if ((string) $ep->getParam('framework', 'uikit') !== 'uikit') {
         return (array) $ep->getSubject();
     }
@@ -1630,12 +1631,12 @@ rex_extension::register('YFORM_CONTENT_BUILDER_THEME_TEXT_COLOR_OPTIONS', static
 });
 ```
 
-#### YFORM_CONTENT_BUILDER_FRAMEWORK_NORMALIZE
+#### BUILDER_FRAMEWORK_NORMALIZE
 
 Erlaubt Provider-spezifische Framework-Normalisierung (z. B. `bootstrap` => `uikit`).
 
 ```php
-rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_NORMALIZE', static function(rex_extension_point $ep): string {
+rex_extension::register('BUILDER_FRAMEWORK_NORMALIZE', static function(rex_extension_point $ep): string {
     $framework = trim((string) $ep->getSubject());
     if ($framework === 'bootstrap') {
         return 'uikit';
@@ -1652,7 +1653,7 @@ rex_extension::register('YFORM_CONTENT_BUILDER_FRAMEWORK_NORMALIZE', static func
 ### FrameworkConfig
 
 ```php
-use KLXM\YFormContentBuilder\Config\FrameworkConfig;
+use FriendsOfREDAXO\Builder\Config\FrameworkConfig;
 
 // Hintergrund-Optionen für ein Framework
 $options = FrameworkConfig::getBackgroundChoices('bootstrap');
@@ -1676,7 +1677,7 @@ $prefix = FrameworkConfig::getCssPrefix('bootstrap');  // 'bs-'
 ### EditorConfig
 
 ```php
-use KLXM\YFormContentBuilder\Config\EditorConfig;
+use FriendsOfREDAXO\Builder\Config\EditorConfig;
 
 // Editor-Profil für Element abrufen
 $profile = EditorConfig::getEditorProfile('starter_text', 'text');
@@ -1690,7 +1691,7 @@ $editorType = EditorConfig::getEditorTypeForProfile('default');
 ### ElementRegistry
 
 ```php
-use KLXM\YFormContentBuilder\Config\ElementRegistry;
+use FriendsOfREDAXO\Builder\Config\ElementRegistry;
 
 // Alle bundled Elements
 $bundled = ElementRegistry::getBundledElements();
@@ -1719,7 +1720,7 @@ $config = ElementRegistry::getElementConfig('starter_text');
 ### TemplateEngine
 
 ```php
-use KLXM\YFormContentBuilder\TemplateEngine;
+use FriendsOfREDAXO\Builder\TemplateEngine;
 
 // Template mit Framework-Dispatch rendern
 $html = TemplateEngine::render('wrapper', $data, 'bootstrap');
@@ -1741,7 +1742,7 @@ $frameworks = TemplateEngine::getAvailableFrameworks();
 ### MediaManagerHelper
 
 ```php
-use KLXM\YFormContentBuilder\MediaManagerHelper;
+use FriendsOfREDAXO\Builder\MediaManagerHelper;
 
 $mm = MediaManagerHelper::factory();
 
@@ -1766,12 +1767,12 @@ $mm->addType('example_16_9', 'Beispieltyp 16:9')
 Empfehlung:
 
 - Jedes Addon legt nur die tatsächlich selbst verwendeten MediaManager-Typen in seiner eigenen `install.php` an.
-- Typenbeschreibungen sollten den Addon-Bezug klar enthalten, z. B. `YForm Content Builder: ...` oder `KLXM Elements: ...`.
+- Typenbeschreibungen sollten den Addon-Bezug klar enthalten, z. B. `Builder: ...` oder `KLXM Elements: ...`.
 
 ### ResponsiveImage
 
 ```php
-use KLXM\YFormContentBuilder\Media\ResponsiveImage;
+use FriendsOfREDAXO\Builder\Media\ResponsiveImage;
 
 $image = ResponsiveImage::forFile($file)
     ->withDesktopPreset('starter_cards_16_9')
@@ -1810,7 +1811,7 @@ Hinweise:
 ### FieldRegistry
 
 ```php
-use KLXM\YFormContentBuilder\Fields\FieldRegistry;
+use FriendsOfREDAXO\Builder\Fields\FieldRegistry;
 
 // Feld registrieren
 FieldRegistry::register(new MyField());
@@ -1849,7 +1850,7 @@ $config = Helper::getElementConfig('text_image');
 ### Frontend-Rendering
 
 ```php
-use KLXM\YFormContentBuilder\Helper;
+use FriendsOfREDAXO\Builder\Helper;
 
 // Aus vorhandenem YForm/YORM-Datensatz
 $page = rex_yform_manager_dataset::get(1, 'rex_pages');
@@ -1864,7 +1865,7 @@ echo Helper::outputDatasetById('rex_pages', 1, 'content_builder', 'uikit');
 echo Helper::outputRaw((string) $page?->getValue('content_builder'), 'plain');
 ```
 
-> **Hinweis zur Abwärtskompatibilität:** Die alten Klassennamen `yform_content_builder_helper`, `ContentBuilderFieldRegistry`, `ContentBuilderFieldAbstract` und `ContentBuilderFieldInterface` stehen weiterhin über PHP `class_alias()` zur Verfügung. Neuer Code sollte immer die kanonischen Klassennamen mit `use KLXM\YFormContentBuilder\...` verwenden.
+> **Hinweis zur Abwärtskompatibilität:** Die alten Klassennamen `builder_helper`, `ContentBuilderFieldRegistry`, `ContentBuilderFieldAbstract` und `ContentBuilderFieldInterface` stehen weiterhin über PHP `class_alias()` zur Verfügung. Neuer Code sollte immer die kanonischen Klassennamen mit `use FriendsOfREDAXO\Builder\...` verwenden.
 
 ---
 
@@ -1882,7 +1883,7 @@ echo Helper::outputRaw((string) $page?->getValue('content_builder'), 'plain');
    echo formatPrice($price);
    
    // ✅ Richtig – Closure oder Helper-Klasse verwenden
-   use KLXM\YFormContentBuilder\Helper;
+   use FriendsOfREDAXO\Builder\Helper;
    
    if (Helper::isImage($file)) { ... }
    
@@ -2182,5 +2183,5 @@ Alle alten Klassennamen stehen als `class_alias` zur Verfügung. Sollte eine Kla
 
 1. `boot.php` hat alle benötigten `class_alias`-Einträge.
 2. REDAXO-Autoloader findet die Klasse in `lib/` (Cache löschen hilft).
-3. Für neuen Code: `use KLXM\YFormContentBuilder\Module;` statt des alten Alias verwenden.
+3. Für neuen Code: `use FriendsOfREDAXO\Builder\Module;` statt des alten Alias verwenden.
 
