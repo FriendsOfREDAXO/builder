@@ -146,22 +146,7 @@ function generateFullBuilderOutputCode(string $framework, int $valueId, array $a
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
-
-
-
-
-
-
-\$rawValue = 'REX_VALUE[id={$valueId} output=html]';
-try {
-    \$slice = \$this->getCurrentSlice();
-    if (\$slice) {
-        \$rawValue = (string) \$slice->getValue({$valueId});
-    }
-} catch (\rex_exception \$exception) {
-    // Gridblock/Preview-Kontext ohne current slice: Fallback auf REX_VALUE-Placeholder.
-}
-\$builder = Module::createWithValue({$valueId}, \$rawValue, [
+\$builder = Module::createWithValue({$valueId}, 'REX_VALUE[id={$valueId} output=html]', [
     'framework' => '{$framework}',
     'allowed_elements' => {$allowedElementsCode},
 ]);
@@ -245,16 +230,8 @@ if (rex_post('update_all_modules', 'bool')) {
                 $outputCode = <<<PHP
 <?php
 use FriendsOfREDAXO\Builder\Module;
-\$rawValue = 'REX_VALUE[id={$valueId} output=html]';
-try {
-    \$slice = \$this->getCurrentSlice();
-    if (\$slice) {
-        \$rawValue = (string) \$slice->getValue({$valueId});
-    }
-} catch (\rex_exception \$exception) {
-    // Gridblock/Preview-Kontext ohne current slice: Fallback auf REX_VALUE-Placeholder.
-}
-echo Module::create('{$elementKey}', \$rawValue, '{$framework}', {$valueId})->renderOutput();
+
+echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderOutput();
 ?>
 PHP;
 
@@ -370,16 +347,8 @@ if (rex_post('create_modules', 'bool')) {
             $outputCode = <<<PHP
 <?php
 use FriendsOfREDAXO\Builder\Module;
-\$rawValue = 'REX_VALUE[id={$valueId} output=html]';
-try {
-    \$slice = \$this->getCurrentSlice();
-    if (\$slice) {
-        \$rawValue = (string) \$slice->getValue({$valueId});
-    }
-} catch (\rex_exception \$exception) {
-    // Gridblock/Preview-Kontext ohne current slice: Fallback auf REX_VALUE-Placeholder.
-}
-echo Module::create('{$elementKey}', \$rawValue, '{$framework}', {$valueId})->renderOutput();
+
+echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderOutput();
 ?>
 PHP;
             
