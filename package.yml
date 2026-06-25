@@ -1,5 +1,5 @@
 package: builder
-version: '1.0.0'
+version: '1.0.0-beta1'
 author: 'Friends of REDAXO'
 supportpage: 'https://klxm.de'
 license: MIT

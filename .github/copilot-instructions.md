@@ -2,7 +2,7 @@
 
 Diese Hinweise gelten nur innerhalb dieses Addons.
 
-## Fokus (Release 1.0.0)
+## Fokus (Release 1.0.0-beta1)
 
 - REDAXO Addon `builder` stabil erweitern.
 - Rückwärtskompatibilität beachten.

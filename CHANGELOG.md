@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [1.0.0] - 2026-06-25
+## [1.0.0-beta1] - 2026-06-25
 
 ### Initial Release
 
