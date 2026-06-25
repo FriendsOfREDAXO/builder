@@ -233,6 +233,7 @@ $demoMarkup .= '</section>';
 $demoMarkup .= '<div class="builder-demo-panel">';
 $demoMarkup .= '<h3>Arbeiten in der Demo</h3>';
 $demoMarkup .= '<p class="text-muted">Du kannst die vorhandenen Elemente bearbeiten, neue Demo-Bausteine hinzufügen und die verschachtelte Spaltenstruktur direkt im Builder verändern. Diese Seite schreibt bewusst nichts in den Slice-Speicher zurück.</p>';
+$demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bottom: 0;">Für die Demo wird ein installiertes TinyMCE-Addon empfohlen, damit die Textbausteine direkt im Editor bearbeitet werden können.</div>';
 $demoMarkup .= '</div>';
 
 $demoMarkup .= $builder->getEditor();

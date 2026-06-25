@@ -53,8 +53,9 @@ Builder ist auf Erweiterung ausgelegt:
 
 1. Addon `builder` installieren und aktivieren.
 2. Abhängigkeiten sicherstellen: `yform`, `focuspoint`, optional `media_negotiator`.
-3. In den Einstellungen Framework und Elementquellen konfigurieren.
-4. Optional Module über `Builder -> Module` generieren.
+3. Für die Demo und textbasierte Starter-Elemente wird ein installiertes `tinymce`-Addon empfohlen.
+4. In den Einstellungen Framework und Elementquellen konfigurieren.
+5. Optional Module über `Builder -> Module` generieren.
 
 ## Dokumentation
 
