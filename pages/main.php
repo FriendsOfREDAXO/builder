@@ -6,31 +6,59 @@
 
 $addon = rex_addon::get('builder');
 
-// Verfügbare Elemente inkl. Metadaten laden
-$elementsDir = $addon->getPath('elements');
+// Verfügbare Elemente inkl. Metadaten zentral über registrierte Element-Pfade laden
 $elements = [];
+$elementPaths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
 
-if (is_dir($elementsDir)) {
-	// Zuerst alle Element-Lang-Dateien laden damit Übersetzungen verfügbar sind
-	$dirs = scandir($elementsDir);
+$resolveSourceLabel = static function ($pathKey, string $basePath): string {
+	$key = is_string($pathKey) ? trim($pathKey) : '';
+	if ($key === '' || is_numeric($key)) {
+		$key = basename(rtrim($basePath, '/'));
+	}
+
+	if ($key === 'core' || $key === 'builder') {
+		return 'core';
+	}
+
+	return $key;
+};
+
+foreach ($elementPaths as $pathKey => $basePath) {
+	$basePath = rtrim((string) $basePath, '/');
+	if (!is_dir($basePath)) {
+		continue;
+	}
+
+	$sourceLabel = $resolveSourceLabel($pathKey, $basePath);
+
+	$dirs = scandir($basePath);
+	if (!is_array($dirs)) {
+		continue;
+	}
+
+	// Sprachdateien aus allen registrierten Elementpfaden laden
 	foreach ($dirs as $dir) {
-		if ($dir === '.' || $dir === '..') {
+		if ($dir === '.' || $dir === '..' || str_starts_with($dir, '.')) {
 			continue;
 		}
-		$langDir = $elementsDir . '/' . $dir . '/lang';
+
+		$langDir = $basePath . '/' . $dir . '/lang';
 		if (is_dir($langDir)) {
 			\rex_i18n::addDirectory($langDir);
 		}
 	}
 
-	// Nun alle Elemente mit ihren Konfigurationen laden
-	$dirs = scandir($elementsDir);
+	// Konfigurationen laden (erster Treffer pro Element-Key gewinnt)
 	foreach ($dirs as $dir) {
-		if ($dir === '.' || $dir === '..') {
+		if ($dir === '.' || $dir === '..' || str_starts_with($dir, '.')) {
 			continue;
 		}
 
-		$configPath = $elementsDir . '/' . $dir . '/config.php';
+		if (isset($elements[$dir])) {
+			continue;
+		}
+
+		$configPath = $basePath . '/' . $dir . '/config.php';
 		if (!is_file($configPath)) {
 			continue;
 		}
@@ -40,16 +68,19 @@ if (is_dir($elementsDir)) {
 			continue;
 		}
 
-		$elements[] = [
+		$elements[$dir] = [
 			'key' => $dir,
 			'label' => (string) ($config['label'] ?? $dir),
 			'description' => (string) ($config['description'] ?? ''),
 			'icon' => (string) ($config['icon'] ?? 'fa-cube'),
 			'category' => (string) ($config['category'] ?? '-'),
 			'version' => (string) ($config['version'] ?? '-'),
+			'source' => $sourceLabel,
 		];
 	}
 }
+
+$elements = array_values($elements);
 
 usort($elements, static function (array $a, array $b): int {
 	return strcasecmp($a['label'], $b['label']);
@@ -168,7 +199,12 @@ if ($elements === []) {
 			$listBody .= '<div style="color:#5f6f83; font-size:13px; line-height:1.35;">' . rex_escape($description) . '</div>';
 			$listBody .= '</div>';
 			$listBody .= '<div class="col-sm-4" style="text-align:right;">';
-			$listBody .= '<div style="margin-bottom:5px;"><span class="label label-info" style="margin-right:5px;">v' . rex_escape($element['version']) . '</span><span class="label label-default">' . rex_escape($element['key']) . '</span></div>';
+			$sourceLabel = (string) ($element['source'] ?? '');
+			$sourceBadgeClass = $sourceLabel === 'core' ? 'label-primary' : 'label-warning';
+			if ($sourceLabel === '') {
+				$sourceLabel = '-';
+			}
+			$listBody .= '<div style="margin-bottom:5px;"><span class="label label-info" style="margin-right:5px;">v' . rex_escape($element['version']) . '</span><span class="label label-default" style="margin-right:5px;">' . rex_escape($element['key']) . '</span><span class="label ' . rex_escape($sourceBadgeClass) . '">' . rex_escape($sourceLabel) . '</span></div>';
 			$listBody .= '<div style="color:#8b9ab0; font-size:12px;">' . rex_escape($element['icon']) . '</div>';
 			$listBody .= '</div>';
 			$listBody .= '</div>';

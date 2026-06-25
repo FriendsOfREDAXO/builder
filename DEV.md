@@ -1,4 +1,4 @@
-# Developer Guide – Builder v3.1.0+
+# Developer Guide – Builder v1.0.0+
 
 Umfassender Guide für die Entwicklung mit dem Framework-agnostischen Content Builder System.
 
