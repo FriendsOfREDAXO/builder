@@ -184,6 +184,12 @@ class Module
             $slot = 1;
         }
 
+        // Guard: Nicht im Frontend oder in verschachtelten Kontexten (z.B. Gridblock) versuchen zu laden
+        // Der Builder sollte nur direkt im Backend-Slice-Editor funktionieren
+        if (!rex::isBackend()) {
+            return '';
+        }
+
         // Beim Hinzufügen eines neuen Slices (function=add) keine Daten aus dem vorherigen Slice laden
         $function = rex_request('function', 'string', '');
         if ($function === 'add') {

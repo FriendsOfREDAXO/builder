@@ -119,6 +119,11 @@ class ModuleBuilder
 
     public function getEditor(): string
     {
+        // Guard: Builder sollte nur im Backend-Kontext funktionieren, nicht im Frontend (z.B. Gridblock)
+        if (!rex::isBackend()) {
+            return '';
+        }
+
         $this->applyBackendLocale();
 
         $availableElements = $this->getAvailableElements();
@@ -395,6 +400,11 @@ class ModuleBuilder
 
     public function renderOutput(): string
     {
+        // Guard: Builder sollte nur im Backend-Kontext funktionieren
+        if (!rex::isBackend()) {
+            return '';
+        }
+
         $jsonContent = json_encode($this->slices, JSON_UNESCAPED_UNICODE);
         if (!is_string($jsonContent) || $jsonContent === '[]') {
             return '';
@@ -408,6 +418,12 @@ class ModuleBuilder
         $slot = $valueId;
         if ($slot < 1 || $slot > 20) {
             $slot = 1;
+        }
+
+        // Guard: Nicht im Frontend oder in verschachtelten Kontexten (z.B. Gridblock) versuchen zu laden
+        // Der Builder sollte nur direkt im Backend-Slice-Editor funktionieren
+        if (!rex::isBackend()) {
+            return '';
         }
 
         // Beim Hinzufügen eines neuen Slices (function=add) keine Daten aus dem vorherigen Slice laden
