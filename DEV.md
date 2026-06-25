@@ -1,4 +1,4 @@
-# Developer Guide – Builder v1.0.0-beta1+
+# Developer Guide – Builder v1.0.0-beta2+
 
 Umfassender Guide für die Entwicklung mit dem Framework-agnostischen Content Builder System.
 

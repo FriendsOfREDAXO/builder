@@ -142,6 +142,10 @@ if (rex::isBackend()) {
             'rex-api-call' => 'yform_list_columns',
         ]));
     }
+
+    if ('builder/demo' === rex_be_controller::getCurrentPage()) {
+        rex_view::addJsFile($assetUrl('demo.js'));
+    }
 }
 
 // Assets für Frontend einbinden (CSS für Elemente)

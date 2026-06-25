@@ -1,5 +1,5 @@
 package: builder
-version: '1.0.0-beta1'
+version: '1.0.0-beta2'
 author: 'Friends of REDAXO'
 supportpage: 'https://klxm.de'
 license: MIT
@@ -20,6 +20,9 @@ page:
         main:
             title: 'translate:builder_overview'
             icon: rex-icon fa-info-circle
+        demo:
+            title: 'Demo'
+            icon: rex-icon fa-play-circle
         modules:
             title: 'translate:builder_modules'
             icon: rex-icon fa-code

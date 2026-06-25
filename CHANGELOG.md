@@ -4,6 +4,14 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.0.0-beta2] - 2026-06-25
+
+### Demo-Editor und Layouts
+
+- Builder-Demo als echter Editor mit vorgefüllten Demo- und Default-Elementen.
+- Spaltenlayout mit verschachtelter Struktur in der Demo ergänzt.
+- Unterschiedliche Hintergründe für äußere und innere Layout-Ebenen.
+
 ## [1.0.0-beta1] - 2026-06-25
 
 ### Initial Release
