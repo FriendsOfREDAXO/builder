@@ -146,7 +146,7 @@ function generateFullBuilderOutputCode(string $framework, int $valueId, array $a
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
-\$builder = Module::createWithValue({$valueId}, 'REX_VALUE[id={$valueId} output=html]', [
+\$builder = Module::createWithValue({$valueId}, Module::getSliceValueForModule({$valueId}), [
     'framework' => '{$framework}',
     'allowed_elements' => {$allowedElementsCode},
 ]);
@@ -231,7 +231,7 @@ if (rex_post('update_all_modules', 'bool')) {
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
-echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderOutput();
+echo Module::create('{$elementKey}', Module::getSliceValueForModule({$valueId}), '{$framework}', {$valueId})->renderOutput();
 ?>
 PHP;
 
@@ -348,7 +348,7 @@ if (rex_post('create_modules', 'bool')) {
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
-echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderOutput();
+echo Module::create('{$elementKey}', Module::getSliceValueForModule({$valueId}), '{$framework}', {$valueId})->renderOutput();
 ?>
 PHP;
             

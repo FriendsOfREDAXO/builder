@@ -6,6 +6,7 @@ use FriendsOfREDAXO\Builder\Config\ThemeProviderBridge;
 use FriendsOfREDAXO\Builder\Fields\FieldRegistry;
 use rex;
 use rex_addon;
+use rex_article_content;
 use rex_escape;
 use rex_path;
 use rex_request;
@@ -175,6 +176,62 @@ class Module
     public static function createWithValue(int $valueId = 1, mixed $rawValue = null, array $options = []): ModuleBuilder
     {
         return ModuleBuilder::create($valueId, $rawValue, $options);
+    }
+
+    /**
+     * Hilfsfunktion für Modul-Code-Generierung: zukünftig-sicher auf getCurrentSlice() vorbereitet
+     * 
+     * Diese Methode ist gedacht für die Nutzung in generierten Modul-Output-Dateien.
+     * 
+     * Strategie:
+     * - Wenn Gridblock NICHT verfügbar: Nutzt getCurrentSlice() (Modern, REX_VALUE-unabhängig)
+     * - Wenn Gridblock verfügbar: Nutzt REX_VALUE[id=X output=html] (Gridblock-kompatibel)
+     * 
+     * Zukünftige Migrations-Info:
+     * Wenn REDAXO REX_VALUE[id=X output=html] nicht mehr unterstützt:
+     * 1. Diese Methode wird automatisch nur noch getCurrentSlice() nutzen
+     * 2. Kein Code-Update in Modulen nötig - die generierte Funktion bleibt gleich!
+     * 3. Diese Methode wird vereinfacht (REX_VALUE-Fallback entfernt)
+     * 
+     * @param int $valueId REX_VALUE Slot (1-20)
+     * @return string Raw-Wert (entweder direkt von getCurrentSlice() oder REX_VALUE-Placeholder)
+     */
+    public static function getSliceValueForModule(int $valueId = 1): string
+    {
+        // Wenn Gridblock geladen ist, verwende REX_VALUE als Fallback (Gridblock-Sicherheit)
+        $useGridblockFallback = rex_addon::get('gridblock')?->isAvailable() ?? false;
+        
+        if ($useGridblockFallback) {
+            // Gridblock-Kontext: REX_VALUE mit Try-Catch auf getCurrentSlice()
+            try {
+                $slice = rex_article_content::getCurrentSlice();
+                if ($slice && $slice->getId() > 0) {
+                    $value = $slice->getValue($valueId);
+                    if ($value !== null && $value !== '') {
+                        return (string) $value;
+                    }
+                }
+            } catch (Throwable $e) {
+                // getCurrentSlice() nicht verfügbar - Fallback auf REX_VALUE
+            }
+            
+            return 'REX_VALUE[id=' . $valueId . ' output=html]';
+        }
+        
+        // Nicht-Gridblock: Direkt getCurrentSlice() (Modern, future-proof)
+        try {
+            $slice = rex_article_content::getCurrentSlice();
+            if ($slice && $slice->getId() > 0) {
+                $value = $slice->getValue($valueId);
+                if ($value !== null && $value !== '') {
+                    return (string) $value;
+                }
+            }
+        } catch (Throwable $e) {
+            // getCurrentSlice() nicht verfügbar - leer zurückgeben (kein REX_VALUE Fallback)
+        }
+        
+        return '';
     }
 
     /**
