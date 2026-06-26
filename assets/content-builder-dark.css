@@ -234,20 +234,26 @@ body.rex-theme-dark {
 
     /* Move Buttons */
     .repeater-item .btn-move {
-        background: rgba(255, 255, 255, 0.2);
-        color: #f2f2f2;
+        background: #404040;
+        color: #ccc;
+        border-color: #505050;
     }
 
     .repeater-item .btn-move:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: #505050;
+        border-color: #606060;
+        color: #e0e0e0;
     }
 
     .repeater-item .btn-add-inline {
-        background: rgba(92, 184, 92, 0.6) !important;
+        background: #5cb85c !important;
+        color: white !important;
+        border-color: #4cae4c !important;
     }
 
     .repeater-item .btn-add-inline:hover {
-        background: rgba(92, 184, 92, 0.9) !important;
+        background: #449d44 !important;
+        border-color: #398439 !important;
     }
 
     /* Caption / Filename Styles */

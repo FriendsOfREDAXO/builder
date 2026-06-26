@@ -1021,47 +1021,51 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     right: 10px;
 }
 
-/* Move Buttons für alle Repeater - rechts neben Löschen-Button */  
+/* Move Buttons für alle Repeater - horizontale Anordnung am oberen Rand */  
 .repeater-item .move-buttons {
     position: absolute;
     top: 10px;
     right: 45px; /* 35px für btn-remove + 10px Abstand */
     z-index: 10;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-direction: row;
+    gap: 4px;
 }
 
 .repeater-item .btn-move {
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    opacity: 0.7;
+    transition: opacity 0.15s, background-color 0.15s;
     cursor: pointer;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 2px;
-    padding: 2px 4px;
-    font-size: 10px;
-    width: 20px;
-    height: 14px;
+    background: #e8e8e8;
+    color: #555;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 13px;
+    width: auto;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
 }
 
-.repeater-item:hover .btn-move {
+.repeater-item .btn-move:hover {
     opacity: 1;
+    background: #d8d8d8;
+    border-color: #b0b0b0;
 }
 
 .repeater-item .btn-add-inline {
-    background: rgba(92, 184, 92, 0.8) !important;
-    transition: background-color 0.2s;
+    background: #5cb85c !important;
+    color: white !important;
+    border-color: #4cae4c !important;
 }
 
 .repeater-item .btn-add-inline:hover {
-    background: rgba(60, 160, 60, 1) !important;
-    opacity: 1;
+    background: #449d44 !important;
+    border-color: #398439 !important;
+    opacity: 1 !important;
 }
 
 .repeater-item .btn-move:hover {
