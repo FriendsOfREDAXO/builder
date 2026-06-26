@@ -80,8 +80,10 @@ if (rex::isBackend() && rex_addon::get('focuspoint')->isAvailable()) {
 
 // Extension Points registrieren
 rex_extension::register('PACKAGES_INCLUDED', function() {
-    // Templates registrieren
-    rex_yform::addTemplatePath(rex_path::addon('builder', 'ytemplates'));
+    if (rex_addon::get('yform')->isAvailable() && class_exists('rex_yform')) {
+        // Templates nur registrieren, wenn YForm vorhanden ist.
+        rex_yform::addTemplatePath(rex_path::addon('builder', 'ytemplates'));
+    }
 });
 
 // Assets für Backend einbinden

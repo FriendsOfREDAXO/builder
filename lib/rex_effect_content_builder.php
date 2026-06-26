@@ -49,22 +49,52 @@ class rex_effect_content_builder extends rex_effect_abstract
             return;
         }
 
-        if (!class_exists('rex_effect_focuspoint_fit')) {
-            throw new rex_exception('Das focuspoint AddOn ist erforderlich für rex_effect_content_builder.');
-        }
-
         [$ratioW, $ratioH] = $this->resolveRatio($ratio);
 
-        $focuspoint = new rex_effect_focuspoint_fit();
-        $focuspoint->setMedia($this->media);
-        $focuspoint->setParams([
-            'width' => $ratioW . 'fr',
-            'height' => $ratioH . 'fr',
-            'zoom' => '0',
-            'meta' => 'med_focuspoint',
-            'focus' => '50.0,50.0',
+        if (class_exists('rex_effect_focuspoint_fit')) {
+            $focuspoint = new rex_effect_focuspoint_fit();
+            $focuspoint->setMedia($this->media);
+            $focuspoint->setParams([
+                'width' => $ratioW . 'fr',
+                'height' => $ratioH . 'fr',
+                'zoom' => '0',
+                'meta' => 'med_focuspoint',
+                'focus' => '50.0,50.0',
+            ]);
+            $focuspoint->execute();
+
+            return;
+        }
+
+        // Fallback ohne focuspoint-Addon: zentrierter Crop auf das gewünschte Ratio.
+        $currentWidth = (int) $this->media->getWidth();
+        $currentHeight = (int) $this->media->getHeight();
+        if ($currentWidth < 1 || $currentHeight < 1) {
+            return;
+        }
+
+        $targetWidth = $currentWidth;
+        $targetHeight = (int) floor($targetWidth * $ratioH / $ratioW);
+
+        if ($targetHeight > $currentHeight) {
+            $targetHeight = $currentHeight;
+            $targetWidth = (int) floor($targetHeight * $ratioW / $ratioH);
+        }
+
+        $targetWidth = max(1, min($targetWidth, $currentWidth));
+        $targetHeight = max(1, min($targetHeight, $currentHeight));
+
+        $crop = new rex_effect_crop();
+        $crop->setMedia($this->media);
+        $crop->setParams([
+            'width' => $targetWidth,
+            'height' => $targetHeight,
+            'hpos' => 'center',
+            'vpos' => 'middle',
+            'offset_width' => 0,
+            'offset_height' => 0,
         ]);
-        $focuspoint->execute();
+        $crop->execute();
     }
 
     public function getName()

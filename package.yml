@@ -5,9 +5,6 @@ supportpage: 'https://klxm.de'
 license: MIT
 
 requires:
-    packages:
-        yform: '>=4.0'
-        focuspoint: '>=4.0'
     redaxo: '^5.15'
     php:
         version: '^8.1'

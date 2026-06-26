@@ -59,7 +59,7 @@ $installMessage = '';
 if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
     if (!$installCsrf->isValid()) {
         $installMessage .= rex_view::warning(rex_i18n::msg('csrf_token_invalid'));
-    } elseif (!$mediaManagerAvailable || !$focuspointAvailable) {
+    } elseif (!$mediaManagerAvailable) {
         $installMessage .= rex_view::warning(rex_i18n::msg('builder_media_types_preview_install_requires'));
     } else {
         $ratioTypes = $collectFocuspointRatioTypes($presets);
@@ -114,6 +114,7 @@ if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
                         ++$installed;
                     }
 
+                    $effectName = 'focuspoint_fit';
                     $effectParameters = [
                         'rex_effect_focuspoint_fit' => [
                             'rex_effect_focuspoint_fit_meta' => 'med_focuspoint',
@@ -124,18 +125,47 @@ if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
                         ],
                     ];
 
+                    if (!$focuspointAvailable || !class_exists('rex_effect_focuspoint_fit')) {
+                        $effectName = 'content_builder';
+                        $effectParameters = [
+                            'rex_effect_content_builder' => [
+                                'rex_effect_content_builder_preset' => 'focuspoint_ratio_fallback',
+                                'rex_effect_content_builder_ratio' => (string) $ratioData['width_fr'] . '_' . (string) $ratioData['height_fr'],
+                                'rex_effect_content_builder_mode' => 'focuspoint',
+                                'rex_effect_content_builder_width' => '1600',
+                                'rex_effect_content_builder_allow_enlarge' => 'not_enlarge',
+                            ],
+                        ];
+                    }
+
                     $effectRows = $sql->getArray(
-                        'SELECT id FROM ' . rex::getTable('media_manager_type_effect') . ' WHERE type_id = :type_id AND effect = :effect ORDER BY id ASC LIMIT 1',
-                        [':type_id' => $typeId, ':effect' => 'focuspoint_fit']
+                        'SELECT id, effect FROM ' . rex::getTable('media_manager_type_effect')
+                        . ' WHERE type_id = :type_id AND effect IN (\'focuspoint_fit\', \'content_builder\')'
+                        . ' ORDER BY priority ASC, id ASC',
+                        [':type_id' => $typeId]
                     );
 
                     if ($effectRows !== []) {
                         $effectId = (int) $effectRows[0]['id'];
                         $sql->setTable(rex::getTable('media_manager_type_effect'));
                         $sql->setWhere(['id' => $effectId]);
+                        $sql->setValue('effect', $effectName);
                         $sql->setValue('parameters', json_encode($effectParameters));
                         $sql->addGlobalUpdateFields();
                         $sql->update();
+
+                        // Doppelte Alt-Effekte entfernen (z. B. focuspoint_fit + content_builder parallel).
+                        for ($i = 1, $len = count($effectRows); $i < $len; ++$i) {
+                            $obsoleteId = (int) ($effectRows[$i]['id'] ?? 0);
+                            if ($obsoleteId <= 0) {
+                                continue;
+                            }
+
+                            $sql->setQuery(
+                                'DELETE FROM ' . rex::getTable('media_manager_type_effect') . ' WHERE id = :id',
+                                [':id' => $obsoleteId]
+                            );
+                        }
                     } else {
                         $priorityRows = $sql->getArray(
                             'SELECT MAX(priority) AS max_priority FROM ' . rex::getTable('media_manager_type_effect') . ' WHERE type_id = :type_id',
@@ -145,7 +175,7 @@ if (rex_post('ycb_action', 'string') === 'install_focuspoint_ratio_types') {
 
                         $sql->setTable(rex::getTable('media_manager_type_effect'));
                         $sql->setValue('type_id', $typeId);
-                        $sql->setValue('effect', 'focuspoint_fit');
+                        $sql->setValue('effect', $effectName);
                         $sql->setValue('parameters', json_encode($effectParameters));
                         $sql->setValue('priority', $priority);
                         $sql->addGlobalCreateFields();
@@ -223,7 +253,7 @@ $installForm .= '<div class="col-sm-10">';
 $installForm .= '<div class="checkbox" style="margin-top:0;">';
 $installForm .= '<label><input type="checkbox" name="install_with_texts" value="1" checked> ' . rex_i18n::msg('builder_media_types_preview_install_with_texts') . '</label>';
 $installForm .= '</div>';
-$installForm .= '<button class="btn btn-default" type="submit"' . ((!$mediaManagerAvailable || !$focuspointAvailable) ? ' disabled' : '') . '>' . rex_i18n::msg('builder_media_types_preview_install_button') . '</button>';
+$installForm .= '<button class="btn btn-default" type="submit"' . ((!$mediaManagerAvailable) ? ' disabled' : '') . '>' . rex_i18n::msg('builder_media_types_preview_install_button') . '</button>';
 $installForm .= '<p class="help-block" style="margin-top:8px;">' . rex_i18n::msg('builder_media_types_preview_install_hint') . '</p>';
 $installForm .= '</div>';
 $installForm .= '</div>';
