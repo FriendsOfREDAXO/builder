@@ -5,6 +5,8 @@ supportpage: 'https://klxm.de'
 license: MIT
 
 requires:
+    packages:
+        media_manager: '*'
     redaxo: '^5.15'
     php:
         version: '^8.1'
