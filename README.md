@@ -20,6 +20,9 @@ Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe.
 - Repeater- und Nested-Elemente für komplexe Inhaltsstrukturen 😀
 - Rollen- und Sichtbarkeitssteuerung über Feldkonfiguration 😀
 - Modul-Generator im Backend zur schnellen REDAXO-Modulerstellung ⭐️
+- Geführte YForm-Listen-Profile auf eigener Verwaltungsseite
+- Profiltypen für Listen: Kontakte, News, Events, Produkte, Slides/Teaser und freie Listen
+- Neues Slides-/Teaser-Layout im Element `yform_list` (UIkit, Bootstrap und Plain)
 
 ## Einsatzbereiche
 
@@ -57,10 +60,31 @@ Builder ist auf Erweiterung ausgelegt:
 ## Installation
 
 1. Addon `builder` installieren und aktivieren.
-2. Abhängigkeiten sicherstellen: `yform`, `focuspoint`, optional `media_negotiator`.
-3. Für die Demo und textbasierte Starter-Elemente wird ein installiertes `tinymce`-Addon empfohlen.
-4. In den Einstellungen Framework und Elementquellen konfigurieren.
-5. Optional Module über `Builder -> Module` generieren.
+2. Pflicht-Abhängigkeit sicherstellen: `media_manager`.
+3. Optionale Addons je nach Einsatz:
+	- `yform` für YForm-Felder und YForm-Listen-Profile
+	- `focuspoint` für Focuspoint-Cropping (ohne Focuspoint mit Crop-Fallback)
+	- `media_negotiator` für moderne Bildformate
+4. Für die Demo und textbasierte Starter-Elemente wird ein installiertes `tinymce`-Addon empfohlen.
+5. In den Einstellungen Framework und Elementquellen konfigurieren.
+6. Optional Module über `Builder -> Module` generieren.
+
+## YForm-Listen-Profile
+
+Die Profile für das Element `yform_list` werden über eine eigene Seite gepflegt:
+
+- `Builder -> YForm-Listen-Profile`
+
+Beim Anlegen eines Profils wird zuerst der gewünschte Listentyp ausgewählt. Danach werden passende Felder und sinnvolle Defaults gesetzt, damit nicht alle Optionen manuell konfiguriert werden müssen.
+
+Verfügbare Profiltypen:
+
+- Freie Liste
+- Kontakte
+- News / Artikel
+- Events / Termine
+- Produkte
+- Slides / Teaser-Slider
 
 ## Dokumentation
 
