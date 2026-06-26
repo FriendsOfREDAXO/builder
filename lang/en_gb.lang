@@ -150,3 +150,16 @@ builder_enable_element_search = Element Search
 builder_enable_element_search_label = Enable live search for element palette
 builder_enable_element_search_notice = When active, a live search is displayed if 5 or more elements are available. The search will be placed below the pasted element or at the beginning of the element list.
 builder_element_search_placeholder = Search elements...
+
+builder_docs_section_overview = Documentation
+builder_docs_section_tutorial = Tutorial
+builder_docs_section_api = API Documentation
+builder_docs_section_dev = Developer Guide
+builder_docs_section_schema = Schema Reference
+builder_docs_section_changelog = Changelog
+builder_docs_search_placeholder = Search documentation
+builder_docs_search_results = Search results
+builder_docs_search_results_for = Search results for
+builder_docs_no_results = No results found.
+builder_docs_toc = Table of contents
+builder_docs_toc_filter = Filter TOC

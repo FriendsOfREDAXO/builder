@@ -140,3 +140,16 @@ builder_enable_element_search = Element-Suche
 builder_enable_element_search_label = Live-Suche für Element-Palette aktivieren
 builder_enable_element_search_notice = Wenn aktiv, wird eine Live-Suche angezeigt, wenn 5 oder mehr Elemente verfügbar sind. Die Suche wird unterhalb des kopierten Elements oder am Anfang der Element-Liste platziert.
 builder_element_search_placeholder = Element durchsuchen...
+
+builder_docs_section_overview = Dokumentation
+builder_docs_section_tutorial = Tutorial
+builder_docs_section_api = API-Dokumentation
+builder_docs_section_dev = Developer Guide
+builder_docs_section_schema = Schema-Referenz
+builder_docs_section_changelog = Changelog
+builder_docs_search_placeholder = Dokumentation durchsuchen
+builder_docs_search_results = Suchergebnisse
+builder_docs_search_results_for = Suchergebnisse für
+builder_docs_no_results = Keine Treffer gefunden.
+builder_docs_toc = Inhaltsverzeichnis
+builder_docs_toc_filter = TOC filtern

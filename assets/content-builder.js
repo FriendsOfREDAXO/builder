@@ -237,6 +237,17 @@
         initDropdownZIndex: function() {
             $(document)
                 .on('show.bs.dropdown', '.slice-toolbar .btn-group-insert, .column-add-slice, .content-builder-add', function() {
+                    var $trigger = $(this);
+                    var $builder = $trigger.closest('.yform-content-builder');
+
+                    // Das untere "+ Element hinzufügen"-Menü beim Öffnen immer
+                    // frisch aus derselben zentralen Logik generieren.
+                    // Damit ist das initiale Server-HTML nur Fallback.
+                    if ($trigger.hasClass('content-builder-add') && $builder.length > 0) {
+                        var availableElements = ContentBuilder.getAvailableElementsFromBuilder($builder);
+                        ContentBuilder.updateMainAddDropdown($builder, availableElements);
+                    }
+
                     var $slice = $(this).closest('.content-builder-slice');
                     if ($slice.length > 0) {
                         // Keep dropdown above nearby slices, but below modals.
@@ -2681,7 +2692,37 @@
                         }
                     });
                 });
+
+                // Unteres "+ Element hinzufügen"-Dropdown mit derselben
+                // Quelle/Filterlogik wie die Insert-Dropdowns synchronisieren.
+                // So verhalten sich beide Menüs identisch bei aktivierten
+                // Addon-Quellen/Filtern in den Builder-Einstellungen.
+                self.updateMainAddDropdown($builder, availableElements);
             });
+        },
+
+        updateMainAddDropdown: function($builder, availableElements) {
+            if (!$builder || $builder.length === 0) {
+                return;
+            }
+
+            var $targetMenu = $builder.find('> .content-builder-add > .btn-group > .dropdown-menu').first();
+            if ($targetMenu.length === 0) {
+                return;
+            }
+
+            // Bestehende Insert-Logik wiederverwenden und danach auf btn-add-slice mappen.
+            var $insertGroup = this.createInsertButton(availableElements, 'end', '', $builder);
+            var $newMenu = $insertGroup.find('> .dropdown-menu').first().clone();
+
+            $newMenu.find('.btn-insert-slice').each(function() {
+                $(this)
+                    .removeClass('btn-insert-slice')
+                    .addClass('btn-add-slice')
+                    .removeAttr('data-insert-after');
+            });
+
+            $targetMenu.replaceWith($newMenu);
         },
         
         createInsertButton: function(availableElements, insertAfter, currentSliceType, $builder) {

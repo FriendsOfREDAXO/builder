@@ -37,16 +37,3 @@ page:
         docs:
             title: 'translate:builder_docs'
             icon: rex-icon fa-book
-            subPath: README.md
-        dev:
-            title: 'translate:builder_dev'
-            icon: rex-icon fa-code
-            subPath: DEV.md
-        api:
-            title: 'translate:builder_api'
-            icon: rex-icon fa-code-fork
-            subPath: API.md
-        tutorial:
-            title: 'translate:builder_tutorial'
-            icon: rex-icon fa-graduation-cap
-            subPath: TUTORIAL.md
