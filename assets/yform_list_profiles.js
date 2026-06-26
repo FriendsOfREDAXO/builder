@@ -145,12 +145,20 @@
         function applyTypeVisibility() {
             var type = typeSelect.value || 'generic';
             var contactLabels = document.querySelectorAll('.yfl-type-contact');
+            var productLabels = document.querySelectorAll('.yfl-type-product');
             contactLabels.forEach(function (label) {
                 var row = label.closest('.form-group');
                 if (!row) {
                     return;
                 }
                 row.style.display = (type === 'contact') ? '' : 'none';
+            });
+            productLabels.forEach(function (label) {
+                var row = label.closest('.form-group');
+                if (!row) {
+                    return;
+                }
+                row.style.display = (type === 'product') ? '' : 'none';
             });
 
             var layoutSelect = document.querySelector('select[name="default_layout"]');
@@ -163,7 +171,7 @@
                 contact: 'contact',
                 news: 'cards',
                 event: 'list',
-                product: 'cards',
+                product: 'slides',
                 slides: 'slides',
                 generic: 'cards'
             };

@@ -48,12 +48,21 @@ $containerStyle = StarterConfig::mapContainer($containerWidth, 'plain');
     $teaser = rex_escape((string) ($it['teaser'] ?? ''));
     $href = $showLinks ? (string) ($it['href'] ?? '') : '';
     $img = ListRenderer::imgTag($it, '', 640);
+    $product = (array) ($it['product'] ?? []);
+    $currency = (string) ($product['currency'] ?? 'EUR');
+    $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+    $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+    $badge = trim((string) ($product['badge'] ?? ''));
+    $availability = trim((string) ($product['availability'] ?? ''));
     ?>
     <article style="min-width:min(520px,90vw);scroll-snap-align:start;border:1px solid #ddd;border-radius:6px;overflow:hidden;">
         <?= $img ?>
         <div style="padding:.85rem;">
+            <?php if ($badge !== ''): ?><div style="margin-bottom:.4rem;"><span style="display:inline-block;background:#0d6efd;color:#fff;border-radius:4px;padding:.1rem .45rem;font-size:.8rem;"><?= rex_escape($badge) ?></span></div><?php endif; ?>
             <h3 style="margin-top:0;"><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h3>
             <?php if ($teaser !== ''): ?><p style="margin-bottom:0;"><?= $teaser ?></p><?php endif; ?>
+            <?php if ($price !== ''): ?><p style="margin:.35rem 0 0;"><strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?></p><?php endif; ?>
+            <?php if ($availability !== ''): ?><p style="margin:.2rem 0 0;color:#666;"><small><?= rex_escape($availability) ?></small></p><?php endif; ?>
         </div>
     </article>
     <?php endforeach; ?>
@@ -66,12 +75,21 @@ $containerStyle = StarterConfig::mapContainer($containerWidth, 'plain');
     $teaser = rex_escape((string) ($it['teaser'] ?? ''));
     $href = $showLinks ? (string) ($it['href'] ?? '') : '';
     $img = ListRenderer::imgTag($it, '', 360);
+    $product = (array) ($it['product'] ?? []);
+    $currency = (string) ($product['currency'] ?? 'EUR');
+    $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+    $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+    $badge = trim((string) ($product['badge'] ?? ''));
+    $availability = trim((string) ($product['availability'] ?? ''));
     ?>
     <article style="border:1px solid #ddd;border-radius:6px;overflow:hidden;">
         <?= $img ?>
         <div style="padding:.85rem;">
+            <?php if ($badge !== ''): ?><div style="margin-bottom:.4rem;"><span style="display:inline-block;background:#0d6efd;color:#fff;border-radius:4px;padding:.1rem .45rem;font-size:.8rem;"><?= rex_escape($badge) ?></span></div><?php endif; ?>
             <h3 style="margin-top:0;"><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h3>
             <?php if ($teaser !== ''): ?><p style="margin-bottom:0;"><?= $teaser ?></p><?php endif; ?>
+            <?php if ($price !== ''): ?><p style="margin:.35rem 0 0;"><strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?></p><?php endif; ?>
+            <?php if ($availability !== ''): ?><p style="margin:.2rem 0 0;color:#666;"><small><?= rex_escape($availability) ?></small></p><?php endif; ?>
         </div>
     </article>
     <?php endforeach; ?>
@@ -83,8 +101,18 @@ $containerStyle = StarterConfig::mapContainer($containerWidth, 'plain');
     $title = rex_escape((string) ($it['title'] ?? ''));
     $teaser = rex_escape((string) ($it['teaser'] ?? ''));
     $href = $showLinks ? (string) ($it['href'] ?? '') : '';
+    $product = (array) ($it['product'] ?? []);
+    $currency = (string) ($product['currency'] ?? 'EUR');
+    $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+    $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+    $availability = trim((string) ($product['availability'] ?? ''));
     ?>
-    <li><strong><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></strong><?php if ($teaser !== ''): ?> - <?= $teaser ?><?php endif; ?></li>
+    <li>
+        <strong><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></strong>
+        <?php if ($teaser !== ''): ?> - <?= $teaser ?><?php endif; ?>
+        <?php if ($price !== ''): ?> | <strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?><?php endif; ?>
+        <?php if ($availability !== ''): ?> <small>(<?= rex_escape($availability) ?>)</small><?php endif; ?>
+    </li>
     <?php endforeach; ?>
 </ul>
 <?php endif; ?>

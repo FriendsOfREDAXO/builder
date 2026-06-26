@@ -50,6 +50,11 @@ final class ListRenderer
         $phoneCol = self::pickCol((string) ($profile['phone_field'] ?? ''), $allowedCols, '');
         $mobileCol = self::pickCol((string) ($profile['mobile_field'] ?? ''), $allowedCols, '');
         $emailCol = self::pickCol((string) ($profile['email_field'] ?? ''), $allowedCols, '');
+        $priceCol = self::pickCol((string) ($profile['price_field'] ?? ''), $allowedCols, '');
+        $oldPriceCol = self::pickCol((string) ($profile['old_price_field'] ?? ''), $allowedCols, '');
+        $currencyCol = self::pickCol((string) ($profile['currency_field'] ?? ''), $allowedCols, '');
+        $badgeCol = self::pickCol((string) ($profile['badge_field'] ?? ''), $allowedCols, '');
+        $availabilityCol = self::pickCol((string) ($profile['availability_field'] ?? ''), $allowedCols, '');
 
         // Element-Overrides
         $limit = isset($elementData['limit']) ? (int) $elementData['limit'] : (int) $profile['default_limit'];
@@ -91,7 +96,7 @@ final class ListRenderer
         if ('' !== $imageCol) {
             $cols[] = $imageCol;
         }
-        foreach ([$firstnameCol, $freitextCol, $phoneCol, $mobileCol, $emailCol] as $extraCol) {
+        foreach ([$firstnameCol, $freitextCol, $phoneCol, $mobileCol, $emailCol, $priceCol, $oldPriceCol, $currencyCol, $badgeCol, $availabilityCol] as $extraCol) {
             if ('' !== $extraCol && !in_array($extraCol, $cols, true)) {
                 $cols[] = $extraCol;
             }
@@ -140,6 +145,13 @@ final class ListRenderer
                 'mobile' => '' !== $mobileCol ? (string) ($row[$mobileCol] ?? '') : '',
                 'email' => '' !== $emailCol ? (string) ($row[$emailCol] ?? '') : '',
             ];
+            $product = [
+                'price' => '' !== $priceCol ? (string) ($row[$priceCol] ?? '') : '',
+                'old_price' => '' !== $oldPriceCol ? (string) ($row[$oldPriceCol] ?? '') : '',
+                'currency' => '' !== $currencyCol ? (string) ($row[$currencyCol] ?? '') : 'EUR',
+                'badge' => '' !== $badgeCol ? (string) ($row[$badgeCol] ?? '') : '',
+                'availability' => '' !== $availabilityCol ? (string) ($row[$availabilityCol] ?? '') : '',
+            ];
             $items[] = [
                 'id' => $id,
                 'title' => $title,
@@ -148,6 +160,7 @@ final class ListRenderer
                 'media_type' => (string) $profile['media_type'],
                 'href' => self::buildHref($profile, $row),
                 'contact' => $contact,
+                'product' => $product,
                 'raw' => $row,
             ];
         }
@@ -229,9 +242,14 @@ final class ListRenderer
             $phoneCol = self::pickCol((string) ($profile['phone_field'] ?? ''), $allowedCols, '');
             $mobileCol = self::pickCol((string) ($profile['mobile_field'] ?? ''), $allowedCols, '');
             $emailCol = self::pickCol((string) ($profile['email_field'] ?? ''), $allowedCols, '');
+            $priceCol = self::pickCol((string) ($profile['price_field'] ?? ''), $allowedCols, '');
+            $oldPriceCol = self::pickCol((string) ($profile['old_price_field'] ?? ''), $allowedCols, '');
+            $currencyCol = self::pickCol((string) ($profile['currency_field'] ?? ''), $allowedCols, '');
+            $badgeCol = self::pickCol((string) ($profile['badge_field'] ?? ''), $allowedCols, '');
+            $availabilityCol = self::pickCol((string) ($profile['availability_field'] ?? ''), $allowedCols, '');
 
             $cols = ['id'];
-            foreach ([$titleCol, $teaserCol, $imageCol, $firstnameCol, $freitextCol, $phoneCol, $mobileCol, $emailCol] as $c) {
+            foreach ([$titleCol, $teaserCol, $imageCol, $firstnameCol, $freitextCol, $phoneCol, $mobileCol, $emailCol, $priceCol, $oldPriceCol, $currencyCol, $badgeCol, $availabilityCol] as $c) {
                 if ('' !== $c && !in_array($c, $cols, true)) {
                     $cols[] = $c;
                 }
@@ -277,6 +295,13 @@ final class ListRenderer
                         'phone' => '' !== $phoneCol ? (string) ($row[$phoneCol] ?? '') : '',
                         'mobile' => '' !== $mobileCol ? (string) ($row[$mobileCol] ?? '') : '',
                         'email' => '' !== $emailCol ? (string) ($row[$emailCol] ?? '') : '',
+                    ],
+                    'product' => [
+                        'price' => '' !== $priceCol ? (string) ($row[$priceCol] ?? '') : '',
+                        'old_price' => '' !== $oldPriceCol ? (string) ($row[$oldPriceCol] ?? '') : '',
+                        'currency' => '' !== $currencyCol ? (string) ($row[$currencyCol] ?? '') : 'EUR',
+                        'badge' => '' !== $badgeCol ? (string) ($row[$badgeCol] ?? '') : '',
+                        'availability' => '' !== $availabilityCol ? (string) ($row[$availabilityCol] ?? '') : '',
                     ],
                     'raw' => $row,
                 ];
@@ -483,6 +508,33 @@ final class ListRenderer
             return '';
         }
         return mb_strlen($clean) > $len ? mb_substr($clean, 0, $len - 1) . '…' : $clean;
+    }
+
+    /**
+     * Formatiert Preiswerte robust als Textausgabe.
+     */
+    public static function formatPrice(string $value, string $currency = 'EUR'): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        $normalized = str_replace([' ', "\xc2\xa0"], '', $value);
+        $normalized = str_replace(',', '.', $normalized);
+        if (!is_numeric($normalized)) {
+            return $value;
+        }
+
+        $number = (float) $normalized;
+        $formatted = number_format($number, 2, ',', '.');
+
+        $currency = strtoupper(trim($currency));
+        if ($currency === '') {
+            $currency = 'EUR';
+        }
+
+        return $formatted . ' ' . $currency;
     }
 
     private static function resolveImage(string $value): string

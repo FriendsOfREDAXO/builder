@@ -68,6 +68,11 @@ if ('save' === $func) {
             'phone_field' => trim((string) rex_post('phone_field', 'string', '')),
             'mobile_field' => trim((string) rex_post('mobile_field', 'string', '')),
             'email_field' => trim((string) rex_post('email_field', 'string', '')),
+            'price_field' => trim((string) rex_post('price_field', 'string', '')),
+            'old_price_field' => trim((string) rex_post('old_price_field', 'string', '')),
+            'currency_field' => trim((string) rex_post('currency_field', 'string', '')),
+            'badge_field' => trim((string) rex_post('badge_field', 'string', '')),
+            'availability_field' => trim((string) rex_post('availability_field', 'string', '')),
         ];
 
         // Typbasierte Defaults, damit nicht alle Felder manuell ausgefüllt werden müssen.
@@ -147,6 +152,24 @@ if ('save' === $func) {
 
         if ($profileType === 'slides' && $newProfile['media_type'] === '') {
             $newProfile['media_type'] = 'card';
+        }
+
+        if ($profileType === 'product') {
+            if ($newProfile['price_field'] === '') {
+                $newProfile['price_field'] = 'price';
+            }
+            if ($newProfile['old_price_field'] === '') {
+                $newProfile['old_price_field'] = 'old_price';
+            }
+            if ($newProfile['currency_field'] === '') {
+                $newProfile['currency_field'] = 'currency';
+            }
+            if ($newProfile['badge_field'] === '') {
+                $newProfile['badge_field'] = 'badge';
+            }
+            if ($newProfile['availability_field'] === '') {
+                $newProfile['availability_field'] = 'availability';
+            }
         }
         // Bei Rename altes Profil entfernen
         if ('' !== $origId && $origId !== $rawId) {
@@ -245,6 +268,11 @@ if ('' !== $editId && isset($profiles[$editId])) {
         'phone_field' => '',
         'mobile_field' => '',
         'email_field' => '',
+        'price_field' => '',
+        'old_price_field' => '',
+        'currency_field' => '',
+        'badge_field' => '',
+        'availability_field' => '',
     ];
 }
 
@@ -417,6 +445,37 @@ if ([] !== $columns || '' !== (string) $editing['table'] || $showAddForm) {
     $fields[] = [
         'label' => '<label class="yfl-type-contact">E-Mail-Spalte</label>',
         'field' => $selectField('email_field', (string) ($editing['email_field'] ?? ''), $columns),
+    ];
+
+    // Produkt-spezifische Feld-Mappings (relevant fuer Produkt-Listings).
+    $fields[] = [
+        'label' => '<label class="yfl-type-product"><hr><strong style="display:block;margin:8px 0;">Produkt-Listing (optional)</strong></label>',
+        'field' => '<p class="help-block" style="margin:0 0 12px;">Diese Feld-Mappings steuern Preis, Label und Verfügbarkeit für Produkt-Listings und Slides/Teaser.</p>',
+    ];
+    $fields[] = [
+        'label' => '<label class="yfl-type-product">Preis-Spalte</label>',
+        'field' => $selectField('price_field', (string) ($editing['price_field'] ?? ''), $columns),
+        'note' => 'Z. B. <code>price</code>, <code>price_gross</code>, <code>verkaufspreis</code>.',
+    ];
+    $fields[] = [
+        'label' => '<label class="yfl-type-product">Alter Preis-Spalte</label>',
+        'field' => $selectField('old_price_field', (string) ($editing['old_price_field'] ?? ''), $columns),
+        'note' => 'Optional, für durchgestrichenen Vergleichspreis.',
+    ];
+    $fields[] = [
+        'label' => '<label class="yfl-type-product">Währung-Spalte</label>',
+        'field' => $selectField('currency_field', (string) ($editing['currency_field'] ?? ''), $columns),
+        'note' => 'Optional, z. B. <code>EUR</code>, <code>USD</code>. Fallback ist EUR.',
+    ];
+    $fields[] = [
+        'label' => '<label class="yfl-type-product">Badge-Spalte</label>',
+        'field' => $selectField('badge_field', (string) ($editing['badge_field'] ?? ''), $columns),
+        'note' => 'Optional, z. B. <code>Neu</code>, <code>Sale</code>, <code>Top</code>.',
+    ];
+    $fields[] = [
+        'label' => '<label class="yfl-type-product">Verfügbarkeit-Spalte</label>',
+        'field' => $selectField('availability_field', (string) ($editing['availability_field'] ?? ''), $columns),
+        'note' => 'Optional, z. B. <code>Auf Lager</code> / <code>Nicht verfügbar</code>.',
     ];
 }
 

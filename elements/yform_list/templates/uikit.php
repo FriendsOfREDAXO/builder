@@ -74,15 +74,24 @@ if (null !== $error) {
             $teaser = rex_escape((string) $it['teaser']);
             $href = $showLinks ? (string) $it['href'] : '';
             $img = \FriendsOfREDAXO\Builder\ListRenderer::imgTag($it, 'uk-card-media-top');
+            $product = (array) ($it['product'] ?? []);
+            $currency = (string) ($product['currency'] ?? 'EUR');
+            $price = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+            $oldPrice = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+            $badge = trim((string) ($product['badge'] ?? ''));
+            $availability = trim((string) ($product['availability'] ?? ''));
             $titleHtml = '' !== $href
                 ? '<a href="' . rex_escape($href) . '" class="uk-link-reset">' . $title . '</a>'
                 : $title;
             echo '<div>'
                 . '<div class="uk-card uk-card-default">'
+                . ('' !== $badge ? '<div class="uk-position-top-right uk-padding-small"><span class="uk-label">' . rex_escape($badge) . '</span></div>' : '')
                 . $img
                 . '<div class="uk-card-body">'
                 . '<h3 class="uk-card-title uk-margin-remove-bottom">' . $titleHtml . '</h3>'
                 . ('' !== $teaser ? '<p class="uk-margin-small-top">' . $teaser . '</p>' : '')
+                . ('' !== $price ? '<p class="uk-margin-small-top uk-margin-remove-bottom"><strong>' . rex_escape($price) . '</strong>' . ('' !== $oldPrice ? ' <span class="uk-text-meta" style="text-decoration:line-through;">' . rex_escape($oldPrice) . '</span>' : '') . '</p>' : '')
+                . ('' !== $availability ? '<p class="uk-text-meta uk-margin-remove-top">' . rex_escape($availability) . '</p>' : '')
                 . '</div>'
                 . '</div>'
                 . '</div>';
@@ -148,6 +157,11 @@ if (null !== $error) {
                 $teaser = rex_escape((string) $it['teaser']);
                 $href = $showLinks ? (string) $it['href'] : '';
                 $img = \FriendsOfREDAXO\Builder\ListRenderer::imgTag($it, 'rex-yfl-thumb', 80);
+                $product = (array) ($it['product'] ?? []);
+                $currency = (string) ($product['currency'] ?? 'EUR');
+                $price = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+                $oldPrice = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+                $availability = trim((string) ($product['availability'] ?? ''));
                 $titleHtml = '' !== $href
                     ? '<a href="' . rex_escape($href) . '">' . $title . '</a>'
                     : $title;
@@ -157,6 +171,8 @@ if (null !== $error) {
                     . '<div class="uk-flex-1">'
                     . '<h4 class="uk-margin-remove">' . $titleHtml . '</h4>'
                     . ('' !== $teaser ? '<p class="uk-margin-remove uk-text-meta">' . $teaser . '</p>' : '')
+                        . ('' !== $price ? '<p class="uk-margin-remove"><strong>' . rex_escape($price) . '</strong>' . ('' !== $oldPrice ? ' <span class="uk-text-meta" style="text-decoration:line-through;">' . rex_escape($oldPrice) . '</span>' : '') . '</p>' : '')
+                        . ('' !== $availability ? '<p class="uk-margin-remove uk-text-meta">' . rex_escape($availability) . '</p>' : '')
                     . '</div>'
                     . '</div>'
                     . '</li>';
@@ -173,6 +189,12 @@ if (null !== $error) {
             $teaser = rex_escape((string) $it['teaser']);
             $href = $showLinks ? (string) $it['href'] : '';
             $img = \FriendsOfREDAXO\Builder\ListRenderer::imgTag($it, 'uk-width-1-1', 1200);
+            $product = (array) ($it['product'] ?? []);
+            $currency = (string) ($product['currency'] ?? 'EUR');
+            $price = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+            $oldPrice = \FriendsOfREDAXO\Builder\ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+            $badge = trim((string) ($product['badge'] ?? ''));
+            $availability = trim((string) ($product['availability'] ?? ''));
             $titleHtml = '' !== $href
                 ? '<a href="' . rex_escape($href) . '" class="uk-link-reset">' . $title . '</a>'
                 : $title;
@@ -183,9 +205,22 @@ if (null !== $error) {
                 echo '<div class="uk-card-media-top">' . $img . '</div>';
             }
             echo '<div class="uk-card-body">';
+            if ('' !== $badge) {
+                echo '<div class="uk-margin-small-bottom"><span class="uk-label">' . rex_escape($badge) . '</span></div>';
+            }
             echo '<h3 class="uk-card-title">' . $titleHtml . '</h3>';
             if ('' !== $teaser) {
                 echo '<p class="uk-text-meta uk-margin-remove-bottom">' . $teaser . '</p>';
+            }
+            if ('' !== $price) {
+                echo '<p class="uk-margin-small-top uk-margin-remove-bottom"><strong>' . rex_escape($price) . '</strong>';
+                if ('' !== $oldPrice) {
+                    echo ' <span class="uk-text-meta" style="text-decoration:line-through;">' . rex_escape($oldPrice) . '</span>';
+                }
+                echo '</p>';
+            }
+            if ('' !== $availability) {
+                echo '<p class="uk-text-meta uk-margin-remove-top">' . rex_escape($availability) . '</p>';
             }
             echo '</div>';
             echo '</article>';

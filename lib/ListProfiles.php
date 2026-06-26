@@ -327,6 +327,11 @@ final class ListProfiles
             'phone_field' => trim((string) ($cfg['phone_field'] ?? '')),
             'mobile_field' => trim((string) ($cfg['mobile_field'] ?? '')),
             'email_field' => trim((string) ($cfg['email_field'] ?? '')),
+            'price_field' => trim((string) ($cfg['price_field'] ?? '')),
+            'old_price_field' => trim((string) ($cfg['old_price_field'] ?? '')),
+            'currency_field' => trim((string) ($cfg['currency_field'] ?? '')),
+            'badge_field' => trim((string) ($cfg['badge_field'] ?? '')),
+            'availability_field' => trim((string) ($cfg['availability_field'] ?? '')),
         ];
     }
 }

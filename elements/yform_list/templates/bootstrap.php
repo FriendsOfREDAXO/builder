@@ -55,12 +55,21 @@ $tel = static fn(string $v): string => preg_replace('/[^+\d]/', '', $v) ?? '';
         $teaser = rex_escape((string) ($it['teaser'] ?? ''));
         $href = $showLinks ? (string) ($it['href'] ?? '') : '';
         $img = ListRenderer::imgTag($it, 'd-block w-100');
+        $product = (array) ($it['product'] ?? []);
+        $currency = (string) ($product['currency'] ?? 'EUR');
+        $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+        $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+        $badge = trim((string) ($product['badge'] ?? ''));
+        $availability = trim((string) ($product['availability'] ?? ''));
         ?>
         <div class="carousel-item<?= $index === 0 ? ' active' : '' ?>">
             <?php if ($img !== ''): ?><?= $img ?><?php endif; ?>
             <div class="carousel-caption d-none d-md-block" style="background:rgba(0,0,0,.45);border-radius:.5rem;padding:.8rem 1rem;">
+                <?php if ($badge !== ''): ?><div class="mb-2"><span class="badge bg-primary"><?= rex_escape($badge) ?></span></div><?php endif; ?>
                 <h5><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>" class="text-white text-decoration-none"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h5>
                 <?php if ($teaser !== ''): ?><p class="mb-0"><?= $teaser ?></p><?php endif; ?>
+                <?php if ($price !== ''): ?><p class="mb-0"><strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?></p><?php endif; ?>
+                <?php if ($availability !== ''): ?><p class="mb-0"><small><?= rex_escape($availability) ?></small></p><?php endif; ?>
             </div>
         </div>
         <?php endforeach; ?>
@@ -83,17 +92,26 @@ $tel = static fn(string $v): string => preg_replace('/[^+\d]/', '', $v) ?? '';
     $href = $showLinks ? (string) ($it['href'] ?? '') : '';
     $img = ListRenderer::imgTag($it, 'card-img-top');
     $contact = (array) ($it['contact'] ?? []);
+    $product = (array) ($it['product'] ?? []);
     $role = trim((string) ($contact['role'] ?? ''));
     $phone = trim((string) ($contact['phone'] ?? ''));
     $mobile = trim((string) ($contact['mobile'] ?? ''));
     $email = trim((string) ($contact['email'] ?? ''));
+    $currency = (string) ($product['currency'] ?? 'EUR');
+    $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+    $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+    $badge = trim((string) ($product['badge'] ?? ''));
+    $availability = trim((string) ($product['availability'] ?? ''));
     ?>
     <div class="col-12 col-md-6 col-lg-<?= rex_escape((string) $col) ?>">
         <div class="card h-100">
+            <?php if ($badge !== ''): ?><div class="position-absolute top-0 end-0 p-2"><span class="badge bg-primary"><?= rex_escape($badge) ?></span></div><?php endif; ?>
             <?= $img ?>
             <div class="card-body">
                 <h3 class="h5 card-title"><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>" class="text-decoration-none"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h3>
                 <?php if ($teaser !== ''): ?><p class="card-text"><?= $teaser ?></p><?php endif; ?>
+                <?php if ($price !== ''): ?><p class="mb-1"><strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small class="text-muted" style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?></p><?php endif; ?>
+                <?php if ($availability !== ''): ?><p class="small text-muted mb-2"><?= rex_escape($availability) ?></p><?php endif; ?>
                 <?php if ($role !== ''): ?><div class="small text-muted"><?= rex_escape($role) ?></div><?php endif; ?>
                 <?php if ($phone !== ''): ?><div><a href="tel:<?= rex_escape($tel($phone)) ?>"><?= rex_escape($phone) ?></a></div><?php endif; ?>
                 <?php if ($mobile !== ''): ?><div><a href="tel:<?= rex_escape($tel($mobile)) ?>"><?= rex_escape($mobile) ?></a></div><?php endif; ?>
@@ -110,10 +128,17 @@ $tel = static fn(string $v): string => preg_replace('/[^+\d]/', '', $v) ?? '';
     $title = rex_escape((string) ($it['title'] ?? ''));
     $teaser = rex_escape((string) ($it['teaser'] ?? ''));
     $href = $showLinks ? (string) ($it['href'] ?? '') : '';
+    $product = (array) ($it['product'] ?? []);
+    $currency = (string) ($product['currency'] ?? 'EUR');
+    $price = ListRenderer::formatPrice((string) ($product['price'] ?? ''), $currency);
+    $oldPrice = ListRenderer::formatPrice((string) ($product['old_price'] ?? ''), $currency);
+    $availability = trim((string) ($product['availability'] ?? ''));
     ?>
     <li class="list-group-item px-0">
         <h4 class="h6 mb-1"><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h4>
         <?php if ($teaser !== ''): ?><p class="mb-0"><?= $teaser ?></p><?php endif; ?>
+        <?php if ($price !== ''): ?><p class="mb-0"><strong><?= rex_escape($price) ?></strong><?php if ($oldPrice !== ''): ?> <small class="text-muted" style="text-decoration:line-through;"><?= rex_escape($oldPrice) ?></small><?php endif; ?></p><?php endif; ?>
+        <?php if ($availability !== ''): ?><p class="small text-muted mb-0"><?= rex_escape($availability) ?></p><?php endif; ?>
     </li>
     <?php endforeach; ?>
 </ul>

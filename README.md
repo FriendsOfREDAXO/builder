@@ -22,7 +22,7 @@ Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe.
 - Modul-Generator im Backend zur schnellen REDAXO-Modulerstellung ⭐️
 - Geführte YForm-Listen-Profile auf eigener Verwaltungsseite
 - Profiltypen für Listen: Kontakte, News, Events, Produkte, Slides/Teaser und freie Listen
-- Neues Slides-/Teaser-Layout im Element `yform_list` (UIkit, Bootstrap und Plain)
+- Slides-/Teaser-Layout im Element `yform_list` (UIkit, Bootstrap und Plain)
 
 ## Einsatzbereiche
 
@@ -76,6 +76,14 @@ Die Profile für das Element `yform_list` werden über eine eigene Seite gepfleg
 - `Builder -> YForm-Listen-Profile`
 
 Beim Anlegen eines Profils wird zuerst der gewünschte Listentyp ausgewählt. Danach werden passende Felder und sinnvolle Defaults gesetzt, damit nicht alle Optionen manuell konfiguriert werden müssen.
+
+Funktionen der YForm-Listen-Profile:
+
+- Profilbezogene Feldzuordnung für Titel, Teaser, Bilder, Linkparameter und Sortierung
+- Typabhängige Zusatzfelder für Kontakte (z. B. Rolle, Telefon, E-Mail)
+- Typabhängige Zusatzfelder für Produkte (Preis, alter Preis, Währung, Badge, Verfügbarkeit)
+- Vorgabewerte für sinnvolle Layouts je Profiltyp (z. B. `slides` für Teaser-/Produktdarstellung)
+- Einheitliche Ausgabe über die mitgelieferten Templates für UIkit, Bootstrap und Plain
 
 Verfügbare Profiltypen:
 
