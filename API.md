@@ -1510,21 +1510,14 @@ rex_extension::register('BUILDER_ELEMENT_PATHS', function($ep) {
     $paths = $ep->getSubject();
     $paths['my_addon'] = rex_path::addon('my_addon', 'elements/');
 
-    // Theme-Ordner mit Fallback
-    $preferredPath = rex_path::base('theme/private/builder/theme_elements');
-    $fallbackPath = rex_path::base('theme/private/builder/elements');
-
-    if (is_dir($preferredPath)) {
-        $paths['theme'] = $preferredPath;
-    } elseif (is_dir($fallbackPath)) {
-        $paths['theme'] = $fallbackPath;
-    }
+    // Theme-Ordner: hier setzt du den Key 'theme'
+    $paths['theme'] = rex_path::base('theme/private/builder/theme_elements');
 
     return $paths;
 });
 ```
 
-Praxis-Hinweis: Nutze einen stabilen Schluessel wie `theme`, damit die Quelle in den Einstellungen eindeutig bleibt, auch wenn der Ordnername spaeter geaendert wird.
+Praxis-Hinweis: Der Key wird in `$paths['theme'] = ...` gesetzt. Dieser Key taucht spaeter in den Builder-Einstellungen als Quelle auf.
 
 ### BUILDER_BUNDLED_ELEMENTS
 
