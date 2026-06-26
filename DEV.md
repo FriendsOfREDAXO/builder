@@ -388,15 +388,22 @@ rex_extension::register(
         // Element-Pfad vom eigenen Addon
         $paths['my_addon'] = rex_path::addon('my_addon', 'content_elements/');
         
-        // Optional: Theme-Addon Elements
-        if (rex_addon::get('theme_elements')->isAvailable()) {
-            $paths['theme'] = rex_path::addon('theme_elements', 'elements/');
+                // Optional: Theme-Ordner mit Fallback (kein eigenes Addon noetig)
+                $preferredPath = rex_path::base('theme/private/builder/theme_elements');
+                $fallbackPath = rex_path::base('theme/private/builder/elements');
+
+                if (is_dir($preferredPath)) {
+                    $paths['theme'] = $preferredPath;
+                } elseif (is_dir($fallbackPath)) {
+                    $paths['theme'] = $fallbackPath;
         }
         
         return $paths;
     }
 );
 ```
+
+        Hinweis: Der Schluessel (`theme`) bestimmt die spaetere Quelle in den Builder-Einstellungen.
 
 ---
 

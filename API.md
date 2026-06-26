@@ -1509,9 +1509,22 @@ Wird aufgerufen um zusätzliche Pfade für Elemente zu registrieren.
 rex_extension::register('BUILDER_ELEMENT_PATHS', function($ep) {
     $paths = $ep->getSubject();
     $paths['my_addon'] = rex_path::addon('my_addon', 'elements/');
+
+    // Theme-Ordner mit Fallback
+    $preferredPath = rex_path::base('theme/private/builder/theme_elements');
+    $fallbackPath = rex_path::base('theme/private/builder/elements');
+
+    if (is_dir($preferredPath)) {
+        $paths['theme'] = $preferredPath;
+    } elseif (is_dir($fallbackPath)) {
+        $paths['theme'] = $fallbackPath;
+    }
+
     return $paths;
 });
 ```
+
+Praxis-Hinweis: Nutze einen stabilen Schluessel wie `theme`, damit die Quelle in den Einstellungen eindeutig bleibt, auch wenn der Ordnername spaeter geaendert wird.
 
 ### BUILDER_BUNDLED_ELEMENTS
 
