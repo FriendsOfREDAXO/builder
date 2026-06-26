@@ -589,6 +589,43 @@ return [
 ];
 ```
 
+### settings_modal mit Fieldsets und Akkordeon
+
+Fuer laengere Einstellungen kann `settings_modal` in Gruppen aufgeteilt werden.
+
+```php
+'settings_modal' => [
+    'label' => 'Layout & Sektion',
+    'icon' => 'fa-cog',
+    'accordion' => [
+        // initial: first | all | none
+        'initial' => 'first',
+        // true = immer nur ein Bereich offen
+        'single_open' => true,
+        // true = geoeffneten Bereich wieder zuklappen duerfen
+        'collapsible' => true,
+    ],
+    'fieldsets' => [
+        'layout' => [
+            'label' => 'Layout',
+            'icon' => 'fa-th',
+            'fields' => ['columns', 'gap', 'match_height'],
+        ],
+        'section' => [
+            'label' => 'Sektion',
+            'icon' => 'fa-window-maximize',
+            'fields' => ['section_bg', 'section_padding'],
+        ],
+    ],
+],
+```
+
+Hinweise:
+
+- `fieldsets` und `fields` sind alternativ nutzbar.
+- Ohne `accordion` gelten Defaults: `initial=first`, `single_open=true`, `collapsible=true`.
+- In jedem Fieldset muessen die Eintraege in `fields` auf Keys unter Root-`fields` verweisen.
+
 ---
 
 ## Eigene Elemente erstellen

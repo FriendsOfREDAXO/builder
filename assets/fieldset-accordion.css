@@ -1,0 +1,156 @@
+/**
+ * Builder Fieldsets mit Akkordeon-Interaktion
+ * Semantische <fieldset> Elemente mit optionalem Akkordeon via <div>
+ */
+
+/* Fieldset Basis-Styling */
+.builder-fieldsets {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.builder-fieldset {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 0;
+  padding: 0;
+  background-color: #ffffff;
+}
+
+.builder-fieldset:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+.builder-fieldset .builder-fieldset-legend {
+  cursor: pointer;
+  user-select: none;
+  padding: 12px 16px;
+  margin: 0;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s ease;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.builder-fieldset .builder-fieldset-legend:hover {
+  background-color: #ebebeb;
+}
+
+.builder-fieldset .builder-fieldset-legend:active {
+  background-color: #e0e0e0;
+}
+
+.builder-fieldset .builder-fieldset-legend:focus {
+  outline: 2px solid #1e87f0;
+  outline-offset: 2px;
+}
+
+.builder-fieldset .builder-fieldset-legend-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.builder-fieldset .builder-fieldset-legend-icon {
+  font-size: 16px;
+  color: #666;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.builder-fieldset .builder-fieldset-legend-label {
+  flex: 1;
+}
+
+.builder-fieldset .builder-fieldset-legend-toggle {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.builder-fieldset.accordion-open .builder-fieldset-legend-toggle {
+  transform: rotate(180deg);
+}
+
+/* Akkordeon Inhalt - Div basiert */
+.builder-fieldset-body {
+  max-height: 2000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 16px;
+}
+
+.builder-fieldset-body.accordion-collapsed {
+  max-height: 0;
+  padding: 0;
+}
+
+/* Dark Mode */
+body.rex-theme-dark .builder-fieldset {
+  border-color: #3a4654;
+  background-color: #1f2933;
+}
+
+body.rex-theme-dark .builder-fieldset .builder-fieldset-legend {
+  background-color: #2d3c4a;
+  color: #e8f0f7;
+}
+
+body.rex-theme-dark .builder-fieldset .builder-fieldset-legend:hover {
+  background-color: #354655;
+}
+
+body.rex-theme-dark .builder-fieldset .builder-fieldset-legend:active {
+  background-color: #3c5264;
+}
+
+body.rex-theme-dark .builder-fieldset .builder-fieldset-legend-icon {
+  color: #b0b8c1;
+}
+
+body.rex-theme-dark .builder-fieldset-body {
+  background-color: #1f2933;
+}
+
+/* Media Query Dark Mode */
+@media (prefers-color-scheme: dark) {
+  body.rex-has-theme:not(.rex-theme-light) .builder-fieldset {
+    border-color: #3a4654;
+    background-color: #1f2933;
+  }
+
+  body.rex-has-theme:not(.rex-theme-light) .builder-fieldset .builder-fieldset-legend {
+    background-color: #2d3c4a;
+    color: #e8f0f7;
+  }
+
+  body.rex-has-theme:not(.rex-theme-light) .builder-fieldset .builder-fieldset-legend:hover {
+    background-color: #354655;
+  }
+
+  body.rex-has-theme:not(.rex-theme-light) .builder-fieldset .builder-fieldset-legend-icon {
+    color: #b0b8c1;
+  }
+
+  body.rex-has-theme:not(.rex-theme-light) .builder-fieldset-body {
+    background-color: #1f2933;
+  }
+}
+

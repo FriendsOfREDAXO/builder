@@ -28,6 +28,42 @@ The schema defines:
 - **Field Types**: `text`, `textarea`, `choice`, `checkbox`, `ckeditor5`, `be_media`, `be_media_enhanced`, `be_link`, `repeater`.
 - **Recursive Definitions**: `repeater` fields can contain other fields.
 
+### settings_modal: Fieldsets + Akkordeon
+
+`settings_modal` kann entweder eine flache `fields`-Liste oder gruppierte `fieldsets` enthalten.
+
+Zusatzoptionen fuer das Gruppierungsverhalten:
+
+- `accordion.initial`: `first` | `all` | `none`
+- `accordion.single_open`: nur eine Gruppe gleichzeitig offen
+- `accordion.collapsible`: geoeffnete Gruppe wieder zuklappbar
+
+Beispiel:
+
+```php
+'settings_modal' => [
+    'label' => 'Layout & Sektion',
+    'icon' => 'fa-cog',
+    'accordion' => [
+        'initial' => 'first',
+        'single_open' => true,
+        'collapsible' => true,
+    ],
+    'fieldsets' => [
+        'layout' => [
+            'label' => 'Layout',
+            'icon' => 'fa-th',
+            'fields' => ['columns', 'gap'],
+        ],
+        'section' => [
+            'label' => 'Sektion',
+            'icon' => 'fa-window-maximize',
+            'fields' => ['section_bg', 'section_padding'],
+        ],
+    ],
+]
+```
+
 ### Nesting-Flags in Element-Configs
 
 Elemente können ihr Selbstverschachtelungs-Verhalten direkt in `config.php` definieren:

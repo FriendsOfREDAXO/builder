@@ -185,7 +185,14 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         } else {
             // Standard: Alle Felder ohne Tabs (außer die im Modal)
             $modalFields = [];
-            if (isset($config['settings_modal']['fields'])) {
+            if (isset($config['settings_modal']['fieldsets']) && is_array($config['settings_modal']['fieldsets'])) {
+                foreach ($config['settings_modal']['fieldsets'] as $fieldset) {
+                    if (!is_array($fieldset) || !isset($fieldset['fields']) || !is_array($fieldset['fields'])) {
+                        continue;
+                    }
+                    $modalFields = array_merge($modalFields, $fieldset['fields']);
+                }
+            } elseif (isset($config['settings_modal']['fields'])) {
                 $modalFields = $config['settings_modal']['fields'];
             }
             
@@ -284,8 +291,11 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         echo '</div>';
         echo '<div class="modal-body" style="text-align: left;">';
         
-        // Felder im Modal rendern
-        if (isset($modalConfig['fields']) && is_array($modalConfig['fields'])) {
+        // Fieldsets (mit Akkordeon) oder einfache Felder rendern
+        if (isset($modalConfig['fieldsets']) && is_array($modalConfig['fieldsets'])) {
+            $this->renderModalFieldsets($modalConfig['fieldsets'], $config, $sliceData);
+        } elseif (isset($modalConfig['fields']) && is_array($modalConfig['fields'])) {
+            // Legacy: einfache Felderliste
             foreach ($modalConfig['fields'] as $fieldName) {
                 if (isset($config['fields'][$fieldName])) {
                     $this->renderFormField($fieldName, $config['fields'][$fieldName], $sliceData);
@@ -299,6 +309,71 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         echo '</div>';
         echo '</div>';
         echo '</div>';
+        echo '</div>';
+    }
+
+    /**
+     * Modal mit echten <fieldset> Elementen rendern (mit optionalem Akkordeon)
+     *
+     * @param array<string, array<string, mixed>> $fieldsets
+     * @param array<string, mixed> $config
+     * @param array<string, mixed> $sliceData
+     */
+    protected function renderModalFieldsets(array $fieldsets, array $config, array $sliceData)
+    {
+        $accordionConfig = [];
+        if (isset($config['settings_modal']['accordion']) && is_array($config['settings_modal']['accordion'])) {
+            $accordionConfig = $config['settings_modal']['accordion'];
+        }
+
+        $initialOpen = (string) ($accordionConfig['initial'] ?? 'first');
+        if (!in_array($initialOpen, ['first', 'all', 'none'], true)) {
+            $initialOpen = 'first';
+        }
+
+        $singleOpen = array_key_exists('single_open', $accordionConfig)
+            ? (bool) $accordionConfig['single_open']
+            : true;
+        $collapsible = array_key_exists('collapsible', $accordionConfig)
+            ? (bool) $accordionConfig['collapsible']
+            : true;
+
+        echo '<div class="builder-fieldsets" data-accordion-initial="' . rex_escape($initialOpen) . '" data-accordion-single="' . ($singleOpen ? '1' : '0') . '" data-accordion-collapsible="' . ($collapsible ? '1' : '0') . '">';
+        
+        $fieldsetIndex = 0;
+        foreach ($fieldsets as $fieldsetKey => $fieldsetDef) {
+            $fsLabel = $fieldsetDef['label'] ?? $fieldsetKey;
+            $fsIcon = $fieldsetDef['icon'] ?? 'fa-folder';
+            $fsFields = $fieldsetDef['fields'] ?? [];
+            $isOpen = match ($initialOpen) {
+                'all' => true,
+                'none' => false,
+                default => $fieldsetIndex === 0,
+            };
+            
+            echo '<fieldset class="builder-fieldset' . ($isOpen ? ' accordion-open' : '') . '">';
+            echo '<legend class="builder-fieldset-legend" tabindex="0" role="button" aria-expanded="' . ($isOpen ? 'true' : 'false') . '">';
+            echo '<span class="builder-fieldset-legend-main">';
+            if (!empty($fsIcon)) {
+                echo '<span class="builder-fieldset-legend-icon"><i class="fa ' . rex_escape($fsIcon) . '"></i></span>';
+            }
+            echo '<span class="builder-fieldset-legend-label">' . rex_escape($fsLabel) . '</span>';
+            echo '</span>';
+            echo '<span class="builder-fieldset-legend-toggle" aria-hidden="true">▼</span>';
+            echo '</legend>';
+            
+            // Body mit Feldern
+            echo '<div class="builder-fieldset-body' . ($isOpen ? '' : ' accordion-collapsed') . '">';
+            foreach ($fsFields as $fieldName) {
+                if (isset($config['fields'][$fieldName])) {
+                    $this->renderFormField($fieldName, $config['fields'][$fieldName], $sliceData);
+                }
+            }
+            echo '</div>';
+            echo '</fieldset>';
+            $fieldsetIndex++;
+        }
+        
         echo '</div>';
     }
 

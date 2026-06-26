@@ -23,11 +23,28 @@ return [
     'settings_modal' => [
         'label' => 'Layout & Sektion',
         'icon' => 'fa-cog',
-        'fields' => array_merge(
-            StarterConfig::getGridFieldNames(),
-            ['layout', 'limit', 'teaser_length'],
-            StarterConfig::getOptionalSectionFieldNames(),
-        ),
+        'accordion' => [
+            'initial' => 'first',
+            'single_open' => true,
+            'collapsible' => true,
+        ],
+        'fieldsets' => [
+            'grid' => [
+                'label' => 'Grid',
+                'icon' => 'fa-th',
+                'fields' => StarterConfig::getGridFieldNames(),
+            ],
+            'list' => [
+                'label' => 'Listen-Layout',
+                'icon' => 'fa-list',
+                'fields' => ['layout', 'limit', 'teaser_length'],
+            ],
+            'section' => [
+                'label' => 'Sektion',
+                'icon' => 'fa-window-maximize',
+                'fields' => StarterConfig::getOptionalSectionFieldNames(),
+            ],
+        ],
     ],
 
     'fields' => array_merge(

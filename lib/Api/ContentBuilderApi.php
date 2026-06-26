@@ -295,7 +295,14 @@ class ContentBuilderApi extends rex_api_function
         } else {
             // Standard: Alle Felder ohne Tabs (außer die im Modal)
             $modalFields = [];
-            if (isset($config['settings_modal']['fields'])) {
+            if (isset($config['settings_modal']['fieldsets']) && is_array($config['settings_modal']['fieldsets'])) {
+                foreach ($config['settings_modal']['fieldsets'] as $fieldset) {
+                    if (!is_array($fieldset) || !isset($fieldset['fields']) || !is_array($fieldset['fields'])) {
+                        continue;
+                    }
+                    $modalFields = array_merge($modalFields, $fieldset['fields']);
+                }
+            } elseif (isset($config['settings_modal']['fields'])) {
                 $modalFields = $config['settings_modal']['fields'];
             }
 
@@ -486,7 +493,74 @@ class ContentBuilderApi extends rex_api_function
         echo '</div>';
         echo '<div class="modal-body">';
 
-        if (isset($modalConfig['fields']) && is_array($modalConfig['fields'])) {
+        if (isset($modalConfig['fieldsets']) && is_array($modalConfig['fieldsets'])) {
+            $accordionConfig = [];
+            if (isset($modalConfig['accordion']) && is_array($modalConfig['accordion'])) {
+                $accordionConfig = $modalConfig['accordion'];
+            }
+
+            $initialOpen = (string) ($accordionConfig['initial'] ?? 'first');
+            if (!in_array($initialOpen, ['first', 'all', 'none'], true)) {
+                $initialOpen = 'first';
+            }
+
+            $singleOpen = array_key_exists('single_open', $accordionConfig)
+                ? (bool) $accordionConfig['single_open']
+                : true;
+            $collapsible = array_key_exists('collapsible', $accordionConfig)
+                ? (bool) $accordionConfig['collapsible']
+                : true;
+
+            echo '<div class="builder-fieldsets" data-accordion-initial="' . rex_escape($initialOpen) . '" data-accordion-single="' . ($singleOpen ? '1' : '0') . '" data-accordion-collapsible="' . ($collapsible ? '1' : '0') . '">';
+
+            $fieldsetIndex = 0;
+            foreach ($modalConfig['fieldsets'] as $fieldsetKey => $fieldsetDef) {
+                if (!is_array($fieldsetDef)) {
+                    continue;
+                }
+
+                $fsLabel = $fieldsetDef['label'] ?? $fieldsetKey;
+                $fsIcon = $fieldsetDef['icon'] ?? 'fa-folder';
+                $fsFields = isset($fieldsetDef['fields']) && is_array($fieldsetDef['fields']) ? $fieldsetDef['fields'] : [];
+                $isOpen = match ($initialOpen) {
+                    'all' => true,
+                    'none' => false,
+                    default => $fieldsetIndex === 0,
+                };
+
+                echo '<fieldset class="builder-fieldset' . ($isOpen ? ' accordion-open' : '') . '">';
+                echo '<legend class="builder-fieldset-legend" tabindex="0" role="button" aria-expanded="' . ($isOpen ? 'true' : 'false') . '">';
+                echo '<span class="builder-fieldset-legend-main">';
+                if ($fsIcon !== '') {
+                    echo '<span class="builder-fieldset-legend-icon"><i class="fa ' . rex_escape((string) $fsIcon) . '"></i></span>';
+                }
+                echo '<span class="builder-fieldset-legend-label">' . rex_escape((string) $fsLabel) . '</span>';
+                echo '</span>';
+                echo '<span class="builder-fieldset-legend-toggle" aria-hidden="true">▼</span>';
+                echo '</legend>';
+
+                echo '<div class="builder-fieldset-body' . ($isOpen ? '' : ' accordion-collapsed') . '">';
+                $modalFieldMap = [];
+                foreach ($fsFields as $fieldName) {
+                    if (isset($config['fields'][$fieldName])) {
+                        $modalFieldMap[$fieldName] = $config['fields'][$fieldName];
+                    }
+                }
+
+                FieldRegistry::renderFieldRowsGroup(
+                    $modalFieldMap,
+                    [],
+                    function (string $fieldName, array $fieldConfig) use ($sliceData): void {
+                        FieldRegistry::renderField($fieldName, $fieldConfig, $sliceData);
+                    }
+                );
+                echo '</div>';
+                echo '</fieldset>';
+                $fieldsetIndex++;
+            }
+
+            echo '</div>';
+        } elseif (isset($modalConfig['fields']) && is_array($modalConfig['fields'])) {
             $modalFieldMap = [];
             foreach ($modalConfig['fields'] as $fieldName) {
                 if (isset($config['fields'][$fieldName])) {

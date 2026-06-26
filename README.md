@@ -12,6 +12,7 @@ Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe.
 
 - Page- und Content-Builder für REDAXO-Module und YForm-Felder
 - Modulare Elemente mit konfigurierbaren Feldern, Gruppen und Einstellungen
+- Settings-Modal mit gruppierten Fieldsets und konfigurierbarem Akkordeon-Verhalten
 - Framework-Templates für UIkit, Bootstrap und Plain HTML bei den mitgelieferten bereits dabei. 
 - Erweiterbar über eigene Elemente in Projekt- oder Addon-Pfaden
 - Klare Extension-Point-Schnittstellen für Framework-, Theme- und Editor-Integration
