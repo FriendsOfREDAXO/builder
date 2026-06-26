@@ -3493,9 +3493,6 @@
                                 $input.attr('name', newName);
                             }
                         });
-                        
-                        // REX:READY Event triggern um Editoren neu zu initialisieren
-                        $(document).trigger('rex:ready', [$item]);
                     });
                 } else {
                     // Fallback: am Ende einfügen
