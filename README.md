@@ -94,6 +94,20 @@ Verfügbare Profiltypen:
 - Produkte
 - Slides / Teaser-Slider
 
+## Ausblick
+
+Geplant ist ein eigener Modus **YForm NoCode**, mit dem nicht nur Listen, sondern auch Detailseiten im Builder ohne eigene Template-Programmierung aufgebaut werden können.
+
+Zielbild:
+
+- Layout weiterhin visuell im Builder erstellen (wie bisher)
+- Statt statischer Inhalte optional je Feld eine YForm-Spalte binden
+- Umschaltbar pro Feld: **manuell** oder **dynamisch aus Tabelle**
+- Tabellenkontext und Datensatzquelle zentral definieren (z. B. fester Datensatz, URL-Parameter, Listenkontext)
+- Medien- und Textfelder gleich bedienen, aber wahlweise mit Spalten-Mapping statt freier Eingabe
+
+Damit wird ein Workflow möglich, der dem bekannten CMS-Pattern aus Webflow ähnelt: Struktur und Design bleiben frei, der Content wird pro Elementfeld an Datenquellen gekoppelt.
+
 ## Dokumentation
 
 - API: [API.md](API.md)

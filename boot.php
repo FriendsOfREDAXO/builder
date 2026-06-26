@@ -139,6 +139,7 @@ if (rex::isBackend()) {
 
     // YForm-Listen-Profile: AJAX-Spaltenlader nur auf den relevanten Subseiten laden.
     if (in_array(rex_be_controller::getCurrentPage(), ['builder/settings', 'builder/settings_yform_list_profiles'], true)) {
+        rex_view::addCssFile($assetUrl('yform_list_profiles.css'));
         rex_view::addJsFile($assetUrl('yform_list_profiles.js'));
         rex_view::setJsProperty('YFL_API_URL', rex_url::backendController([
             'rex-api-call' => 'yform_list_columns',

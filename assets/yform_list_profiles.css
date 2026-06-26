@@ -1,0 +1,42 @@
+/* Nur fuer Builder -> YForm-Listen-Profile */
+.yfl-select.form-control {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid #c7d1de;
+    border-radius: 8px;
+    color: #1f2933;
+    font-size: 14px;
+    line-height: 1.35;
+    min-height: 38px;
+    padding: 8px 38px 8px 12px;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23637786' d='M3.22 5.97a.75.75 0 0 1 1.06.03L8 9.9 11.72 6a.75.75 0 1 1 1.1 1.02l-4.25 4.6a.75.75 0 0 1-1.1 0L3.2 7.02a.75.75 0 0 1 .02-1.05z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px 14px;
+}
+
+.yfl-select.form-control:hover {
+    border-color: #9fb1c8;
+    background-color: #fcfdff;
+}
+
+.yfl-select.form-control:focus {
+    border-color: #5c84bf;
+    box-shadow: 0 0 0 3px rgba(92, 132, 191, 0.2);
+    outline: none;
+}
+
+.yfl-select.form-control:disabled {
+    background-color: #f5f7fa;
+    color: #768191;
+    cursor: not-allowed;
+    border-color: #d8dee7;
+}
+
+/* Firefox-Pfeil ausblenden, da eigener Pfeil genutzt wird */
+.yfl-select.form-control::-ms-expand {
+    display: none;
+}

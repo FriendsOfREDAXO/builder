@@ -197,6 +197,52 @@ if ('' !== $message) {
     echo $message;
 }
 
+
+$totalProfiles = count($profiles);
+$totalTables = count($availableTables);
+$profileTypes = [];
+foreach ($profiles as $profileConfig) {
+    if (!is_array($profileConfig)) {
+        continue;
+    }
+    $profileType = trim((string) ($profileConfig['profile_type'] ?? 'generic'));
+    if ($profileType === '') {
+        $profileType = 'generic';
+    }
+    $profileTypes[$profileType] = true;
+}
+$totalProfileTypes = count($profileTypes);
+
+$introHtml = '';
+$introHtml .= '<section class="builder-hero">';
+$introHtml .= '<div class="builder-hero__bg" aria-hidden="true">';
+$introHtml .= '<span class="builder-hero__block builder-hero__block--a"></span>';
+$introHtml .= '<span class="builder-hero__block builder-hero__block--b"></span>';
+$introHtml .= '<span class="builder-hero__block builder-hero__block--c"></span>';
+$introHtml .= '<span class="builder-hero__block builder-hero__block--d"></span>';
+$introHtml .= '</div>';
+$introHtml .= '<div class="builder-hero__content">';
+$introHtml .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
+$introHtml .= '<div class="builder-hero__copy">';
+$introHtml .= '<p class="builder-hero__kicker">Builder · YForm Listen</p>';
+$introHtml .= '<h2 class="builder-hero__title">YForm No-Code Builder für Listenprofile</h2>';
+$introHtml .= '<p class="builder-hero__lead">Konfiguriere Tabellen, Feld-Mappings, Filter, Sortierung und Layouts ohne eigene PHP-Templates. Profile lassen sich direkt im Element <code>yform_list</code> wiederverwenden.</p>';
+$introHtml .= '<div class="builder-hero__chips">';
+$introHtml .= '<span class="builder-chip">No Code</span>';
+$introHtml .= '<span class="builder-chip">Kontakte</span>';
+$introHtml .= '<span class="builder-chip">Produkte</span>';
+$introHtml .= '<span class="builder-chip">Slides</span>';
+$introHtml .= '</div>';
+$introHtml .= '</div>';
+$introHtml .= '<div class="builder-hero__stats">';
+$introHtml .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalProfiles) . '</strong><span>Profile</span></div>';
+$introHtml .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalTables) . '</strong><span>YForm Tabellen</span></div>';
+$introHtml .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalProfileTypes) . '</strong><span>Profiltypen</span></div>';
+$introHtml .= '</div>';
+$introHtml .= '</div>';
+$introHtml .= '</section>';
+echo '<div style="margin-bottom:16px;">' . $introHtml . '</div>';
+
 // ---- Liste der Profile + Edit-Formulare -----------------------------------
 $editId = (string) rex_request('edit', 'string', '');
 $showAddForm = 'add' === rex_request('mode', 'string', '');
@@ -235,7 +281,7 @@ $listingHtml .= '<p style="margin-top:10px;">'
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
-$fragment->setVar('title', 'YForm-Listen-Profile', false);
+$fragment->setVar('title', 'Profile verwalten', false);
 $fragment->setVar('body', $listingHtml, false);
 echo $fragment->parse('core/page/section.php');
 
@@ -286,7 +332,7 @@ $columns = '' !== (string) $editing['table']
 
 $selectField = static function (string $name, string $current, array $columns, bool $allowEmpty = true): string {
     $allowEmptyAttr = $allowEmpty ? '1' : '0';
-    $html = '<select class="form-control" name="' . $name . '"'
+    $html = '<select class="form-control yfl-select" name="' . $name . '"'
         . ' data-yfl-column-select="1"'
         . ' data-current-value="' . rex_escape($current) . '"'
         . ' data-allow-empty="' . $allowEmptyAttr . '"'
@@ -317,7 +363,7 @@ $selectField = static function (string $name, string $current, array $columns, b
     return $html;
 };
 
-$tableSelect = '<select class="form-control" id="yfl-profile-table" name="table">';
+$tableSelect = '<select class="form-control yfl-select" id="yfl-profile-table" name="table">';
 $tableSelect .= '<option value="">— Tabelle wählen —</option>';
 foreach ($availableTables as $tableName => $label) {
     $sel = ($tableName === (string) $editing['table']) ? ' selected' : '';
@@ -365,7 +411,7 @@ $profileTypeOptions = [
     'slides' => 'Slides / Teaser-Slider',
 ];
 
-$profileTypeSelect = '<select class="form-control" id="yfl-profile-type" name="profile_type">';
+$profileTypeSelect = '<select class="form-control yfl-select" id="yfl-profile-type" name="profile_type">';
 foreach ($profileTypeOptions as $typeValue => $typeLabel) {
     $selected = $typeValue === $profileType ? ' selected' : '';
     $profileTypeSelect .= '<option value="' . rex_escape($typeValue) . '"' . $selected . '>' . rex_escape($typeLabel) . '</option>';
@@ -481,7 +527,7 @@ if ([] !== $columns || '' !== (string) $editing['table'] || $showAddForm) {
 
 $fields[] = [
     'label' => '<label>Sortier-Richtung</label>',
-    'field' => '<select class="form-control" name="sort_dir">' . $sortDirOptions . '</select>',
+    'field' => '<select class="form-control yfl-select" name="sort_dir">' . $sortDirOptions . '</select>',
 ];
 
 // Virtual URLs (separates Addon) – einfache Checkbox
@@ -506,7 +552,7 @@ if (\FriendsOfREDAXO\Builder\ListProfiles::hasVirtualUrls()) {
 if (\FriendsOfREDAXO\Builder\ListProfiles::hasUrlAddon()) {
     $urlProfiles = \FriendsOfREDAXO\Builder\ListProfiles::collectUrlProfiles((string) $editing['table']);
     $currentUrlProfile = (string) $editing['url_profile'];
-    $upHtml = '<select class="form-control" id="yfl-url-profile" name="url_profile"'
+    $upHtml = '<select class="form-control yfl-select" id="yfl-url-profile" name="url_profile"'
         . ' data-current-value="' . rex_escape($currentUrlProfile) . '">';
     $upHtml .= '<option value=""' . ('' === $currentUrlProfile ? ' selected' : '') . '>— kein URL-Profil —</option>';
     $hasCurrent = false;
@@ -547,7 +593,7 @@ $fields[] = [
 ];
 $fields[] = [
     'label' => '<label>Default-Layout</label>',
-    'field' => '<select class="form-control" name="default_layout">' . $layoutOptions . '</select>',
+    'field' => '<select class="form-control yfl-select" name="default_layout">' . $layoutOptions . '</select>',
     'note' => 'Für Slides/Teaser-Profile wird das Layout <code>slides</code> empfohlen.',
 ];
 $fields[] = [

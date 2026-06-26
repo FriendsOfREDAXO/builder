@@ -4,6 +4,15 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.0.0-beta3] - 2026-06-26
+
+### YForm-Listen-Profile und Doku
+
+- Profilverwaltung um Produkt-Mappings (Preis, alter Preis, Währung, Badge, Verfügbarkeit) erweitert.
+- Templates für UIkit, Bootstrap und Plain um Produktausgabe ergänzt.
+- Eigene Profilseite für YForm-Listen mit Hero-Einleitung und verbessertem Styling.
+- README um Funktionsbeschreibung und Ausblick zum Modus "YForm NoCode" ergänzt.
+
 ## [1.0.0-beta2] - 2026-06-25
 
 ### Demo-Editor und Layouts
