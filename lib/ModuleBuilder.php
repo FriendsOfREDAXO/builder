@@ -629,7 +629,7 @@ class ModuleBuilder
             return '';
         }
 
-        if (preg_match('/^[a-zA-Z0-9.%()\-\s+/]+$/', $value) !== 1) {
+        if (preg_match('#^[a-zA-Z0-9.%()\-\s+/]+$#', $value) !== 1) {
             return '';
         }
 

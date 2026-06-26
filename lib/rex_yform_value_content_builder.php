@@ -21,7 +21,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
     private const LEGACY_DEFAULT_LANG = 'de';
     private const LEGACY_DEFAULT_TARGET = 'starter_text';
     private const LEGACY_DEFAULT_EDITOR_CLASSES = 'form-control cke5-editor yform-cb-legacy-editor';
-    private const MAX_WIDTH_PATTERN = '/^[a-zA-Z0-9.%()\-\s+/]+$/';
+    private const MAX_WIDTH_PATTERN = '#^[a-zA-Z0-9.%()\-\s+/]+$#';
     
     /**
      * Get next unique media counter (global über alle Instanzen)
@@ -2002,6 +2002,12 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                 'label' => 'Legacy-Migration Zielfeld (Key)',
                 'default' => 'text',
                 'notice' => 'Feldname im Zielelement, z. B. text, content oder body.',
+            ],
+            'wrapper_max_width' => [
+                'type' => 'text',
+                'label' => 'Wrapper max-width',
+                'default' => '',
+                'notice' => 'Optionale maximale Breite des Builder-Wrappers, z. B. 1400px, 60rem oder 100%. Alternativ wird max_width akzeptiert.',
             ],
             'description' => ['type' => 'text', 'label' => 'Beschreibung'],
             'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
