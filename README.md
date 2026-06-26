@@ -116,6 +116,20 @@ Hinweise:
 - `cke5`/`tinymce`: `profile`, `rows`
 - `repeater`: `add_label`, `view`, `grid_columns`, `fields`, `item_modal`
 
+### YForm-Value-Optionen
+
+Für das YForm-Feld `content_builder` kannst du zusätzliche Feld-Optionen direkt in der YForm-Definition setzen. Besonders nützlich ist `wrapper_max_width` für eine optionale maximale Breite des Wrappers.
+
+Beispiel:
+
+```php
+'wrapper_max_width' => '1140px',
+```
+
+Alternativ wird auch `max_width` akzeptiert. Wenn einer der beiden Werte gesetzt ist, erhält der Wrapper der Klasse `.yform-content-builder` ein Inline-`max-width` plus automatische Zentrierung.
+
+Für Module ist dieselbe Option in der PHP-API beschrieben: siehe [API.md](API.md) im Abschnitt zur Full Builder API.
+
 ## Medienmodell
 
 - Basistyp: `content_builder`

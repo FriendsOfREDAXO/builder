@@ -34,7 +34,11 @@ body.rex-theme-dark {
 
     .content-builder-slice:hover {
         border-color: #4a90e2;
-        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+        box-shadow: none;
+    }
+
+    .content-builder-slices > .content-builder-slice:hover {
+        box-shadow: 0 2px 6px rgba(74, 144, 226, 0.22);
     }
 
     /* Offline Slice */
@@ -667,7 +671,11 @@ body.rex-theme-dark {
 
         .content-builder-slice:hover {
             border-color: #4a90e2;
-            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+            box-shadow: none;
+        }
+
+        .content-builder-slices > .content-builder-slice:hover {
+            box-shadow: 0 2px 6px rgba(74, 144, 226, 0.22);
         }
 
         /* Section Element */

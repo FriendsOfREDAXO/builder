@@ -126,6 +126,8 @@ $contentBuilder = Module::createWithValue(1, $currentValue, [
     'framework' => 'bootstrap', // Framework für Backend-Preview
     'label' => 'Seiteninhalt',
     'description' => 'Fügen Sie Content-Elemente hinzu',
+    // Optional: Wrapper-Breite des Editors begrenzen
+    // 'wrapper_max_width' => '1140px',
     // Optional: Nur bestimmte Elemente erlauben
     // 'allowed_elements' => ['headline', 'text', 'gallery', 'hero'],
     // Optional: Selbst-Verschachtelung je Elementtyp verhindern
@@ -147,7 +149,9 @@ $currentValue = $this->getCurrentSlice()->getValue(1);
 
 // Content Builder erstellen
 $contentBuilder = Module::createWithValue(1, $currentValue, [
-    'framework' => 'uikit' 
+    'framework' => 'uikit',
+    // Optional: Wrapper-Breite des Editors begrenzen
+    // 'wrapper_max_width' => '1140px'
 ]);
 
 // Frontend-Output ausgeben

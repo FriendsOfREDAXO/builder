@@ -6,8 +6,10 @@
 /* Container */
 .yform-content-builder {
     position: relative;
-    background: transparent;
+    background: #fff;
     border: 8px solid rgba(255, 255, 255, 0.4);
+    padding-left: 5px;
+    padding-right: 5px;
     box-sizing: border-box;
     background-clip: padding-box;
 }
@@ -23,9 +25,9 @@
 .content-builder-slice {
     position: relative;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(60, 141, 188, 0.35);
     border-radius: 4px;
-    background: #fff;
+    background: transparent;
     transition: all 0.2s ease;
 }
 
@@ -80,7 +82,7 @@
 }
 
 .content-builder-slice.is-section .slice-rendered {
-    padding: 15px;
+    padding: 8px;
 }
 
 /* Section Backend Label */
@@ -199,7 +201,12 @@
 
 .content-builder-slice:hover {
     border-color: #3c8dbc;
-    box-shadow: 0 2px 8px rgba(60, 141, 188, 0.2);
+    box-shadow: none;
+}
+
+/* Leichter Hover-Schatten nur fuer Slices auf erster Ebene. */
+.content-builder-slices > .content-builder-slice:hover {
+    box-shadow: 0 2px 6px rgba(60, 141, 188, 0.16);
 }
 
 .content-builder-slice.ui-sortable-helper {
@@ -417,7 +424,7 @@
 
 /* Gerenderte Ansicht */
 .slice-rendered {
-    padding: 15px;
+    padding: 8px;
     min-height: 40px;
 }
 

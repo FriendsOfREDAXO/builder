@@ -19,6 +19,7 @@
  * @var bool $legacy_migration_hint
  * @var string $legacy_migration_target
  * @var string $legacy_migration_field
+ * @var string $wrapper_max_width
  * @var string $element_defaults_json
  */
 
@@ -118,9 +119,13 @@ foreach ($legacy_editor_attributes as $attrName => $attrValue) {
 $legacyEditorAttributeString = implode(' ', $legacyEditorAttributeParts);
 $builderValue = $legacy_is_active ? [] : $value;
 $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
+$wrapperStyle = '';
+if (trim((string) $wrapper_max_width) !== '') {
+    $wrapperStyle = ' style="max-width:' . rex_escape($wrapper_max_width) . ';margin-left:auto;margin-right:auto;"';
+}
 ?>
 
-<div class="form-group yform-element <?= $fieldClass ?>" 
+<div class="form-group yform-element <?= $fieldClass ?>"<?= $wrapperStyle ?>
      data-framework="<?= $framework ?>"
      data-online-toggle="<?= $enableOnlineToggle ? '1' : '0' ?>"
      data-element-search="<?= $addon->getConfig('enable_element_search') ? '1' : '0' ?>"

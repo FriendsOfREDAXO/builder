@@ -42,6 +42,7 @@ class ModuleBuilder
     /** Key des Feldes im Zielelement, in das das HTML übertragen wird (Standard: text) */
     protected string $legacyMigrationField = 'text';
     protected string $legacyHtml = '';
+    protected string $wrapperMaxWidth = '';
     /** @var array<string, array<string, mixed>> */
     protected array $elementDefaults = [];
     protected bool $enableCopyPaste = false;
@@ -86,6 +87,7 @@ class ModuleBuilder
         if ($instance->legacyMigrationField === '') {
             $instance->legacyMigrationField = 'text';
         }
+        $instance->wrapperMaxWidth = $instance->normalizeWrapperMaxWidth($options['wrapper_max_width'] ?? $options['max_width'] ?? '');
 
         if ($rawValue === null || $rawValue === '') {
             try {
@@ -150,10 +152,20 @@ class ModuleBuilder
             $legacyEditorAttributeParts[] = rex_escape((string) $attrName) . '="' . rex_escape((string) $attrValue) . '"';
         }
         $legacyEditorAttributeString = implode(' ', $legacyEditorAttributeParts);
+        $wrapperStyleParts = [];
+        if ($this->wrapperMaxWidth !== '') {
+            $wrapperStyleParts[] = 'max-width:' . $this->wrapperMaxWidth;
+            $wrapperStyleParts[] = 'margin-left:auto';
+            $wrapperStyleParts[] = 'margin-right:auto';
+        }
+        $wrapperStyleString = implode(';', $wrapperStyleParts);
+        if ($wrapperStyleString !== '') {
+            $wrapperStyleString .= ';';
+        }
 
         ob_start();
         ?>
-        <div class="form-group yform-content-builder"
+        <div class="form-group yform-content-builder"<?= $wrapperStyleString !== '' ? ' style="' . rex_escape($wrapperStyleString) . '"' : '' ?>
              data-framework="<?= rex_escape($this->framework) ?>"
              data-online-toggle="<?= $this->enableOnlineToggle ? '1' : '0' ?>"
              data-legacy-mode="<?= $legacyActive ? '1' : '0' ?>"
@@ -608,6 +620,20 @@ class ModuleBuilder
         }
 
         return false;
+    }
+
+    protected function normalizeWrapperMaxWidth(mixed $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        if (preg_match('/^[a-zA-Z0-9.%()\-\s+/]+$/', $value) !== 1) {
+            return '';
+        }
+
+        return $value;
     }
 
     /**
