@@ -51,6 +51,63 @@ Builder ist auf Erweiterung ausgelegt:
 - Framework-Optionen über `BUILDER_FRAMEWORK_OPTIONS`
 - Editorprofile über `BUILDER_EDITOR_PROFILES`
 
+## Feldattribute
+
+Elementfelder in `elements/<element_key>/config.php` unterstützen gemeinsame und feldtypspezifische Konfigurationen.
+
+Gemeinsame Attribute:
+
+- `label` Beschriftung im Backend-Editor
+- `notice` Hilfetext unter dem Feld
+- `default` Standardwert für neue Elemente
+- `perm` Rollenbasierte Sichtbarkeit (`admin`, `editor|power`, `['editor', 'admin']`)
+- `visible_if` Feld nur bei erfüllter Bedingung anzeigen
+
+Beispiel `visible_if`:
+
+```php
+'subtitle' => [
+	'type' => 'text',
+	'label' => 'Untertitel',
+	'visible_if' => ['show_subtitle' => '1'],
+]
+```
+
+### Beliebige HTML-Attribute via `attributes`
+
+Für die Feldtypen `text`, `textarea`, `checkbox`, `select`, `choice` kann ein `attributes`-Array gesetzt werden.
+
+```php
+'text' => [
+	'type' => 'textarea',
+	'label' => 'Text',
+	'rows' => 8,
+	'attributes' => [
+		'maxlength' => '500',
+		'data-autoresize' => 'true',
+		'aria-describedby' => 'hint-text',
+		'style' => 'background:#fffbe6; border-color:#f0c040;',
+	],
+]
+```
+
+Hinweise:
+
+- Alle Attributschlüssel und Werte werden serverseitig escapt.
+- Gesperrte Attribute (werden ignoriert): `name`, `type`, `value`, `checked`, `selected`, `id`, `rows`
+- `attributes` wirkt auf das Backend-Formularfeld. Die Frontend-Ausgabe steuerst du weiterhin über das Template.
+
+### Feldtypspezifische Attribute (Auszug)
+
+- `text`: `placeholder`, `attributes`
+- `textarea`: `rows`, `attributes`
+- `checkbox`: `default`, `attributes`
+- `select`: `options`, `default`, `attributes`
+- `choice`: `choices`, `default`, `multiple`, `selectpicker`, `choice_colors`, `choice_icons`, `attributes`
+- `be_media`: `allowed_types`
+- `cke5`/`tinymce`: `profile`, `rows`
+- `repeater`: `add_label`, `view`, `grid_columns`, `fields`, `item_modal`
+
 ## Medienmodell
 
 - Basistyp: `content_builder`
