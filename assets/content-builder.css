@@ -261,6 +261,22 @@
     display: none;
 }
 
+/* Im Kompaktmodus: nur Parent-Slices mit Kindern bekommen eine
+   ausserhalb liegende Toolbar; Child-/Leaf-Slices bleiben innen. */
+.yform-content-builder.compact-mode .content-builder-slice:has(.content-builder-slice) > .slice-toolbar {
+    top: 0;
+    right: 0;
+    transform: translateY(calc(-100% - 4px));
+    border-radius: 4px 4px 0 0;
+}
+
+.yform-content-builder.compact-mode .content-builder-slice:not(:has(.content-builder-slice)) > .slice-toolbar {
+    top: -1px;
+    right: -1px;
+    transform: none;
+    border-radius: 0 4px 0 4px;
+}
+
 /* Toolbar */
 .slice-toolbar {
     position: absolute;
