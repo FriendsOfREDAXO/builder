@@ -28,6 +28,8 @@ builder_media_types_preview_install_success = Focuspoint-Ratio-Typen verarbeitet
 builder_media_types_preview_install_error = Installation fehlgeschlagen: %s
 
 builder_settings = Einstellungen
+builder_yform_list_profiles = YForm-Listen-Profile
+builder_yform_list_profiles_notice = Die Verwaltung der YForm-Listen-Profile ist in eine eigene Seite ausgelagert.
 builder_docs = Dokumentation
 builder_dev = Developer Guide
 builder_api = API-Dokumentation

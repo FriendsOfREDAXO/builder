@@ -342,7 +342,15 @@ if ($hasThemeProvider) {
     echo $fragment->parse('core/page/section.php');
 }
 
-// =============================================================================
-// YForm-Listen-Profile (für yform_list Element)
-// =============================================================================
-require __DIR__ . '/settings_yform_list_profiles.php';
+$yformProfilesBody = '<p>' . rex_i18n::msg('builder_yform_list_profiles_notice') . '</p>';
+$yformProfilesBody .= '<p><a class="btn btn-default" href="'
+    . rex_url::backendPage('builder/settings_yform_list_profiles')
+    . '"><i class="rex-icon fa-table"></i> '
+    . rex_i18n::msg('builder_yform_list_profiles')
+    . '</a></p>';
+
+$fragment = new rex_fragment();
+$fragment->setVar('class', 'info', false);
+$fragment->setVar('title', rex_i18n::msg('builder_yform_list_profiles'), false);
+$fragment->setVar('body', $yformProfilesBody, false);
+echo $fragment->parse('core/page/section.php');

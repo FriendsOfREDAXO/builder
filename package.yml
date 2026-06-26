@@ -31,6 +31,9 @@ page:
         settings:
             title: 'translate:builder_settings'
             icon: rex-icon fa-cog
+        settings_yform_list_profiles:
+            title: 'translate:builder_yform_list_profiles'
+            icon: rex-icon fa-table
         docs:
             title: 'translate:builder_docs'
             icon: rex-icon fa-book

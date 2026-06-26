@@ -28,6 +28,8 @@ builder_media_types_preview_install_success = Focuspoint ratio types processed. 
 builder_media_types_preview_install_error = Installation failed: %s
 
 builder_settings = Settings
+builder_yform_list_profiles = YForm list profiles
+builder_yform_list_profiles_notice = Management of YForm list profiles was moved to a dedicated page.
 builder_docs = Documentation
 builder_dev = Developer Guide
 builder_api = API Documentation
