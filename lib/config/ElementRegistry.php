@@ -54,7 +54,6 @@ class ElementRegistry
             'starter_callout',
             'columns',
             'yform_list',
-            'forcal_list',
             'table',
             'smart_link_showcase',
             'smart_links_multi_showcase',
