@@ -225,6 +225,7 @@ class RepeaterField extends FieldAbstract
         echo '<div class="move-buttons">';
         echo '<button type="button" class="btn-move btn-move-up" title="Nach oben"><i class="fa fa-chevron-up"></i></button>';
         echo '<button type="button" class="btn-move btn-move-down" title="Nach unten"><i class="fa fa-chevron-down"></i></button>';
+        echo '<button type="button" class="btn-move btn-add-inline" title="Danach einfügen"><i class="fa fa-plus"></i></button>';
         echo '</div>';
     }
 

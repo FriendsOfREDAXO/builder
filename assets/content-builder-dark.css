@@ -242,6 +242,14 @@ body.rex-theme-dark {
         background: rgba(255, 255, 255, 0.3);
     }
 
+    .repeater-item .btn-add-inline {
+        background: rgba(92, 184, 92, 0.6) !important;
+    }
+
+    .repeater-item .btn-add-inline:hover {
+        background: rgba(92, 184, 92, 0.9) !important;
+    }
+
     /* Caption / Filename Styles */
     .cb-media-filename {
         color: #bbb !important;

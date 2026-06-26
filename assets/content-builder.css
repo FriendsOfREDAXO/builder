@@ -1054,6 +1054,16 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     opacity: 1;
 }
 
+.repeater-item .btn-add-inline {
+    background: rgba(92, 184, 92, 0.8) !important;
+    transition: background-color 0.2s;
+}
+
+.repeater-item .btn-add-inline:hover {
+    background: rgba(60, 160, 60, 1) !important;
+    opacity: 1;
+}
+
 .repeater-item .btn-move:hover {
     background: rgba(0, 0, 0, 0.8);
 }
