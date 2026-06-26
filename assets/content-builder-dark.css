@@ -237,6 +237,8 @@ body.rex-theme-dark {
         background: #404040;
         color: #ccc;
         border-color: #505050;
+        min-width: 28px;
+        height: 28px;
     }
 
     .repeater-item .btn-move:hover {
@@ -249,6 +251,8 @@ body.rex-theme-dark {
         background: #5cb85c !important;
         color: white !important;
         border-color: #4cae4c !important;
+        min-width: 28px !important;
+        height: 28px !important;
     }
 
     .repeater-item .btn-add-inline:hover {

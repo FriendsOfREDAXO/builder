@@ -1042,12 +1042,13 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     border-radius: 4px;
     padding: 4px 6px;
     font-size: 13px;
-    width: auto;
-    height: auto;
+    min-width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .repeater-item .btn-move:hover {
@@ -1060,6 +1061,8 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     background: #5cb85c !important;
     color: white !important;
     border-color: #4cae4c !important;
+    min-width: 28px !important;
+    height: 28px !important;
 }
 
 .repeater-item .btn-add-inline:hover {
