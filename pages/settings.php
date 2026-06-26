@@ -158,10 +158,7 @@ $hero .= '</div>';
 $hero .= '</div>';
 $hero .= '</section>';
 
-$heroFragment = new rex_fragment();
-$heroFragment->setVar('title', rex_i18n::msg('builder_settings'), false);
-$heroFragment->setVar('body', $hero, false);
-echo $heroFragment->parse('core/page/section.php');
+echo '<div style="margin-bottom:16px;">' . $hero . '</div>';
 
 $ownAddonChoices = [];
 $otherAddonChoices = [];

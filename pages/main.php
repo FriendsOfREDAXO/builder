@@ -150,10 +150,7 @@ $hero .= '</div>';
 $hero .= '</div>';
 $hero .= '</section>';
 
-$fragment = new rex_fragment();
-$fragment->setVar('title', 'Builder', false);
-$fragment->setVar('body', $hero, false);
-echo $fragment->parse('core/page/section.php');
+echo '<div style="margin-bottom:16px;">' . $hero . '</div>';
 
 $listBody = '<div class="builder-main-overview">';
 $listBody .= '<p class="help-block">Schneller Überblick über alle verfügbaren Content-Builder-Elemente mit Metadaten.</p>';

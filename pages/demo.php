@@ -284,7 +284,4 @@ $demoMarkup .= '</div>';
 
 $demoMarkup .= '</div>';
 
-$fragment = new rex_fragment();
-$fragment->setVar('title', 'Demo', false);
-$fragment->setVar('body', $demoMarkup, false);
-echo $fragment->parse('core/page/section.php');
+echo $demoMarkup;
