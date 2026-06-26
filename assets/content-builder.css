@@ -282,9 +282,9 @@
     transition-delay: 0s;
 }
 
-/* Sobald ein verschachteltes Slice aktiv ist, Eltern-Toolbar ausblenden,
-   damit keine Toolbars uebereinanderliegen. */
-.content-builder-slice:has(.content-builder-slice:hover) > .slice-toolbar {
+/* Nur ausserhalb vom Kompaktmodus Eltern-Toolbar ausblenden,
+   damit im Kompaktmodus der umgebende Slice erreichbar bleibt. */
+.yform-content-builder:not(.compact-mode) .content-builder-slice:has(.content-builder-slice:hover) > .slice-toolbar {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
