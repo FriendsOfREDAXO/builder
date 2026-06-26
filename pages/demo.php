@@ -22,7 +22,7 @@ $initialSlices = [
                 'tag' => 'h2',
             ],
             'container_width' => 'uk-container',
-            'section_padding' => 'uk-section-large',
+            'section_padding' => 'uk-section-medium',
             'enable_section' => true,
             'enable_container' => true,
         ],
@@ -34,7 +34,7 @@ $initialSlices = [
         'data' => [
             'text' => '<p>Diese Demo zeigt die typischen Default- und Starter-Elemente so, wie sie später in echten Projekten zusammengesetzt werden können.</p><p>Du kannst die Elemente verschieben, ergänzen und bearbeiten. Gespeichert wird hier bewusst nichts.</p>',
             'container_width' => 'uk-container',
-            'section_padding' => 'uk-section-small',
+            'section_padding' => 'uk-section-medium',
             'enable_section' => true,
             'enable_container' => true,
         ],
@@ -100,7 +100,7 @@ $initialSlices = [
                         'data' => [
                             'col_layout' => '66_33',
                             'section_bg' => 'uk-background-primary',
-                            'section_light' => true,
+                            'section_light' => 0,
                             'columns' => [
                                 [
                                     [
@@ -129,7 +129,7 @@ $initialSlices = [
                             ],
                             'enable_section' => true,
                             'enable_container' => true,
-                            'section_padding' => 'uk-section-small',
+                            'section_padding' => 'uk-section-medium',
                             'container_width' => 'uk-container',
                         ],
                     ],
@@ -149,7 +149,7 @@ $initialSlices = [
             ],
             'enable_section' => true,
             'enable_container' => true,
-            'section_padding' => 'uk-section-small',
+            'section_padding' => 'uk-section-medium',
             'container_width' => 'uk-container',
         ],
     ],
@@ -185,7 +185,7 @@ $initialSlices = [
             ],
             'section_bg' => '',
             'section_bg_image' => '',
-            'section_padding' => 'uk-section-small',
+            'section_padding' => 'uk-section-medium',
             'container_width' => 'uk-container',
             'section_light' => 0,
             'enable_section' => true,
@@ -195,7 +195,7 @@ $initialSlices = [
 ];
 
 $builder = \FriendsOfREDAXO\Builder\Module::createWithValue(1, null, [
-    'framework' => 'uikit',
+    'framework' => 'plain',
     'label' => 'Builder Demo',
     'description' => 'Demo-Editor mit echten Starter- und Default-Elementen',
     'allowed_elements' => ['starter_headline', 'starter_text', 'divider', 'columns', 'starter_cards'],
@@ -234,7 +234,7 @@ $demoMarkup .= '<div class="builder-demo-panel">';
 $demoMarkup .= '<div style="display: flex; justify-content: space-between; align-items: center;">';
 $demoMarkup .= '<div>';
 $demoMarkup .= '<h3>Arbeiten in der Demo</h3>';
-$demoMarkup .= '<p class="text-muted">Du kannst die vorhandenen Elemente bearbeiten, neue Demo-Bausteine hinzufügen und die verschachtelte Spaltenstruktur direkt im Builder verändern. Diese Seite schreibt bewusst nichts in den Slice-Speicher zurück.</p>';
+$demoMarkup .= '<p class="text-muted">Du kannst die vorhandenen Elemente bearbeiten, neue Demo-Bausteine hinzufügen und die verschachtelte Spaltenstruktur direkt im Builder verändern. Die Demo rendert absichtlich mit dem framework-neutralen Plain-Template und speichert nichts dauerhaft.</p>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '<div style="white-space: nowrap; margin-left: 20px;">';
 $demoMarkup .= '<label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal; cursor: pointer;">';
@@ -245,6 +245,35 @@ $demoMarkup .= '</div>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bottom: 0;">Für die Demo wird ein installiertes TinyMCE-Addon empfohlen, damit die Textbausteine direkt im Editor bearbeitet werden können.</div>';
 $demoMarkup .= '</div>';
+
+$demoMarkup .= '<style>';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header{max-width:760px;margin:0 auto 28px;padding:0 8px;text-align:center;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header p:first-child{margin:0 0 10px;color:#b86118;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header h1,.builder-demo-page .slice-rendered > header h2,.builder-demo-page .slice-rendered > header h3,.builder-demo-page .slice-rendered > header h4{margin:0 0 14px;color:#23364a;font-weight:800;line-height:1.08;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header mark{padding:0 .18em;border-radius:.35em;background:#ffe3b8;color:#23364a;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header p:last-child{margin:0 auto;color:#5f7693;font-size:18px;line-height:1.65;max-width:680px;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider{margin:20px 0 26px;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider-text{display:inline-block;padding:6px 14px;border-radius:999px;background:#edf5ff;color:#31506f;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider hr{margin-top:10px;border:0;border-top:1px solid #d5e2f0;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered .cb-plain-row{row-gap:24px;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered .cb-plain-row > div{margin-bottom:12px;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered [style*="background:#fff"]{color:#23364a !important;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered [style*="background:#fff"] h1,.builder-demo-page .slice-rendered [style*="background:#fff"] h2,.builder-demo-page .slice-rendered [style*="background:#fff"] h3,.builder-demo-page .slice-rendered [style*="background:#fff"] h4,.builder-demo-page .slice-rendered [style*="background:#fff"] p,.builder-demo-page .slice-rendered [style*="background:#fff"] li{color:#23364a !important;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style]{border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(37,61,88,.08);}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style] img{aspect-ratio:16/10;object-fit:cover;background:#dfe8f2;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style] h4{margin:0 0 10px;color:#23364a;font-size:19px;font-weight:700;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style] a{display:inline-flex;align-items:center;gap:6px;color:#0d5aa7;font-weight:700;text-decoration:none;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style] a:hover{text-decoration:underline;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered article[style] a::after{content:"\\2192";}';
+$demoMarkup .= '@media (max-width: 991px){.builder-demo-page .slice-rendered .cb-plain-row{display:block !important;margin-left:0 !important;margin-right:0 !important;}.builder-demo-page .slice-rendered .cb-plain-row > div{max-width:none !important;flex:0 0 100% !important;padding:0 !important;}}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered > header h1,body.rex-theme-dark .builder-demo-page .slice-rendered > header h2,body.rex-theme-dark .builder-demo-page .slice-rendered > header h3,body.rex-theme-dark .builder-demo-page .slice-rendered > header h4{color:#edf4fb;}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered > header p:last-child{color:#b1c3d8;}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered > header mark{background:#5d451d;color:#fff1d7;}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered .cb-divider-text{background:#24384d;color:#dce9f7;}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered .cb-divider hr{border-top-color:#41586f;}';
+$demoMarkup .= 'body.rex-theme-dark .builder-demo-page .slice-rendered article[style]{box-shadow:0 18px 36px rgba(0,0,0,.28);}';
+$demoMarkup .= '@media (prefers-color-scheme: dark){body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header h1,body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header h2,body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header h3,body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header h4{color:#edf4fb;}body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header p:last-child{color:#b1c3d8;}body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered > header mark{background:#5d451d;color:#fff1d7;}body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered .cb-divider-text{background:#24384d;color:#dce9f7;}body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered .cb-divider hr{border-top-color:#41586f;}body.rex-has-theme:not(.rex-theme-light) .builder-demo-page .slice-rendered article[style]{box-shadow:0 18px 36px rgba(0,0,0,.28);}}';
+$demoMarkup .= '</style>';
 
 $builderHtml = $builder->getEditor();
 $demoMarkup .= $builderHtml;

@@ -61,9 +61,17 @@ function loadElementLanguageDirectories(): void
 // WICHTIG: Lang-Dateien aller Elemente am Anfang laden damit Übersetzungen verfügbar sind
 loadElementLanguageDirectories();
 
+function normalizeFramework(string $framework): string
+{
+    $framework = trim($framework);
+
+    return $framework !== '' ? $framework : 'uikit';
+}
+
 // Helper: Generiert Modul-Code für ein Element
 function generateModuleCode(string $elementKey, string $framework, int $valueId = 1): string
 {
+    $frameworkCode = var_export(normalizeFramework($framework), true);
     $config = [];
     $configPath = resolveElementConfigPath($elementKey);
     
@@ -84,6 +92,8 @@ use FriendsOfREDAXO\Builder\Module;
 echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderInput();
 ?>
 PHP;
+
+    $code = str_replace("'{$framework}'", $frameworkCode, $code);
     
     return $code;
 }
@@ -110,6 +120,7 @@ function exportAllowedElementsCode(array $allowedElements): string
 function generateFullBuilderInputCode(string $framework, int $valueId, array $allowedElements): string
 {
     $allowedElementsCode = exportAllowedElementsCode($allowedElements);
+    $frameworkCode = var_export(normalizeFramework($framework), true);
 
     return <<<PHP
 <?php
@@ -124,7 +135,7 @@ use FriendsOfREDAXO\Builder\Module;
 
 
 \$builder = Module::createWithValue({$valueId}, null, [
-    'framework' => '{$framework}',
+    'framework' => {$frameworkCode},
     'label' => rex_i18n::msg('builder_title'),
     'description' => rex_i18n::msg('builder_intro'),
     'allowed_elements' => {$allowedElementsCode},
@@ -141,13 +152,14 @@ PHP;
 function generateFullBuilderOutputCode(string $framework, int $valueId, array $allowedElements): string
 {
     $allowedElementsCode = exportAllowedElementsCode($allowedElements);
+    $frameworkCode = var_export(normalizeFramework($framework), true);
 
     return <<<PHP
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
 \$builder = Module::createWithValue({$valueId}, Module::getSliceValueForModule({$valueId}), [
-    'framework' => '{$framework}',
+    'framework' => {$frameworkCode},
     'allowed_elements' => {$allowedElementsCode},
 ]);
 
@@ -159,7 +171,7 @@ PHP;
 // Bestehende Module aktualisieren (alle yfcb_* Module neu generieren)
 if (rex_post('update_all_modules', 'bool')) {
     $moduleMode = rex_post('module_mode', 'string', 'single');
-    $framework = rex_post('framework', 'string', 'uikit');
+    $framework = normalizeFramework(rex_post('framework', 'string', 'uikit'));
     $valueId = rex_post('value_id', 'int', 1);
     $selectedElements = rex_post('elements', 'array', []);
     $fullModuleKey = trim(rex_post('full_module_key', 'string', 'yfcb_builder'));
@@ -270,7 +282,7 @@ PHP;
 if (rex_post('create_modules', 'bool')) {
     $moduleMode = rex_post('module_mode', 'string', 'single');
     $selectedElements = rex_post('elements', 'array', []);
-    $framework = rex_post('framework', 'string', 'uikit');
+    $framework = normalizeFramework(rex_post('framework', 'string', 'uikit'));
     $valueId = rex_post('value_id', 'int', 1);
     $fullModuleKey = trim(rex_post('full_module_key', 'string', 'yfcb_builder'));
     $fullModuleName = trim(rex_post('full_module_name', 'string', 'Builder'));
@@ -525,6 +537,8 @@ $hero .= '</section>';
 
 echo '<div style="margin-bottom:16px;">' . $hero . '</div>';
 
+$currentFramework = normalizeFramework(rex_request('framework', 'string', 'uikit'));
+
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', 'Module erstellen/aktualisieren', false);
@@ -562,11 +576,13 @@ $content .= '</div>';
 // Framework-Auswahl
 $content .= '<div class="form-group">';
 $content .= '<label for="framework"><strong>Framework</strong></label>';
-$content .= '<select class="form-control" id="framework" name="framework">';
-$content .= '<option value="uikit">UIkit</option>';
-$content .= '<option value="bootstrap">Bootstrap</option>';
-$content .= '</select>';
-$content .= '<small class="help-block">Wähle das Framework, das du in deinen Modulen verwenden möchtest.</small>';
+$content .= '<input class="form-control" id="framework" name="framework" list="builder-framework-options" value="' . rex_escape($currentFramework) . '">';
+$content .= '<datalist id="builder-framework-options">';
+$content .= '<option value="uikit">';
+$content .= '<option value="bootstrap">';
+$content .= '<option value="plain">';
+$content .= '</datalist>';
+$content .= '<small class="help-block">Vorschläge: uikit, bootstrap, plain. Du kannst hier auch einen freien Template-Key eintragen.</small>';
 $content .= '</div>';
 
 // REX_VALUE Slot Auswahl
