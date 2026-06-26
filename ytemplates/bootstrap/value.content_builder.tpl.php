@@ -140,9 +140,15 @@ if (trim((string) $wrapper_max_width) !== '') {
     <?php endif; ?>
 
     <?php if (!$legacy_is_active): ?>
-        <div class="alert alert-info yform-cb-start-separator" style="margin-bottom: 12px; border-left: 4px solid #1b809e;">
-            <strong class="yform-cb-start-separator__title"><i class="builder-icon-logo yform-cb-start-logo" aria-hidden="true"></i> Content-Builder-Bereich</strong><br>
-            <span>Ab hier beginnt der modulare Seiteninhalt.</span>
+        <div class="alert alert-info yform-cb-start-separator" style="margin-bottom: 12px; border-left: 4px solid #1b809e; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div>
+                <strong class="yform-cb-start-separator__title"><i class="builder-icon-logo yform-cb-start-logo" aria-hidden="true"></i> Content-Builder-Bereich</strong><br>
+                <span>Ab hier beginnt der modulare Seiteninhalt.</span>
+            </div>
+            <label style="display:flex; align-items:center; gap:6px; margin:0; font-weight:normal; white-space:nowrap; cursor:pointer; flex-shrink:0;">
+                <input type="checkbox" id="cb-compact-toggle-<?= rex_escape($field_id) ?>" style="cursor:pointer;" />
+                <span style="font-size:13px;">Kompaktmodus</span>
+            </label>
         </div>
 
         <div class="yform-cb-persist-status is-clean" data-cb-persist-status="clean" style="margin-bottom: 12px;">
@@ -477,6 +483,30 @@ if (trim((string) $wrapper_max_width) !== '') {
     <?php if ($notice): ?>
         <p class="help-block"><?= $notice ?></p>
     <?php endif; ?>
-    
+
 </div>
+<script nonce="<?= rex_response::getNonce() ?>">
+(function() {
+    var toggleId = 'cb-compact-toggle-<?= rex_escape($field_id) ?>';
+    var lsKey    = 'cb-compact-mode-<?= rex_escape($field_id) ?>';
+    var toggle   = document.getElementById(toggleId);
+    if (!toggle) return;
+    var wrapper  = toggle.closest('.yform-content-builder');
+    if (!wrapper) return;
+
+    var saved = localStorage.getItem(lsKey) === '1';
+    toggle.checked = saved;
+    if (saved) wrapper.classList.add('compact-mode');
+
+    toggle.addEventListener('change', function() {
+        if (this.checked) {
+            wrapper.classList.add('compact-mode');
+            localStorage.setItem(lsKey, '1');
+        } else {
+            wrapper.classList.remove('compact-mode');
+            localStorage.setItem(lsKey, '0');
+        }
+    });
+}());
+</script>
 
