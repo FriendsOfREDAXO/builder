@@ -14,6 +14,9 @@ $pdfoutAvailable = rex_addon::get('pdfout')->isAvailable();
 $presets = MediaTypeRegistry::getPresets();
 ksort($presets, SORT_NATURAL | SORT_FLAG_CASE);
 
+$totalPresets = count($presets);
+$selectedMediaLabel = $selectedMedia !== '' ? $selectedMedia : '–';
+
 /**
  * @param array<string, array{ratio: string, mode?: string, widths?: list<int>, default_width?: int}> $presetList
  * @return array<string, array{width_fr:int, height_fr:int, title:string, description:string}>
@@ -215,6 +218,40 @@ $media = null;
 if ($selectedMedia !== '') {
     $media = rex_media::get($selectedMedia);
 }
+
+$hero = '';
+$hero .= '<section class="builder-hero">';
+$hero .= '<div class="builder-hero__bg" aria-hidden="true">';
+$hero .= '<span class="builder-hero__block builder-hero__block--a"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--b"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--c"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--d"></span>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__content">';
+$hero .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
+$hero .= '<div class="builder-hero__copy">';
+$hero .= '<p class="builder-hero__kicker">Builder · Virtuelle Bildtypen</p>';
+$hero .= '<h2 class="builder-hero__title">Virtuelle Medientypen live prüfen</h2>';
+$hero .= '<p class="builder-hero__lead">Teste Presets, Ratio-Modi und Breiten direkt gegen eine ausgewählte Datei. So siehst du sofort, wie deine virtuellen Bildtypen im Frontend wirken.</p>';
+$hero .= '<div class="builder-hero__chips">';
+$hero .= '<span class="builder-chip">Media Manager</span>';
+$hero .= '<span class="builder-chip">Focuspoint</span>';
+$hero .= '<span class="builder-chip">Preset Preview</span>';
+$hero .= '<span class="builder-chip">Virtual Types</span>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__stats">';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalPresets) . '</strong><span>Presets</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . ($mediaManagerAvailable ? 'Ja' : 'Nein') . '</strong><span>Media Manager</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape($selectedMediaLabel) . '</strong><span>Aktuelle Datei</span></div>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '</section>';
+
+$heroFragment = new rex_fragment();
+$heroFragment->setVar('title', rex_i18n::msg('builder_media_types_preview'), false);
+$heroFragment->setVar('body', $hero, false);
+echo $heroFragment->parse('core/page/section.php');
 
 $content = '';
 $content .= '<p class="help-block">' . rex_i18n::msg('builder_media_types_preview_intro') . '</p>';

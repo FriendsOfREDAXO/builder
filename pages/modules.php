@@ -465,6 +465,15 @@ foreach ($elementPaths as $pathKey => $basePath) {
 // Sortiere Elemente
 asort($elements);
 
+$totalElements = count($elements);
+$totalCategories = count($elementsByCategory);
+$totalExternalElements = 0;
+foreach ($elementSourceMeta as $sourceMeta) {
+    if ((bool) ($sourceMeta['is_external'] ?? false)) {
+        ++$totalExternalElements;
+    }
+}
+
 // Sortiere Kategorien und Elemente in Kategorien
 if (!empty($elementsByCategory)) {
     foreach ($elementsByCategory as $category => $categoryElements) {
@@ -485,6 +494,40 @@ if (!empty($elementsByCategory)) {
 }
 
 // UI
+$hero = '';
+$hero .= '<section class="builder-hero">';
+$hero .= '<div class="builder-hero__bg" aria-hidden="true">';
+$hero .= '<span class="builder-hero__block builder-hero__block--a"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--b"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--c"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--d"></span>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__content">';
+$hero .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
+$hero .= '<div class="builder-hero__copy">';
+$hero .= '<p class="builder-hero__kicker">Builder · Module</p>';
+$hero .= '<h2 class="builder-hero__title">Module aus Builder-Elementen generieren</h2>';
+$hero .= '<p class="builder-hero__lead">Erzeuge pro Element einzelne REDAXO-Module oder ein zentrales Full-Builder-Modul. Framework, erlaubte Elemente und Value-Slot steuerst du direkt hier.</p>';
+$hero .= '<div class="builder-hero__chips">';
+$hero .= '<span class="builder-chip">Single Module</span>';
+$hero .= '<span class="builder-chip">Full Builder</span>';
+$hero .= '<span class="builder-chip">UIkit / Bootstrap</span>';
+$hero .= '<span class="builder-chip">YFCB Keys</span>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__stats">';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalElements) . '</strong><span>Elemente</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalCategories) . '</strong><span>Kategorien</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalExternalElements) . '</strong><span>Externe Quellen</span></div>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '</section>';
+
+$heroFragment = new rex_fragment();
+$heroFragment->setVar('title', 'Module', false);
+$heroFragment->setVar('body', $hero, false);
+echo $heroFragment->parse('core/page/section.php');
+
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', 'Module erstellen/aktualisieren', false);

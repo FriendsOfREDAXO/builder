@@ -125,6 +125,44 @@ $replaceKeepCoreElements = array_values(array_unique(array_filter(array_map(
 $customElementPaths = \FriendsOfREDAXO\Builder\Config\ElementModeResolver::getCustomPaths();
 $addonChoices = \FriendsOfREDAXO\Builder\Config\ElementModeResolver::getAddonChoices($customElementPaths);
 
+$totalThemeChoices = max(0, count($themes) - 1);
+$totalAddonSources = count($addonChoices);
+$activeAddonSources = $enabledElementAddons === [] ? $totalAddonSources : count($enabledElementAddons);
+
+$hero = '';
+$hero .= '<section class="builder-hero">';
+$hero .= '<div class="builder-hero__bg" aria-hidden="true">';
+$hero .= '<span class="builder-hero__block builder-hero__block--a"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--b"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--c"></span>';
+$hero .= '<span class="builder-hero__block builder-hero__block--d"></span>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__content">';
+$hero .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
+$hero .= '<div class="builder-hero__copy">';
+$hero .= '<p class="builder-hero__kicker">Builder · Einstellungen</p>';
+$hero .= '<h2 class="builder-hero__title">Globale Builder-Konfiguration</h2>';
+$hero .= '<p class="builder-hero__lead">Steuere Theme, Elementquellen und Editor-Funktionen zentral für alle Builder-Instanzen. Änderungen wirken sofort auf neue und bestehende Integrationen.</p>';
+$hero .= '<div class="builder-hero__chips">';
+$hero .= '<span class="builder-chip">Theme Provider</span>';
+$hero .= '<span class="builder-chip">Elementquellen</span>';
+$hero .= '<span class="builder-chip">Merge / Replace</span>';
+$hero .= '<span class="builder-chip">Editor Features</span>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '<div class="builder-hero__stats">';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $activeAddonSources) . '/' . rex_escape((string) $totalAddonSources) . '</strong><span>Aktive Quellen</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalThemeChoices) . '</strong><span>Themes</span></div>';
+$hero .= '<div class="builder-stat"><strong>' . rex_escape((string) count($availableYformTables)) . '</strong><span>YForm Tabellen</span></div>';
+$hero .= '</div>';
+$hero .= '</div>';
+$hero .= '</section>';
+
+$heroFragment = new rex_fragment();
+$heroFragment->setVar('title', rex_i18n::msg('builder_settings'), false);
+$heroFragment->setVar('body', $hero, false);
+echo $heroFragment->parse('core/page/section.php');
+
 $ownAddonChoices = [];
 $otherAddonChoices = [];
 foreach ($addonChoices as $addonKey => $addonLabel) {

@@ -7,6 +7,14 @@ Komplexe Layouts oder Datenstrukturen visuell gestalten. Mit Builder ist das mö
 👋 Aber erstmal vorweg: Es ist kein Out-of-the-Box Pagebuilder. Das meiste muss man selbst beisteuern. Ihr entscheided was es kann und welche Elemente es geben wird. Zum Start gibt es ein paar Demo-Elemente mit denen Ihr spielen könnt. 
 Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe. 
 
+## Leichter Einstieg
+
+Für einen leichten Einstieg empfehlen wir direkt am Anfang:
+
+1. Starter-Addon: https://github.com/FriendsOfREDAXO/builder_starter
+	Hinweis: Das Starter-Addon ist aktuell nicht im REDAXO-Installer verfügbar. Bitte manuell von GitHub herunterladen oder über das ZIP-Installer-Addon als ZIP-Datei installieren.
+2. Anschließend das Tutorial in diesem Addon lesen und Schritt für Schritt nachbauen (`TUTORIAL.md`).
+
 
 ## Features
 
