@@ -190,4 +190,49 @@ abstract class FieldAbstract implements FieldInterface
         }
         return ++$GLOBALS['yform_cb_link_counter'];
     }
+
+    /**
+     * Rendert zusätzliche HTML-Attribute aus dem Feld-Config-Key 'attributes'.
+     *
+     * Verwendung in config.php:
+     * ```php
+     * 'mein_feld' => [
+     *     'type'       => 'text',
+     *     'label'      => 'Name',
+     *     'attributes' => [
+     *         'data-validate' => 'required',
+     *         'maxlength'     => '120',
+     *         'autocomplete'  => 'name',
+     *         'class'         => 'my-extra-class',  // wird zur form-control-Klasse addiert
+     *     ],
+     * ]
+     * ```
+     *
+     * Geschützte Attribute (vom Feldtyp selbst gesteuert, werden ignoriert):
+     *   name, type, value, checked, selected, id, rows
+     *
+     * @return string Fertig escapeter HTML-Attributstring inkl. führendem Leerzeichen,
+     *                oder leerer String wenn keine Attribute konfiguriert.
+     */
+    protected function renderExtraAttributes(array $fieldConfig): string
+    {
+        $attributes = $fieldConfig['attributes'] ?? [];
+        if (!is_array($attributes) || $attributes === []) {
+            return '';
+        }
+
+        // Attribute die vom Feldtyp selbst gesetzt werden – Konflikte vermeiden
+        $blocked = ['name', 'type', 'value', 'checked', 'selected', 'id', 'rows'];
+
+        $parts = [];
+        foreach ($attributes as $attr => $val) {
+            $attr = strtolower(trim((string) $attr));
+            if ($attr === '' || in_array($attr, $blocked, true)) {
+                continue;
+            }
+            $parts[] = rex_escape($attr) . '="' . rex_escape((string) $val) . '"';
+        }
+
+        return $parts !== [] ? ' ' . implode(' ', $parts) : '';
+    }
 }

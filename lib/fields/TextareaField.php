@@ -30,7 +30,9 @@ class TextareaField extends FieldAbstract
 
         echo '<textarea class="form-control" ';
         echo 'name="' . rex_escape($fieldName) . '" ';
-        echo 'rows="' . intval($rows) . '">';
+        echo 'rows="' . intval($rows) . '"';
+        echo $this->renderExtraAttributes($fieldConfig);
+        echo '>';
         echo rex_escape($value);
         echo '</textarea>';
 

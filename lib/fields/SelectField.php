@@ -28,7 +28,7 @@ class SelectField extends FieldAbstract
         $this->openFormGroup();
         $this->renderLabel($label);
 
-        echo '<select class="form-control" name="' . rex_escape($fieldName) . '">';
+        echo '<select class="form-control" name="' . rex_escape($fieldName) . '"' . $this->renderExtraAttributes($fieldConfig) . '>';
         
         foreach ($options as $optValue => $optLabel) {
             $selected = ($value == $optValue) ? ' selected' : '';

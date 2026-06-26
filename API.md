@@ -639,14 +639,46 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
 - ✅ Funktioniert im **Backend-Editor** und **Frontend-Formular**
 - ✅ Nicht berechtigt = gar nicht zu sehen
 
+- ✅ Nicht berechtigt = gar nicht zu sehen
+
+### attributes – beliebige HTML-Attribute
+
+Jedes Feld akzeptiert einen optionalen `attributes`-Key mit einem assoziativen Array beliebiger HTML-Attribute.
+Der Builder escapt alle Schlüssel und Werte sicher.
+
+Unterstützt von: `text`, `textarea`, `checkbox`, `select`, `choice`
+
+```php
+'beschreibung' => [
+    'type'       => 'textarea',
+    'label'      => 'Beschreibung',
+    'attributes' => [
+        'data-autoresize'  => 'true',
+        'maxlength'        => '500',
+        'style'            => 'background:#fffbe6;',
+        'aria-describedby' => 'hint-beschreibung',
+    ],
+]
+```
+
+Gesperrte Attribute (vom Feldtyp selbst gesteuert, werden ignoriert):
+`name`, `type`, `value`, `checked`, `selected`, `id`, `rows`
+
+---
+
 ### text
 
 ```php
 'title' => [
-    'type' => 'text',
-    'label' => 'Titel',
+    'type'        => 'text',
+    'label'       => 'Titel',
     'placeholder' => 'Titel eingeben...',
-    'notice' => 'Max. 100 Zeichen'
+    'notice'      => 'Max. 100 Zeichen',
+    // Optionale HTML-Attribute:
+    'attributes'  => [
+        'maxlength'    => '100',
+        'autocomplete' => 'off',
+    ],
 ]
 ```
 
@@ -654,9 +686,14 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
 
 ```php
 'description' => [
-    'type' => 'textarea',
-    'label' => 'Beschreibung',
-    'rows' => 5
+    'type'       => 'textarea',
+    'label'      => 'Beschreibung',
+    'rows'       => 5,
+    // Optionale HTML-Attribute:
+    'attributes' => [
+        'data-autoresize' => 'true',
+        'maxlength'       => '500',
+    ],
 ]
 ```
 
@@ -664,9 +701,14 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
 
 ```php
 'show_title' => [
-    'type' => 'checkbox',
-    'label' => 'Titel anzeigen',
-    'default' => 1
+    'type'       => 'checkbox',
+    'label'      => 'Titel anzeigen',
+    'default'    => 1,
+    // Optionale HTML-Attribute:
+    'attributes' => [
+        'data-toggle' => 'collapse',
+        'data-target' => '#title-section',
+    ],
 ]
 ```
 
@@ -674,13 +716,17 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
 
 ```php
 'size' => [
-    'type' => 'select',
-    'label' => 'Größe',
+    'type'    => 'select',
+    'label'   => 'Größe',
     'options' => [
-        'small' => 'Klein',
+        'small'  => 'Klein',
         'medium' => 'Mittel',
-        'large' => 'Groß'
-    ]
+        'large'  => 'Groß',
+    ],
+    // Optionale HTML-Attribute:
+    'attributes' => [
+        'data-placeholder' => 'Bitte wählen…',
+    ],
 ]
 ```
 
@@ -706,6 +752,20 @@ Mit dem `perm` Key kannst du einzelne Felder nur für bestimmte Benutzerrollen s
         'center' => '<svg>...</svg>'
     ],
     'default' => 'primary'
+]
+```
+
+Optionale HTML-Attribute:
+
+```php
+'color' => [
+    'type'       => 'choice',
+    'label'      => 'Farbe',
+    'choices'    => ['primary' => 'Primär'],
+    'attributes' => [
+        'data-container' => 'body',   // Selectpicker-Option
+        'aria-label'     => 'Farbe wählen',
+    ],
 ]
 ```
 

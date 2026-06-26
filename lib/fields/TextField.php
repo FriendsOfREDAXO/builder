@@ -34,6 +34,7 @@ class TextField extends FieldAbstract
         if ($placeholder) {
             echo ' placeholder="' . rex_escape($placeholder) . '"';
         }
+        echo $this->renderExtraAttributes($fieldConfig);
         echo '>';
 
         $this->closeFormGroup($notice);

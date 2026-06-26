@@ -28,7 +28,7 @@ class CheckboxField extends FieldAbstract
         echo '<div class="form-group">';
         echo '<div class="checkbox">';
         echo '<label>';
-        echo '<input type="checkbox" name="' . rex_escape($fieldName) . '" value="1"' . $checked . '> ';
+        echo '<input type="checkbox" name="' . rex_escape($fieldName) . '" value="1"' . $checked . $this->renderExtraAttributes($fieldConfig) . '> ';
         echo rex_escape($label);
         echo '</label>';
         echo '</div>';

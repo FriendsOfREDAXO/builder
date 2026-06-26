@@ -90,7 +90,7 @@ class ChoiceField extends FieldAbstract
             $liveSearchAttr = ' data-live-search="true" data-actions-box="true"';
         }
 
-        echo '<select class="' . $selectClass . '" name="' . rex_escape($fieldNameAttr) . '"' . $multipleAttr . $sizeAttr . $liveSearchAttr . '>';
+        echo '<select class="' . $selectClass . '" name="' . rex_escape($fieldNameAttr) . '"' . $multipleAttr . $sizeAttr . $liveSearchAttr . $this->renderExtraAttributes($fieldConfig) . '>';
         
         foreach ($choices as $choiceValue => $choiceLabel) {
             if (is_array($choiceLabel)) {
