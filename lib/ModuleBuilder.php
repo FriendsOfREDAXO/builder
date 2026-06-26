@@ -155,8 +155,6 @@ class ModuleBuilder
         $wrapperStyleParts = [];
         if ($this->wrapperMaxWidth !== '') {
             $wrapperStyleParts[] = 'max-width:' . $this->wrapperMaxWidth;
-            $wrapperStyleParts[] = 'margin-left:auto';
-            $wrapperStyleParts[] = 'margin-right:auto';
         }
         $wrapperStyleString = implode(';', $wrapperStyleParts);
         if ($wrapperStyleString !== '') {

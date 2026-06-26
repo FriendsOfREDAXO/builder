@@ -121,7 +121,7 @@ $builderValue = $legacy_is_active ? [] : $value;
 $modernHiddenStyle = $legacy_is_active ? ' style="display: none;"' : '';
 $wrapperStyle = '';
 if (trim((string) $wrapper_max_width) !== '') {
-    $wrapperStyle = ' style="max-width:' . rex_escape($wrapper_max_width) . ';margin-left:auto;margin-right:auto;"';
+    $wrapperStyle = ' style="max-width:' . rex_escape($wrapper_max_width) . ';"';
 }
 ?>
 

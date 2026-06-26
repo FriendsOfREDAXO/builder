@@ -196,6 +196,7 @@ $initialSlices = [
 
 $builder = \FriendsOfREDAXO\Builder\Module::createWithValue(1, null, [
     'framework' => 'plain',
+    'wrapper_max_width' => '1400px',
     'label' => 'Builder Demo',
     'description' => 'Demo-Editor mit echten Starter- und Default-Elementen',
     'allowed_elements' => ['starter_headline', 'starter_text', 'divider', 'columns', 'starter_cards'],
@@ -276,7 +277,9 @@ $demoMarkup .= '@media (prefers-color-scheme: dark){body.rex-has-theme:not(.rex-
 $demoMarkup .= '</style>';
 
 $builderHtml = $builder->getEditor();
+$demoMarkup .= '<div style="max-width:1400px;margin:0 auto;width:100%;">';
 $demoMarkup .= $builderHtml;
+$demoMarkup .= '</div>';
 
 // JavaScript für Kompaktmodus-Toggle
 $demoMarkup .= '<script nonce="' . rex_response::getNonce() . '">';
