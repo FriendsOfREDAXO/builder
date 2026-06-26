@@ -3457,9 +3457,34 @@
                         var $item = $(this);
                         var currentIndex = parseInt($item.data('index'));
                         var newItemIndex = currentIndex + 1;
-                        $item.attr('data-index', newItemIndex);
                         
-                        // Input-Namen aktualisieren: [currentIndex] -> [newItemIndex]
+                        // WICHTIG: Editoren ZUERST zerstören, bevor Namen geändert werden
+                        // CKE5 zerstören
+                        $item.find('textarea.cke5-editor').each(function() {
+                            var $ta = $(this);
+                            $ta.removeAttr('id');
+                            $ta.removeClass('ck-hidden');
+                            $ta.removeAttr('data-cke-init');
+                        });
+                        // Alle CKE5-DOM-Elemente entfernen
+                        $item.find('.ck-editor__editable, .ck-editor__top, .ck-editor__main, .ck-editor, .ck').remove();
+                        
+                        // TinyMCE zerstören
+                        $item.find('textarea.tiny-editor').each(function() {
+                            var $ta = $(this);
+                            var oldId = $ta.attr('id');
+                            if (oldId && typeof tinymce !== 'undefined' && tinymce.get(oldId)) {
+                                try {
+                                    tinymce.get(oldId).remove();
+                                } catch(e) {}
+                            }
+                            $ta.removeAttr('id');
+                            $ta.removeClass('mce-initialized');
+                        });
+                        $item.find('.tox-tinymce').remove();
+                        
+                        // Jetzt die Namen aktualisieren: [currentIndex] -> [newItemIndex]
+                        $item.attr('data-index', newItemIndex);
                         $item.find('input, textarea, select').each(function() {
                             var $input = $(this);
                             var name = $input.attr('name');

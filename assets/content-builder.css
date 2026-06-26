@@ -1068,10 +1068,6 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     opacity: 1 !important;
 }
 
-.repeater-item .btn-move:hover {
-    background: rgba(0, 0, 0, 0.8);
-}
-
 .repeater-item .btn-move:disabled {
     opacity: 0.3;
     cursor: not-allowed;
