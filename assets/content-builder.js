@@ -1183,14 +1183,6 @@
             });
 
             // Repeater: Item danach einfügen (Inline-Button in Item-Header)
-            $(document).on('click', '.btn-add-inline', function(e) {
-                e.preventDefault();
-                var $item = $(this).closest('.repeater-item');
-                var $container = $item.closest('.repeater-container');
-                var insertAfterIndex = parseInt($item.data('index')) || 0;
-                self.addRepeaterItem($container, insertAfterIndex);
-            });
-
             // Repeater: Item entfernen
             $(document).on('click', '.btn-remove-repeater', function(e) {
                 e.preventDefault();
@@ -2992,17 +2984,12 @@
             this.updateHiddenField();
         },
 
-        addRepeaterItem: function($container, insertAfterIndex) {
+        addRepeaterItem: function($container) {
             var self = this;
             var fieldName = $container.data('field');
             var $items = $container.find('.repeater-item:not(.repeater-item-template)');
             var $templateItem = $container.find('.repeater-item-template');
             var newIndex = $items.length;
-            
-            // Wenn insertAfterIndex definiert ist, ist das neue Item am anderen Ort
-            if (typeof insertAfterIndex !== 'undefined' && insertAfterIndex !== null) {
-                newIndex = insertAfterIndex + 1;
-            }
             
             
             // Prüfen ob ein verstecktes Template-Item existiert
@@ -3445,67 +3432,12 @@
                 });
             }
             
-            // Insert new item: entweder nach einem bestimmten Item (mid-insertion) oder vor dem Template
-            if (typeof insertAfterIndex !== 'undefined' && insertAfterIndex !== null) {
-                // Mid-insertion: Item nach insertAfterIndex einfügen
-                var $insertAfterItem = $container.find('[data-index="' + insertAfterIndex + '"]');
-                if ($insertAfterItem.length > 0) {
-                    $insertAfterItem.after($newItem);
-                    // Alle nachfolgenden Items re-indexen
-                    var $itemsAfterInsert = $container.find('.repeater-item:not(.repeater-item-template)').slice(insertAfterIndex + 1);
-                    $itemsAfterInsert.each(function() {
-                        var $item = $(this);
-                        var currentIndex = parseInt($item.data('index'));
-                        var newItemIndex = currentIndex + 1;
-                        
-                        // WICHTIG: Editoren ZUERST zerstören, bevor Namen geändert werden
-                        // CKE5 zerstören
-                        $item.find('textarea.cke5-editor').each(function() {
-                            var $ta = $(this);
-                            $ta.removeAttr('id');
-                            $ta.removeClass('ck-hidden');
-                            $ta.removeAttr('data-cke-init');
-                        });
-                        // Alle CKE5-DOM-Elemente entfernen
-                        $item.find('.ck-editor__editable, .ck-editor__top, .ck-editor__main, .ck-editor, .ck').remove();
-                        
-                        // TinyMCE zerstören
-                        $item.find('textarea.tiny-editor').each(function() {
-                            var $ta = $(this);
-                            var oldId = $ta.attr('id');
-                            if (oldId && typeof tinymce !== 'undefined' && tinymce.get(oldId)) {
-                                try {
-                                    tinymce.get(oldId).remove();
-                                } catch(e) {}
-                            }
-                            $ta.removeAttr('id');
-                            $ta.removeClass('mce-initialized');
-                        });
-                        $item.find('.tox-tinymce').remove();
-                        
-                        // Jetzt die Namen aktualisieren: [currentIndex] -> [newItemIndex]
-                        $item.attr('data-index', newItemIndex);
-                        $item.find('input, textarea, select').each(function() {
-                            var $input = $(this);
-                            var name = $input.attr('name');
-                            if (name) {
-                                var newName = name.replace('[' + currentIndex + ']', '[' + newItemIndex + ']');
-                                $input.attr('name', newName);
-                            }
-                        });
-                    });
-                } else {
-                    // Fallback: am Ende einfügen
-                    $container.append($newItem);
-                }
+            // Vor Template oder am Ende einfügen
+            var $template = $container.find('.repeater-item-template');
+            if ($template.length > 0) {
+                $template.before($newItem);
             } else {
-                // Standard: vor Template oder am Ende einfügen
-                var $template = $container.find('.repeater-item-template');
-                if ($template.length > 0) {
-                    $template.before($newItem);
-                } else {
-                    $container.append($newItem);
-                }
+                $container.append($newItem);
             }
             $newItem.hide().fadeIn(200);
 
