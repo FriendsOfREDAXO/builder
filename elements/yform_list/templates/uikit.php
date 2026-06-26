@@ -163,6 +163,41 @@ if (null !== $error) {
             }
             echo '</ul>';
         }
+    } elseif ('slides' === $layout) {
+        echo '<div uk-slider="finite: true; autoplay: true; autoplay-interval: 5500">';
+        echo '<div class="uk-position-relative">';
+        echo '<div class="uk-slider-container">';
+        echo '<ul class="uk-slider-items uk-child-width-1-1">';
+        foreach ($items as $it) {
+            $title = rex_escape((string) $it['title']);
+            $teaser = rex_escape((string) $it['teaser']);
+            $href = $showLinks ? (string) $it['href'] : '';
+            $img = \FriendsOfREDAXO\Builder\ListRenderer::imgTag($it, 'uk-width-1-1', 1200);
+            $titleHtml = '' !== $href
+                ? '<a href="' . rex_escape($href) . '" class="uk-link-reset">' . $title . '</a>'
+                : $title;
+
+            echo '<li>';
+            echo '<article class="uk-card uk-card-default">';
+            if ('' !== $img) {
+                echo '<div class="uk-card-media-top">' . $img . '</div>';
+            }
+            echo '<div class="uk-card-body">';
+            echo '<h3 class="uk-card-title">' . $titleHtml . '</h3>';
+            if ('' !== $teaser) {
+                echo '<p class="uk-text-meta uk-margin-remove-bottom">' . $teaser . '</p>';
+            }
+            echo '</div>';
+            echo '</article>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '</div>';
+        echo '<a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slider-item="previous"></a>';
+        echo '<a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slider-item="next"></a>';
+        echo '</div>';
+        echo '<ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin"></ul>';
+        echo '</div>';
     } elseif ('contact' === $layout) {
         $colClass = 'uk-child-width-1-' . rex_escape($columnsMobile)
             . ' uk-child-width-1-' . rex_escape($columnsTablet) . '@s'

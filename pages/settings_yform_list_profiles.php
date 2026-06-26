@@ -42,7 +42,13 @@ if ('save' === $func) {
     if ('' === $rawId || !preg_match('/^[a-z0-9_]+$/i', $rawId)) {
         $message = rex_view::error('Profil-ID darf nur Buchstaben, Zahlen und _ enthalten.');
     } else {
+        $profileType = trim((string) rex_post('profile_type', 'string', 'generic'));
+        if (!in_array($profileType, ['generic', 'contact', 'news', 'event', 'product', 'slides'], true)) {
+            $profileType = 'generic';
+        }
+
         $newProfile = [
+            'profile_type' => $profileType,
             'label' => trim((string) rex_post('label', 'string', '')),
             'table' => trim((string) rex_post('table', 'string', '')),
             'title_field' => trim((string) rex_post('title_field', 'string', '')),
@@ -63,6 +69,85 @@ if ('save' === $func) {
             'mobile_field' => trim((string) rex_post('mobile_field', 'string', '')),
             'email_field' => trim((string) rex_post('email_field', 'string', '')),
         ];
+
+        // Typbasierte Defaults, damit nicht alle Felder manuell ausgefüllt werden müssen.
+        if ($newProfile['default_layout'] === '') {
+            $newProfile['default_layout'] = match ($profileType) {
+                'contact' => 'contact',
+                'slides' => 'slides',
+                default => 'cards',
+            };
+        }
+
+        if ($newProfile['title_field'] === '') {
+            $newProfile['title_field'] = match ($profileType) {
+                'contact' => 'lastname',
+                'news' => 'title',
+                'event' => 'name',
+                'product' => 'name',
+                'slides' => 'title',
+                default => 'name',
+            };
+        }
+
+        if ($newProfile['teaser_field'] === '') {
+            $newProfile['teaser_field'] = match ($profileType) {
+                'contact' => 'position',
+                'news' => 'teaser',
+                'event' => 'teaser',
+                'product' => 'teaser',
+                'slides' => 'teaser',
+                default => '',
+            };
+        }
+
+        if ($newProfile['image_field'] === '') {
+            $newProfile['image_field'] = match ($profileType) {
+                'contact' => 'image',
+                'news' => 'image',
+                'event' => 'image',
+                'product' => 'image',
+                'slides' => 'image',
+                default => '',
+            };
+        }
+
+        if ($newProfile['sort_field'] === '') {
+            $newProfile['sort_field'] = match ($profileType) {
+                'news' => 'createdate',
+                'event' => 'start_date',
+                default => 'id',
+            };
+        }
+
+        if ($newProfile['sort_dir'] === '') {
+            $newProfile['sort_dir'] = match ($profileType) {
+                'event' => 'ASC',
+                default => 'DESC',
+            };
+        }
+
+        if ($profileType === 'contact') {
+            if ($newProfile['firstname_field'] === '') {
+                $newProfile['firstname_field'] = 'firstname';
+            }
+            if ($newProfile['phone_field'] === '') {
+                $newProfile['phone_field'] = 'phone';
+            }
+            if ($newProfile['mobile_field'] === '') {
+                $newProfile['mobile_field'] = 'mobile';
+            }
+            if ($newProfile['email_field'] === '') {
+                $newProfile['email_field'] = 'email';
+            }
+            if ($newProfile['media_type'] === '') {
+                $newProfile['media_type'] = 'avatar';
+            }
+        }
+
+        if ($profileType === 'slides' && $newProfile['media_type'] === '') {
+            $newProfile['media_type'] = 'card';
+        }
         // Bei Rename altes Profil entfernen
         if ('' !== $origId && $origId !== $rawId) {
             unset($profiles[$origId]);
@@ -139,6 +224,7 @@ if ('' !== $editId && isset($profiles[$editId])) {
     $origId = $editId;
 } elseif ($showAddForm) {
     $editing = [
+        'profile_type' => 'generic',
         'id' => '',
         'label' => '',
         'table' => '',
@@ -216,6 +302,7 @@ foreach ([
     'cards' => 'Kacheln (Cards)',
     'list' => 'Liste mit Bild + Anriss',
     'compact' => 'Kompakt (nur Titel)',
+    'slides' => 'Slides / Teaser-Slider',
     'contact' => 'Kontakt-Karten (Avatar, Name, Funktion, Telefon, E-Mail)',
     'contact_compact' => 'Kontakt kompakt (Card-Header mit Avatar – siehe UIkit "Card Header")',
 ] as $val => $lbl) {
@@ -236,6 +323,27 @@ $formHtml .= '<input type="hidden" name="profile_orig_id" value="' . rex_escape(
 
 $fields = [];
 
+$profileType = trim((string) ($editing['profile_type'] ?? 'generic'));
+if (!in_array($profileType, ['generic', 'contact', 'news', 'event', 'product', 'slides'], true)) {
+    $profileType = 'generic';
+}
+
+$profileTypeOptions = [
+    'generic' => 'Freie Liste',
+    'contact' => 'Kontakte',
+    'news' => 'News / Artikel',
+    'event' => 'Events / Termine',
+    'product' => 'Produkte',
+    'slides' => 'Slides / Teaser-Slider',
+];
+
+$profileTypeSelect = '<select class="form-control" id="yfl-profile-type" name="profile_type">';
+foreach ($profileTypeOptions as $typeValue => $typeLabel) {
+    $selected = $typeValue === $profileType ? ' selected' : '';
+    $profileTypeSelect .= '<option value="' . rex_escape($typeValue) . '"' . $selected . '>' . rex_escape($typeLabel) . '</option>';
+}
+$profileTypeSelect .= '</select>';
+
 $fields[] = [
     'label' => '<label>Profil-ID</label>',
     'field' => '<input class="form-control" type="text" name="profile_id" value="' . rex_escape((string) ($editing['id'] ?? $origId)) . '" pattern="[a-z0-9_]+" required placeholder="z.B. news, products">',
@@ -244,6 +352,11 @@ $fields[] = [
 $fields[] = [
     'label' => '<label>Label (Anzeigename)</label>',
     'field' => '<input class="form-control" type="text" name="label" value="' . rex_escape((string) $editing['label']) . '" required placeholder="z.B. News">',
+];
+$fields[] = [
+    'label' => '<label>Listen-Typ</label>',
+    'field' => $profileTypeSelect,
+    'note' => 'Der Typ blendet nur relevante Felder ein und setzt sinnvolle Defaults (z. B. Kontakt, News, Slides).',
 ];
 $fields[] = [
     'label' => '<label>YForm-Tabelle</label>',
@@ -280,29 +393,29 @@ if ([] !== $columns || '' !== (string) $editing['table'] || $showAddForm) {
 
     // Kontakt-spezifische Feld-Mappings (relevant fuer Layout=contact).
     $fields[] = [
-        'label' => '<hr><strong style="display:block;margin:8px 0;">Kontakt-Layout (optional)</strong>',
+        'label' => '<label class="yfl-type-contact"><hr><strong style="display:block;margin:8px 0;">Kontakt-Layout (optional)</strong></label>',
         'field' => '<p class="help-block" style="margin:0 0 12px;">Diese Feld-Mappings werden ausschliesslich beim Layout <code>Kontakt-Karten</code> ausgewertet. Der Cropping/Bildtyp wird ueber den Mediamanager-Typ unten gesteuert (Empfehlung: <code>avatar</code>).</p>',
     ];
     $fields[] = [
-        'label' => '<label>Vorname-Spalte</label>',
+        'label' => '<label class="yfl-type-contact">Vorname-Spalte</label>',
         'field' => $selectField('firstname_field', (string) ($editing['firstname_field'] ?? ''), $columns),
         'note' => 'Optional. Die Titel-Spalte oben dient als Nachname.',
     ];
     $fields[] = [
-        'label' => '<label>Freitext-Spalte</label>',
+        'label' => '<label class="yfl-type-contact">Freitext-Spalte</label>',
         'field' => $selectField('freitext_field', (string) ($editing['freitext_field'] ?? ''), $columns),
         'note' => 'Optional. Wird unter dem Namen angezeigt (z.B. Titel/Suffix).',
     ];
     $fields[] = [
-        'label' => '<label>Telefon-Spalte</label>',
+        'label' => '<label class="yfl-type-contact">Telefon-Spalte</label>',
         'field' => $selectField('phone_field', (string) ($editing['phone_field'] ?? ''), $columns),
     ];
     $fields[] = [
-        'label' => '<label>Mobil-Spalte</label>',
+        'label' => '<label class="yfl-type-contact">Mobil-Spalte</label>',
         'field' => $selectField('mobile_field', (string) ($editing['mobile_field'] ?? ''), $columns),
     ];
     $fields[] = [
-        'label' => '<label>E-Mail-Spalte</label>',
+        'label' => '<label class="yfl-type-contact">E-Mail-Spalte</label>',
         'field' => $selectField('email_field', (string) ($editing['email_field'] ?? ''), $columns),
     ];
 }
@@ -376,6 +489,7 @@ $fields[] = [
 $fields[] = [
     'label' => '<label>Default-Layout</label>',
     'field' => '<select class="form-control" name="default_layout">' . $layoutOptions . '</select>',
+    'note' => 'Für Slides/Teaser-Profile wird das Layout <code>slides</code> empfohlen.',
 ];
 $fields[] = [
     'label' => '<label>Default-Anzahl Einträge</label>',

@@ -46,6 +46,34 @@ $tel = static fn(string $v): string => preg_replace('/[^+\d]/', '', $v) ?? '';
 <div class="alert alert-warning"><?= rex_escape((string) $error) ?></div>
 <?php elseif ($items === []): ?>
 <div class="alert alert-light">Keine Einträge.</div>
+<?php elseif ($layout === 'slides'): ?>
+<div id="rex-yfl-slides-<?= rex_escape((string) substr(md5(json_encode($items) ?: 'slides'), 0, 8)) ?>" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <?php foreach ($items as $index => $it): ?>
+        <?php
+        $title = rex_escape((string) ($it['title'] ?? ''));
+        $teaser = rex_escape((string) ($it['teaser'] ?? ''));
+        $href = $showLinks ? (string) ($it['href'] ?? '') : '';
+        $img = ListRenderer::imgTag($it, 'd-block w-100');
+        ?>
+        <div class="carousel-item<?= $index === 0 ? ' active' : '' ?>">
+            <?php if ($img !== ''): ?><?= $img ?><?php endif; ?>
+            <div class="carousel-caption d-none d-md-block" style="background:rgba(0,0,0,.45);border-radius:.5rem;padding:.8rem 1rem;">
+                <h5><?php if ($href !== ''): ?><a href="<?= rex_escape($href) ?>" class="text-white text-decoration-none"><?= $title ?></a><?php else: ?><?= $title ?><?php endif; ?></h5>
+                <?php if ($teaser !== ''): ?><p class="mb-0"><?= $teaser ?></p><?php endif; ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#rex-yfl-slides-<?= rex_escape((string) substr(md5(json_encode($items) ?: 'slides'), 0, 8)) ?>" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#rex-yfl-slides-<?= rex_escape((string) substr(md5(json_encode($items) ?: 'slides'), 0, 8)) ?>" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
 <?php elseif ($layout === 'cards' || $layout === 'contact' || $layout === 'contact_compact'): ?>
 <div class="row g-3">
     <?php foreach ($items as $it): ?>

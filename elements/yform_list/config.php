@@ -40,7 +40,7 @@ return [
                     ? $profileChoices
                     : ['' => '— Bitte zuerst Profile in den Addon-Einstellungen anlegen —'],
                 'notice' => 'Profile (Tabelle, Spalten, Filter, URL-Schema) werden zentral unter '
-                    . 'Builder → Einstellungen verwaltet.',
+                    . 'Builder → YForm-Listen-Profile verwaltet.',
                 'default' => '',
             ],
             'headline' => [
@@ -60,6 +60,7 @@ return [
                     '' => '— Profil-Default verwenden —',
                     'cards' => 'Kacheln (Cards)',
                     'list' => 'Liste mit Bild + Anriss',
+                    'slides' => 'Slides / Teaser-Slider',
                     'compact' => 'Kompakt (nur Titel)',
                     'contact' => 'Kontakt-Karten (Avatar, Name, Funktion, Telefon, E-Mail)',
                     'contact_compact' => 'Kontakt kompakt (Card-Header mit Avatar)',

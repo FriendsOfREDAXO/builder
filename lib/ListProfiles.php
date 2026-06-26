@@ -32,7 +32,7 @@ final class ListProfiles
 {
     public const CONFIG_KEY = 'yform_list_profiles';
 
-    public const ALLOWED_LAYOUTS = ['cards', 'list', 'compact', 'contact', 'contact_compact'];
+    public const ALLOWED_LAYOUTS = ['cards', 'list', 'compact', 'contact', 'contact_compact', 'slides'];
     public const MAX_LIMIT = 200;
 
     /**
@@ -278,6 +278,11 @@ final class ListProfiles
      */
     private static function normalize(string $id, array $cfg): array
     {
+        $profileType = trim((string) ($cfg['profile_type'] ?? 'generic'));
+        if (!in_array($profileType, ['generic', 'contact', 'news', 'event', 'product', 'slides'], true)) {
+            $profileType = 'generic';
+        }
+
         $sortDir = strtoupper((string) ($cfg['sort_dir'] ?? 'DESC'));
         if (!in_array($sortDir, ['ASC', 'DESC'], true)) {
             $sortDir = 'DESC';
@@ -301,6 +306,7 @@ final class ListProfiles
         }
         return [
             'id' => $id,
+            'profile_type' => $profileType,
             'label' => trim((string) ($cfg['label'] ?? $id)),
             'table' => trim((string) ($cfg['table'] ?? '')),
             'title_field' => trim((string) ($cfg['title_field'] ?? 'name')),

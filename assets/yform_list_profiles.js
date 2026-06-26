@@ -131,6 +131,52 @@
                 loadColumns(tableSelect.value);
             }
         }
+
+        initProfileTypeUi();
+    }
+
+    function initProfileTypeUi() {
+        var typeSelect = document.getElementById('yfl-profile-type');
+        if (!typeSelect || typeSelect.dataset.yflTypeInit === '1') {
+            return;
+        }
+        typeSelect.dataset.yflTypeInit = '1';
+
+        function applyTypeVisibility() {
+            var type = typeSelect.value || 'generic';
+            var contactLabels = document.querySelectorAll('.yfl-type-contact');
+            contactLabels.forEach(function (label) {
+                var row = label.closest('.form-group');
+                if (!row) {
+                    return;
+                }
+                row.style.display = (type === 'contact') ? '' : 'none';
+            });
+
+            var layoutSelect = document.querySelector('select[name="default_layout"]');
+            if (!layoutSelect) {
+                return;
+            }
+
+            var current = layoutSelect.value;
+            var preferred = {
+                contact: 'contact',
+                news: 'cards',
+                event: 'list',
+                product: 'cards',
+                slides: 'slides',
+                generic: 'cards'
+            };
+
+            if (current === '' || current === 'cards' || current === 'list' || current === 'contact') {
+                if (preferred[type]) {
+                    layoutSelect.value = preferred[type];
+                }
+            }
+        }
+
+        typeSelect.addEventListener('change', applyTypeVisibility);
+        applyTypeVisibility();
     }
 
     // REDAXO-Standard: rex:ready (jQuery-Event) wird sowohl beim ersten Laden
