@@ -132,7 +132,7 @@ $hero .= '</div>';
 $hero .= '<div class="builder-hero__content">';
 $hero .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
 $hero .= '<div class="builder-hero__copy">';
-$hero .= '<p class="builder-hero__kicker">Builder 1.0.0-beta3</p>';
+$hero .= '<p class="builder-hero__kicker">Builder ' . rex_escape($addon->getVersion()) . '</p>';
 $hero .= '<h2 class="builder-hero__title">Page und Contentbuilder für REDAXO</h2>';
 $hero .= '<p class="builder-hero__lead">Modular, visuell und erweiterbar. Komplexe Layouts und Datenstrukturen lassen sich direkt im Backend gestalten.</p>';
 $hero .= '<div class="builder-hero__chips">';
