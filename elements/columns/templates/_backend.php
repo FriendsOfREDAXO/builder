@@ -11,24 +11,38 @@
  * @var string $framework
  */
 
-$elementKeys = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getAllElements();
-$available_elements = [];
-foreach ($elementKeys as $key) {
-    $config = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementConfig($key);
-    if ($config !== null) {
-        $config['type'] = $key;
-        $config['key'] = $key;
-        $available_elements[$key] = $config;
+$contextAvailableElements = isset($available_elements) && is_array($available_elements) ? $available_elements : [];
+
+// Fallback: Wenn kein Kontext uebergeben wurde, alle registrierten Elemente laden.
+if ($contextAvailableElements === []) {
+    $elementKeys = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getAllElements();
+    foreach ($elementKeys as $key) {
+        $config = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementConfig($key);
+        if ($config !== null) {
+            $config['type'] = $key;
+            $config['key'] = $key;
+            $contextAvailableElements[$key] = $config;
+        }
     }
 }
-$groupedAvailableElements = [];
-foreach ($available_elements as $elementType => $config) {
-    $category = trim((string) ($config['category'] ?? ''));
-    if ('' === $category) {
-        $category = 'sonstiges';
+
+$available_elements = $contextAvailableElements;
+
+$contextGroupedAvailableElements = isset($groupedAvailableElements) && is_array($groupedAvailableElements)
+    ? $groupedAvailableElements
+    : [];
+
+if ($contextGroupedAvailableElements === []) {
+    foreach ($available_elements as $elementType => $config) {
+        $category = trim((string) ($config['category'] ?? ''));
+        if ('' === $category) {
+            $category = 'sonstiges';
+        }
+        $contextGroupedAvailableElements[$category][$elementType] = $config;
     }
-    $groupedAvailableElements[$category][$elementType] = $config;
 }
+
+$groupedAvailableElements = $contextGroupedAvailableElements;
 $enableOnlineToggle = (bool) rex_addon::get('builder')->getConfig('enable_online_toggle', false);
 
 $backendRowClass = $rowClass . ' content-builder-columns-row';

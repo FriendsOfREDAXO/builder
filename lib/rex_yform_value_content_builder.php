@@ -1047,6 +1047,15 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         
         if ($templateFile !== '') {
             $elementData = $sliceData;
+            $available_elements = $this->getAvailableElements();
+            $groupedAvailableElements = [];
+            foreach ($available_elements as $elementType => $config) {
+                $category = trim((string) ($config['category'] ?? ''));
+                if ('' === $category) {
+                    $category = 'sonstiges';
+                }
+                $groupedAvailableElements[$category][$elementType] = $config;
+            }
             include $templateFile;
         } else {
             echo '<div class="alert alert-danger">Template nicht gefunden</div>';

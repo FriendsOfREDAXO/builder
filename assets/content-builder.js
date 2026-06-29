@@ -1379,6 +1379,7 @@
             var sliceData = this.getSliceData($slice);
             var isNested = $slice.closest('.content-builder-column-slices').length > 0;
             var $editForm = isNested ? $('#nested-slice-edit-modal .modal-body > .slice-edit-form') : $slice.children('.slice-edit-form');
+            var availableElementsRaw = $slice.closest('.yform-content-builder').attr('data-available-elements') || '{}';
             
             
             // YForm-Formular per AJAX laden
@@ -1388,7 +1389,8 @@
                 data: {
                     action: 'load_slice_form',
                     slice_type: sliceType,
-                    slice_data: sliceData
+                    slice_data: sliceData,
+                    available_elements: availableElementsRaw
                 },
                 dataType: 'html',
                 success: function(response) {
@@ -2102,7 +2104,8 @@
                     action: 'render_slice',
                     slice_type: sliceType,
                     slice_data: sliceData,
-                    framework: framework
+                    framework: framework,
+                    available_elements: ($slice.closest('.yform-content-builder').attr('data-available-elements') || '{}')
                 },
                 success: function(response) {
                     $slice.find('.slice-rendered').html(response).show();

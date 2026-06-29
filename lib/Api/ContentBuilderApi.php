@@ -334,6 +334,7 @@ class ContentBuilderApi extends rex_api_function
         $sliceType = rex_request::post('slice_type', 'string');
         $sliceData = rex_request::post('slice_data', 'array', []);
         $framework = rex_request::post('framework', 'string', 'bootstrap');
+        $availableElementsRaw = rex_request::post('available_elements', 'string', '');
 
         $elementPath = $this->getElementPath($sliceType);
         Helper::loadElementI18n($elementPath);
@@ -356,6 +357,52 @@ class ContentBuilderApi extends rex_api_function
 
         if ($templateFile !== '') {
             $elementData = $sliceData;
+
+            $available_elements = [];
+            if ($availableElementsRaw !== '') {
+                $decodedAvailableElements = json_decode($availableElementsRaw, true);
+                if (is_array($decodedAvailableElements)) {
+                    foreach ($decodedAvailableElements as $elementKey => $elementConfig) {
+                        $normalizedKey = trim((string) $elementKey);
+                        if ($normalizedKey === '' || !is_array($elementConfig)) {
+                            continue;
+                        }
+
+                        $elementConfig['type'] = $elementConfig['type'] ?? $normalizedKey;
+                        $elementConfig['key'] = $elementConfig['key'] ?? $normalizedKey;
+                        $available_elements[$normalizedKey] = $elementConfig;
+                    }
+                }
+            }
+
+            if ($available_elements === []) {
+                $elementKeys = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getAllElements();
+                foreach ($elementKeys as $key) {
+                    $config = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementConfig($key);
+                    if ($config === null) {
+                        continue;
+                    }
+
+                    $config['type'] = $key;
+                    $config['key'] = $key;
+                    $available_elements[$key] = $config;
+                }
+            }
+
+            $groupedAvailableElements = [];
+            foreach ($available_elements as $elementType => $config) {
+                $category = trim((string) ($config['category'] ?? ''));
+                if ($category === '') {
+                    $category = 'sonstiges';
+                }
+
+                if (!isset($groupedAvailableElements[$category])) {
+                    $groupedAvailableElements[$category] = [];
+                }
+
+                $groupedAvailableElements[$category][$elementType] = $config;
+            }
+
             include $templateFile;
         } else {
             echo '<div class="alert alert-danger">Template nicht gefunden</div>';
