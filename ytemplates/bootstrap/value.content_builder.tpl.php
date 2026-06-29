@@ -127,6 +127,7 @@ if (trim((string) $wrapper_max_width) !== '') {
 
 <div class="form-group yform-element <?= $fieldClass ?>"<?= $wrapperStyle ?>
      data-framework="<?= $framework ?>"
+    data-copy-paste="<?= $addon->getConfig('enable_copy_paste') ? '1' : '0' ?>"
      data-online-toggle="<?= $enableOnlineToggle ? '1' : '0' ?>"
      data-element-search="<?= $addon->getConfig('enable_element_search') ? '1' : '0' ?>"
      data-legacy-mode="<?= $legacy_is_active ? '1' : '0' ?>"
