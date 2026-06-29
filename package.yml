@@ -14,26 +14,33 @@ requires:
 page:
     title: 'Builder'
     icon: builder-icon-logo
-    perm: admin
+    perm: builder[]
     subpages:
         main:
             title: 'translate:builder_overview'
             icon: rex-icon fa-info-circle
+            perm: builder[]
         demo:
             title: 'Demo'
             icon: rex-icon fa-play-circle
+            perm: builder[]
         modules:
             title: 'translate:builder_modules'
             icon: rex-icon fa-code
+            perm: admin
         media_types_preview:
             title: 'translate:builder_media_types_preview'
             icon: rex-icon fa-image
+            perm: admin
         settings:
             title: 'translate:builder_settings'
             icon: rex-icon fa-cog
+            perm: admin
         settings_yform_list_profiles:
             title: 'translate:builder_yform_list_profiles'
             icon: rex-icon fa-table
+            perm: admin
         docs:
             title: 'translate:builder_docs'
             icon: rex-icon fa-book
+            perm: builder[]

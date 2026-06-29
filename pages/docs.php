@@ -6,6 +6,7 @@
  */
 
 $addon = rex_addon::get('builder');
+$isAdmin = rex::getUser()?->isAdmin() ?? false;
 
 $backendLanguage = rex_i18n::getLanguage();
 $readmeCandidates = [
@@ -24,36 +25,44 @@ foreach ($readmeCandidates as $candidate) {
 
 $builderDocPages = [
     'overview' => [
-        'title' => rex_i18n::msg('builder_docs_section_overview'),
-        'icon' => 'rex-icon fa-book',
+        'title' => $isAdmin ? rex_i18n::msg('builder_docs_section_overview') : 'Redaktionshilfe',
+        'icon' => $isAdmin ? 'rex-icon fa-book' : 'rex-icon fa-life-ring',
         'file' => $readmeFile,
     ],
-    'tutorial' => [
+];
+
+if ($isAdmin) {
+    $builderDocPages['admins'] = [
+        'title' => rex_i18n::msg('builder_docs_section_admins'),
+        'icon' => 'rex-icon fa-wrench',
+        'file' => 'ADMINS.md',
+    ];
+    $builderDocPages['tutorial'] = [
         'title' => rex_i18n::msg('builder_docs_section_tutorial'),
         'icon' => 'rex-icon fa-graduation-cap',
         'file' => 'TUTORIAL.md',
-    ],
-    'api' => [
+    ];
+    $builderDocPages['api'] = [
         'title' => rex_i18n::msg('builder_docs_section_api'),
         'icon' => 'rex-icon fa-code-fork',
         'file' => 'API.md',
-    ],
-    'dev' => [
+    ];
+    $builderDocPages['dev'] = [
         'title' => rex_i18n::msg('builder_docs_section_dev'),
         'icon' => 'rex-icon fa-code',
         'file' => 'DEV.md',
-    ],
-    'schema' => [
+    ];
+    $builderDocPages['schema'] = [
         'title' => rex_i18n::msg('builder_docs_section_schema'),
         'icon' => 'rex-icon fa-sitemap',
         'file' => 'SCHEMA.md',
-    ],
-    'changelog' => [
+    ];
+    $builderDocPages['changelog'] = [
         'title' => rex_i18n::msg('builder_docs_section_changelog'),
         'icon' => 'rex-icon fa-list',
         'file' => 'CHANGELOG.md',
-    ],
-];
+    ];
+}
 
 $builderDocFileMap = [];
 foreach ($builderDocPages as $key => $page) {

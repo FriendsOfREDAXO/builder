@@ -152,6 +152,7 @@ builder_enable_element_search_notice = When active, a live search is displayed i
 builder_element_search_placeholder = Search elements...
 
 builder_docs_section_overview = Documentation
+builder_docs_section_admins = Admin Notes
 builder_docs_section_tutorial = Tutorial
 builder_docs_section_api = API Documentation
 builder_docs_section_dev = Developer Guide

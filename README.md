@@ -4,212 +4,120 @@ Page und Contentbuilder für REDAXO. Modular und erweiterbar.
 
 Komplexe Layouts oder Datenstrukturen visuell gestalten. Mit Builder ist das möglich.
 
-👋 Aber erstmal vorweg: Es ist kein Out-of-the-Box Pagebuilder. Das meiste muss man selbst beisteuern. Ihr entscheided was es kann und welche Elemente es geben wird. Zum Start gibt es ein paar Demo-Elemente mit denen Ihr spielen könnt. 
-Es ist vollständig unabhängig von irgendwelchen Frameworks in der Ausgabe. 
+## Redaktionshilfe
 
-## Leichter Einstieg
+### Grundprinzip
 
-Für einen leichten Einstieg empfehlen wir direkt am Anfang:
+Der Builder besteht aus einzelnen Elementen, die untereinander angeordnet werden.
+Jedes Element bildet einen inhaltlichen Baustein, zum Beispiel:
 
-1. Starter-Addon: https://github.com/FriendsOfREDAXO/builder_starter
-	Hinweis: Das Starter-Addon ist aktuell nicht im REDAXO-Installer verfügbar. Bitte manuell von GitHub herunterladen oder über das ZIP-Installer-Addon als ZIP-Datei installieren.
-2. Anschließend das Tutorial in diesem Addon lesen und Schritt für Schritt nachbauen (`TUTORIAL.md`).
+- Überschrift
+- Text
+- Trenner
+- Karten
+- Spalten
 
+Aus diesen Bausteinen wird der Inhalt Schritt für Schritt aufgebaut.
 
-## Features
+### So arbeitet ihr im Builder
 
-- Page- und Content-Builder für REDAXO-Module und YForm-Felder
-- Modulare Elemente mit konfigurierbaren Feldern, Gruppen und Einstellungen
-- Settings-Modal mit gruppierten Fieldsets und konfigurierbarem Akkordeon-Verhalten
-- Framework-Templates für UIkit, Bootstrap und Plain HTML bei den mitgelieferten bereits dabei. 
-- Erweiterbar über eigene Elemente in Projekt- oder Addon-Pfaden
-- Klare Extension-Point-Schnittstellen für Framework-, Theme- und Editor-Integration
-- Medienausgabe über Media Manager mit virtuellen Typen (`cb_<preset>__<width>`)
-- Automatische Integration von `media_negotiator` für moderne Bildformate, wenn vorhanden
-- Repeater- und Nested-Elemente für komplexe Inhaltsstrukturen 😀
-- Rollen- und Sichtbarkeitssteuerung über Feldkonfiguration 😀
-- Modul-Generator im Backend zur schnellen REDAXO-Modulerstellung ⭐️
-- Geführte YForm-Listen-Profile auf eigener Verwaltungsseite
-- Profiltypen für Listen: Kontakte, News, Events, Produkte, Slides/Teaser und freie Listen
-- Slides-/Teaser-Layout im Element `yform_list` (UIkit, Bootstrap und Plain)
+#### 1. Neues Element hinzufügen
 
-## Einsatzbereiche
+Über das Plus-Symbol kann an der gewünschten Stelle ein neues Element eingefügt werden.
 
-- Landingpages mit flexiblen Abschnittslayouts
-- Datengetriebene Seiten mit YForm-Tabellen
-- Wiederverwendbare Inhaltsbausteine für Redaktionen
-- Projektübergreifende Komponentenbibliotheken
-- Unterschiedliche Ausgaben möglich  z.B. HTML, JSON-LD, E-Mail-HTML, CSV was auch immer ihr wollt. 
+Je nach Konfiguration stehen nur die Elemente zur Auswahl, die für diesen Bereich erlaubt sind.
 
-## Architekturüberblick
+#### 2. Element bearbeiten
 
-- Kernaddon: `builder`
-- Elementdefinitionen: `elements/<element_key>/config.php`
-- Ausgabe-Templates: `elements/<element_key>/templates/*.php`
-- Feldtypen und Rendering: `lib/`, `lib/fields/`, `assets/content-builder.js`
-- Schema-Validierung: `element-config.schema.json` und `schema/element-config.schema.json`
+Mit dem Stift-Symbol wird die Bearbeitung eines Elements geöffnet.
 
-## Erweiterbarkeit
+Dort lassen sich zum Beispiel anpassen:
 
-Builder ist auf Erweiterung ausgelegt:
+- Texte
+- Überschriften
+- Bilder
+- Abstände
+- Hintergrundoptionen
+- Layout-Einstellungen
 
-- Eigene Elementpfade über `BUILDER_ELEMENT_PATHS`
-- Eigene Presets über `BUILDER_MEDIA_TYPE_PRESETS`
-- Theme-Provider über `BUILDER_THEME_*`
-- Framework-Optionen über `BUILDER_FRAMEWORK_OPTIONS`
-- Editorprofile über `BUILDER_EDITOR_PROFILES`
+Mit **Element übernehmen** werden die Änderungen in den Builder übernommen.
 
-## Feldattribute
+Wichtig: Dadurch ist das Element noch nicht endgültig gespeichert. Dauerhaft gespeichert wird erst, wenn das gesamte Formular oder der Datensatz gespeichert wird.
 
-Elementfelder in `elements/<element_key>/config.php` unterstützen gemeinsame und feldtypspezifische Konfigurationen.
+#### 3. Reihenfolge ändern
 
-Gemeinsame Attribute:
+Mit den Pfeilen nach oben und unten können Elemente verschoben werden.
 
-- `label` Beschriftung im Backend-Editor
-- `notice` Hilfetext unter dem Feld
-- `default` Standardwert für neue Elemente
-- `perm` Rollenbasierte Sichtbarkeit (`admin`, `editor|power`, `['editor', 'admin']`)
-- `visible_if` Feld nur bei erfüllter Bedingung anzeigen
+#### 4. Elemente löschen
 
-Beispiel `visible_if`:
+Mit dem Papierkorb-Symbol wird ein Element entfernt.
 
-```php
-'subtitle' => [
-	'type' => 'text',
-	'label' => 'Untertitel',
-	'visible_if' => ['show_subtitle' => '1'],
-]
-```
+### Arbeiten mit Spalten
 
-### Beliebige HTML-Attribute via `attributes`
+Das Element **Spalten** enthält eigene Bereiche, in die wiederum weitere Elemente eingefügt werden können.
 
-Für die Feldtypen `text`, `textarea`, `checkbox`, `select`, `choice` kann ein `attributes`-Array gesetzt werden.
+Wichtig dabei:
 
-```php
-'text' => [
-	'type' => 'textarea',
-	'label' => 'Text',
-	'rows' => 8,
-	'attributes' => [
-		'maxlength' => '500',
-		'data-autoresize' => 'true',
-		'aria-describedby' => 'hint-text',
-		'style' => 'background:#fffbe6; border-color:#f0c040;',
-	],
-]
-```
+- Innerhalb von Spalten gelten dieselben Bearbeitungsregeln wie außerhalb.
+- Auch dort können Elemente hinzugefügt, bearbeitet, verschoben, kopiert und gelöscht werden.
+- Je nach Feld-Konfiguration können innerhalb von Spalten nur bestimmte Elemente erlaubt sein.
 
-Hinweise:
+### Kopieren und Einfügen
 
-- Alle Attributschlüssel und Werte werden serverseitig escapt.
-- Gesperrte Attribute (werden ignoriert): `name`, `type`, `value`, `checked`, `selected`, `id`, `rows`
-- `attributes` wirkt auf das Backend-Formularfeld. Die Frontend-Ausgabe steuerst du weiterhin über das Template.
+Wenn Copy & Paste aktiviert ist, kann ein Element kopiert und an anderer Stelle wieder eingefügt werden.
 
-### Feldtypspezifische Attribute (Auszug)
+Beim Kopieren wird der aktuelle Inhalt des Elements inklusive seiner Einstellungen übernommen. Das ist besonders nützlich, wenn ähnliche Abschnitte mehrfach gebraucht werden und nur kleine Anpassungen nötig sind.
 
-- `text`: `placeholder`, `attributes`
-- `textarea`: `rows`, `attributes`
-- `checkbox`: `default`, `attributes`
-- `select`: `options`, `default`, `attributes`
-- `choice`: `choices`, `default`, `multiple`, `selectpicker`, `choice_colors`, `choice_icons`, `attributes`
-- `be_media`: `allowed_types`
-- `cke5`/`tinymce`: `profile`, `rows`
-- `repeater`: `add_label`, `view`, `grid_columns`, `fields`, `item_modal`
+Typischer Ablauf:
 
-### YForm-Value-Optionen
+1. Element über das Kopieren-Symbol kopieren.
+2. An der gewünschten Stelle das Plus-Menü öffnen.
+3. **Element einfügen** auswählen.
 
-Für das YForm-Feld `content_builder` kannst du zusätzliche Feld-Optionen direkt in der YForm-Definition setzen. Besonders nützlich ist `wrapper_max_width` für eine optionale maximale Breite des Wrappers.
+Wichtig dabei:
 
-Beispiel:
+- Das eingefügte Element ist zunächst eine Kopie des Originals und kann danach unabhängig weiterbearbeitet werden.
+- Das Einfügen funktioniert auch innerhalb von Spalten, sofern der Zielbereich dieses Element erlaubt.
+- Sichtbar und dauerhaft gespeichert wird die Kopie erst, wenn anschließend auch das gesamte Formular oder der Datensatz gespeichert wird.
 
-```php
-'wrapper_max_width' => '1140px',
-```
+### Kompaktmodus
 
-Alternativ wird auch `max_width` akzeptiert. Wenn einer der beiden Werte gesetzt ist, erhält der Wrapper der Klasse `.yform-content-builder` ein Inline-`max-width` plus automatische Zentrierung.
+Im Kompaktmodus wird der Builder platzsparender dargestellt. Das ist hilfreich bei langen Inhalten oder vielen verschachtelten Elementen.
 
-Für Module ist dieselbe Option in der PHP-API beschrieben: siehe [API.md](API.md) im Abschnitt zur Full Builder API.
+### Speichern
 
-## Medienmodell
+Im Builder gibt es zwei Ebenen:
 
-- Basistyp: `content_builder`
-- Virtuelle Typen: `cb_<preset>__<width>`
-- Preset-Auflösung zur Laufzeit über `MEDIA_MANAGER_FILTERSET`
-- Optionaler `negotiator`-Effekt als letzter Effekt in der Kette
+- **Element übernehmen**: übernimmt Änderungen nur in den aktuellen Builder-Inhalt.
+- **Formular speichern** bzw. **Datensatz speichern**: speichert den gesamten Inhalt dauerhaft.
 
-## Installation
+Wenn der Builder verlassen wird, ohne das gesamte Formular zu speichern, gehen ungespeicherte Änderungen verloren.
 
-1. Addon `builder` installieren und aktivieren.
-2. Pflicht-Abhängigkeit sicherstellen: `media_manager`.
-3. Optionale Addons je nach Einsatz:
-	- `yform` für YForm-Felder und YForm-Listen-Profile
-	- `focuspoint` für Focuspoint-Cropping (ohne Focuspoint mit Crop-Fallback)
-	- `media_negotiator` für moderne Bildformate
-4. Für die Demo und textbasierte Starter-Elemente wird ein installiertes `tinymce`-Addon empfohlen.
-5. In den Einstellungen Framework und Elementquellen konfigurieren.
-6. Optional Module über `Builder -> Module` generieren.
+### Praktische Tipps
 
-## YForm-Listen-Profile
+- Größere Inhalte Abschnitt für Abschnitt bearbeiten.
+- Bei längeren Bearbeitungen regelmäßig den gesamten Datensatz speichern.
+- Spalten nur dort einsetzen, wo wirklich ein mehrspaltiges Layout gebraucht wird.
+- Nach Umbauten Reihenfolge und Abstände der Elemente prüfen.
 
-Die Profile für das Element `yform_list` werden über eine eigene Seite gepflegt:
+### Tipps und Tricks
 
-- `Builder -> YForm-Listen-Profile`
+- Erst grob die Reihenfolge der Elemente aufbauen und Inhalte danach im Detail pflegen.
+- Häufig genutzte Elemente lieber kopieren als neu anlegen, wenn Aufbau und Einstellungen ähnlich bleiben sollen.
+- Bei langen Seiten den Kompaktmodus nutzen, um schneller durch den Inhalt zu navigieren.
+- Nach dem Verschieben oder Einfügen kurz prüfen, ob Überschriften, Abstände und Spaltenaufteilung noch stimmig wirken.
+- Bei verschachtelten Spalten zuerst die grobe Struktur anlegen und danach die Inhalte innerhalb der Spalten befüllen.
+- Wenn ein Bereich unübersichtlich wird, lieber mehrere einfache Elemente verwenden als ein einzelnes Element zu stark zu überladen.
+- Bilder und Texte möglichst direkt nach dem Einfügen eines Elements pflegen, damit der Aufbau später leichter nachvollziehbar bleibt.
 
-Beim Anlegen eines Profils wird zuerst der gewünschte Listentyp ausgewählt. Danach werden passende Felder und sinnvolle Defaults gesetzt, damit nicht alle Optionen manuell konfiguriert werden müssen.
+### Wenn etwas nicht klappt
 
-Funktionen der YForm-Listen-Profile:
+Wenn ein Element nicht wie erwartet reagiert oder eine Auswahl fehlt, liegt das oft an einer bewussten Einschränkung der Feld-Konfiguration.
 
-- Profilbezogene Feldzuordnung für Titel, Teaser, Bilder, Linkparameter und Sortierung
-- Typabhängige Zusatzfelder für Kontakte (z. B. Rolle, Telefon, E-Mail)
-- Typabhängige Zusatzfelder für Produkte (Preis, alter Preis, Währung, Badge, Verfügbarkeit)
-- Vorgabewerte für sinnvolle Layouts je Profiltyp (z. B. `slides` für Teaser-/Produktdarstellung)
-- Einheitliche Ausgabe über die mitgelieferten Templates für UIkit, Bootstrap und Plain
+In solchen Fällen:
 
-Verfügbare Profiltypen:
+- zuerst Eingabewerte prüfen
+- dann den Datensatz einmal speichern und neu laden
+- bei weiterhin bestehendem Problem die Administratoren informieren
 
-- Freie Liste
-- Kontakte
-- News / Artikel
-- Events / Termine
-- Produkte
-- Slides / Teaser-Slider
-
-## Ausblick
-
-Geplant ist ein eigener Modus **YForm NoCode**, mit dem nicht nur Listen, sondern auch Detailseiten im Builder ohne eigene Template-Programmierung aufgebaut werden können.
-
-Zielbild:
-
-- Layout weiterhin visuell im Builder erstellen (wie bisher)
-- Statt statischer Inhalte optional je Feld eine YForm-Spalte binden
-- Umschaltbar pro Feld: **manuell** oder **dynamisch aus Tabelle**
-- Tabellenkontext und Datensatzquelle zentral definieren (z. B. fester Datensatz, URL-Parameter, Listenkontext)
-- Medien- und Textfelder gleich bedienen, aber wahlweise mit Spalten-Mapping statt freier Eingabe
-
-Damit wird ein Workflow möglich, der dem bekannten CMS-Pattern aus Webflow ähnelt: Struktur und Design bleiben frei, der Content wird pro Elementfeld an Datenquellen gekoppelt.
-
-## Dokumentation
-
-- API: [API.md](API.md)
-- Entwicklerleitfaden: [DEV.md](DEV.md)
-- Schema-Referenz: [SCHEMA.md](SCHEMA.md)
-- Tutorial: [TUTORIAL.md](TUTORIAL.md)
-- Änderungen: [CHANGELOG.md](CHANGELOG.md)
-
-## Autor
-
-[Friends of REDAXO ](https://github.com/skerbis](https://friendsofredaxo.github.io)
-
-## Lizenz
-
-[MIT Lizenz](LICENSE.md)
-
-## Credits
-
-**Projekt-Lead**
-
-[Thomas Skerbis](https://github.com/skerbis)
-
-**Sponsored by**
-
-[KLXM Crossmedia](https://klxm.de)
+Technische Hinweise, Installation, Starter-Addon und weiterführende Entwickler-Dokumentation stehen Administratoren auf einer separaten Doku-Seite zur Verfügung.
