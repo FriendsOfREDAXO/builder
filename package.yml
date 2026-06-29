@@ -7,7 +7,7 @@ license: MIT
 requires:
     packages:
         media_manager: '*'
-    redaxo: '^5.15'
+    redaxo: '^5.20.1'
     php:
         version: '^8.1'
 
