@@ -280,6 +280,7 @@
 
                     var $menu = $(this).find('.dropdown-menu').first();
                     if ($menu.length > 0) {
+                        ContentBuilder.cleanupElementMenuTooltips($menu);
                         $menu.removeData('yfcbFrozenWidth');
                         $menu.css({
                             width: '',
@@ -312,6 +313,25 @@
             
             // Element-Suche im Dropdown
             this.initElementSearch();
+        },
+
+        cleanupElementMenuTooltips: function($scope) {
+            if (typeof $.fn.tooltip !== 'function') {
+                return;
+            }
+
+            var $root = ($scope && $scope.length) ? $scope : $(document.body);
+            $root.find('[data-toggle="tooltip"]').each(function() {
+                var $trigger = $(this);
+                try {
+                    $trigger.tooltip('hide');
+                    $trigger.tooltip('destroy');
+                } catch (e) {
+                    // Ignore disposed or not-yet-initialized tooltips.
+                }
+            });
+
+            $('.tooltip').remove();
         },
         
         initElementSearch: function() {
@@ -1839,6 +1859,7 @@
 
         saveSlice: function($slice) {
             var self = this;
+            this.cleanupElementMenuTooltips($(document.body));
             var sliceData = this.collectSliceDataFromForm($slice);
             
             // Slice neu rendern
@@ -2117,6 +2138,7 @@
         },
 
         cancelEdit: function($slice) {
+            this.cleanupElementMenuTooltips($(document.body));
             var isNested = $slice.closest('.content-builder-column-slices').length > 0;
             
             if (isNested) {
