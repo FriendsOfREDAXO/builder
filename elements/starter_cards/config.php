@@ -9,7 +9,7 @@ return [
     'label' => 'Cards',
     'icon' => 'fa fa-th-large',
     'description' => 'Karten mit Bild, Titel, Text, internem oder externem Link und wählbarem Card-Stil.',
-    'version' => '1.15.0',
+    'version' => '1.16.0',
     'category' => 'standards',
     'field_groups' => [
         'content_tab' => [
@@ -20,7 +20,7 @@ return [
         'layout_tab' => [
             'label' => 'Layout',
             'icon' => 'fa-columns',
-            'fields' => array_merge(['image_ratio', 'image_ratio_mobile', 'card_style'], $config::getGridFieldNames()),
+            'fields' => array_merge(['image_ratio', 'image_ratio_mobile', 'hidpi_enabled', 'card_style'], $config::getGridFieldNames()),
         ],
         'section_tab' => [
             'label' => 'Sektion',
@@ -70,6 +70,12 @@ return [
                 'original' => 'Original (kein Crop)',
             ],
             'default' => '',
+        ],
+        'hidpi_enabled' => [
+            'type' => 'checkbox',
+            'label' => 'HiDPI-Varianten erzeugen',
+            'notice' => 'Optional: Fügt größere Srcset-Breiten für Retina/HiDPI hinzu. Kann Datenvolumen erhöhen.',
+            'default' => '0',
         ],
         'items' => [
             'type' => 'repeater',

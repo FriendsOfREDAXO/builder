@@ -85,31 +85,31 @@ class MediaTypeRegistry
             'starter_cards_16_9' => [
                 'ratio' => '16_9',
                 'mode' => 'focuspoint',
-                'widths' => [400, 800, 1200, 1600],
+                'widths' => [400, 800, 1200, 1600, 2000, 2400, 3200],
                 'default_width' => 1200,
             ],
             'starter_cards_21_9' => [
                 'ratio' => '21_9',
                 'mode' => 'focuspoint',
-                'widths' => [400, 800, 1200, 1600],
+                'widths' => [400, 800, 1200, 1600, 2000, 2400, 3200],
                 'default_width' => 1200,
             ],
             'starter_cards_4_3' => [
                 'ratio' => '4_3',
                 'mode' => 'focuspoint',
-                'widths' => [400, 800, 1200, 1600],
+                'widths' => [400, 800, 1200, 1600, 2000, 2400, 3200],
                 'default_width' => 1200,
             ],
             'starter_cards_1_1' => [
                 'ratio' => '1_1',
                 'mode' => 'focuspoint',
-                'widths' => [400, 800, 1200, 1600],
+                'widths' => [400, 800, 1200, 1600, 2000, 2400, 3200],
                 'default_width' => 1200,
             ],
             'starter_cards_original' => [
                 'ratio' => 'original',
                 'mode' => 'resize',
-                'widths' => [400, 800, 1200, 1600],
+                'widths' => [400, 800, 1200, 1600, 2000, 2400, 3200],
                 'default_width' => 1200,
             ],
             'section_background' => [

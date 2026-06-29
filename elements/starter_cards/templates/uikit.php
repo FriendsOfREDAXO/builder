@@ -6,6 +6,7 @@ $items       = $elementData['items'] ?? [];
 $cardStyle   = (string) ($elementData['card_style'] ?? 'default');
 $imageRatio  = (string) ($elementData['image_ratio'] ?? '16_9');
 $imageRatioMobile = (string) ($elementData['image_ratio_mobile'] ?? '');
+$hidpiEnabled = !empty($elementData['hidpi_enabled']);
 $columns     = (string) ($elementData['columns'] ?? '3');
 $columnsTablet = (string) ($elementData['columns_tablet'] ?? '2');
 $columnsMobile = (string) ($elementData['columns_mobile'] ?? '1');
@@ -89,7 +90,7 @@ $gapClass   = $gap === 'collapse' ? '' : 'uk-grid-' . $gap;
 
         $imageBuilder = ResponsiveImage::forFile($imageFile)
             ->withDesktopPreset('starter_cards_' . $imageRatio)
-            ->withWidths([400, 800, 1200, 1600])
+            ->withWidths($hidpiEnabled ? [400, 800, 1200, 1600, 2000, 2400, 3200] : [400, 800, 1200, 1600])
             ->withContainerWidth($containerWidth)
             ->withColumns((int) $columns, (int) $columnsTablet, (int) $columnsMobile);
 

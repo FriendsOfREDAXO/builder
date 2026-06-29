@@ -4,6 +4,7 @@ use FriendsOfREDAXO\Builder\Config\MediaTypeRegistry;
 
 $addon = rex_addon::get('builder');
 $selectedMedia = trim(rex_request('media_file', 'string', ''));
+$previewHidpi = rex_request('preview_hidpi', 'bool', false);
 $currentPage = rex_be_controller::getCurrentPage();
 $installCsrf = rex_csrf_token::factory('ycb_focuspoint_ratio_types_install');
 
@@ -260,7 +261,11 @@ $formContent .= '<div class="form-group">';
 $formContent .= '<label class="col-sm-2 control-label">' . rex_i18n::msg('builder_media_types_preview_select_image') . '</label>';
 $formContent .= '<div class="col-sm-10">';
 $formContent .= rex_var_media::getWidget(1, 'media_file', $selectedMedia);
+$formContent .= '<div class="checkbox" style="margin-top:10px;">';
+$formContent .= '<label><input type="checkbox" name="preview_hidpi" value="1"' . ($previewHidpi ? ' checked' : '') . '> HiDPI-Breiten in der Preview anzeigen (&gt; 1600px)</label>';
+$formContent .= '</div>';
 $formContent .= '<p class="help-block">' . rex_i18n::msg('builder_media_types_preview_note') . '</p>';
+$formContent .= '<p class="help-block" style="margin-top:4px;">Hinweis: Der Schalter betrifft nur die Vorschauansicht. Das tatsächliche Element-Verhalten steuerst du über die HiDPI-Option im jeweiligen Element.</p>';
 $formContent .= '<button class="btn btn-primary" type="submit">' . rex_i18n::msg('builder_media_types_preview_show') . '</button>';
 $formContent .= '</div>';
 $formContent .= '</div>';
@@ -361,17 +366,25 @@ if ($selectedMedia === '') {
         $widths = array_values(array_unique(array_map(static fn ($value): int => max(1, (int) $value), $widths)));
         sort($widths, SORT_NUMERIC);
 
+        $previewWidths = $widths;
+        if (!$previewHidpi) {
+            $previewWidths = array_values(array_filter($widths, static fn (int $width): bool => $width <= 1600));
+            if ($previewWidths === []) {
+                $previewWidths = $widths;
+            }
+        }
+
         $content .= '<article class="ycb-media-type-card">';
         $content .= '<header class="ycb-media-type-card-header">';
         $content .= '<h4 class="ycb-media-type-card-title">' . rex_escape($presetName) . '</h4>';
         $content .= '<p class="ycb-media-type-card-meta">';
         $content .= rex_i18n::msg('builder_media_types_preview_ratio') . ': <strong>' . rex_escape($ratio) . '</strong> | ';
         $content .= rex_i18n::msg('builder_media_types_preview_mode') . ': <strong>' . rex_escape($mode) . '</strong> | ';
-        $content .= rex_i18n::msg('builder_media_types_preview_columns') . ': <strong>' . rex_escape((string) count($widths)) . '</strong>';
+        $content .= rex_i18n::msg('builder_media_types_preview_columns') . ': <strong>' . rex_escape((string) count($previewWidths)) . '</strong>';
         $content .= '</p>';
         $content .= '</header>';
 
-        foreach ($widths as $width) {
+        foreach ($previewWidths as $width) {
             $virtualType = MediaTypeRegistry::buildVirtualType($presetName, $width);
             $variantUrl = rex_media_manager::getUrl($virtualType, $selectedMedia);
 

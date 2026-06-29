@@ -7,6 +7,7 @@ $items       = $elementData['items'] ?? [];
 $cardStyle   = (string) ($elementData['card_style'] ?? 'default');
 $imageRatio  = (string) ($elementData['image_ratio'] ?? '16_9');
 $imageRatioMobile = (string) ($elementData['image_ratio_mobile'] ?? '');
+$hidpiEnabled = !empty($elementData['hidpi_enabled']);
 $columns     = (int) ($elementData['columns'] ?? 3);
 $sectionBg   = (string) ($elementData['section_bg'] ?? '');
 $sectionPadding  = (string) ($elementData['section_padding'] ?? '');
@@ -80,7 +81,7 @@ $desktopPx = (int) max(220, round($containerMaxPx / max(1, $columns)));
 $mobileArtDirectionActive = $imageRatioMobile !== '' && $imageRatioMobile !== $imageRatio;
 
 /** @return array{src:string,srcset:string} */
-$resolveImage = static function (string $image, string $ratio): array {
+$resolveImage = static function (string $image, string $ratio, bool $hidpiEnabled): array {
     if ($image === '') {
         return ['src' => '', 'srcset' => ''];
     }
@@ -90,7 +91,7 @@ $resolveImage = static function (string $image, string $ratio): array {
     }
 
     $preset = 'starter_cards_' . $ratio;
-    $widths = [400, 800, 1200, 1600];
+    $widths = $hidpiEnabled ? [400, 800, 1200, 1600, 2000, 2400, 3200] : [400, 800, 1200, 1600];
     $src = rex_media_manager::getUrl(MediaTypeRegistry::buildVirtualType($preset, 1200), $image);
     $srcset = [];
     foreach ($widths as $w) {
@@ -113,9 +114,9 @@ $resolveImage = static function (string $image, string $ratio): array {
             $link      = $resolveLink($item);
             $fallback  = $headline !== '' ? $headline . ' ' . ($index + 1) : 'Karte ' . ($index + 1);
             $imageAlt  = \FriendsOfREDAXO\Builder\MediaAltResolver::resolve((string) ($item['image'] ?? ''), '', $itemTitle !== '' ? $itemTitle : $fallback);
-            $imageInfo = $resolveImage((string) ($item['image'] ?? ''), $imageRatio);
+            $imageInfo = $resolveImage((string) ($item['image'] ?? ''), $imageRatio, $hidpiEnabled);
             $imageInfoMobile = $mobileArtDirectionActive
-                ? $resolveImage((string) ($item['image'] ?? ''), $imageRatioMobile)
+                ? $resolveImage((string) ($item['image'] ?? ''), $imageRatioMobile, $hidpiEnabled)
                 : ['src' => '', 'srcset' => ''];
             ?>
             <div class="<?= rex_escape($colClass) ?>">
