@@ -1887,15 +1887,16 @@
             var sliceData = {};
             var sliceType = String($slice.data('slice-type') || '');
 
-            // Preserve nested column-slice arrays only for the dedicated "columns" element.
-            // Other elements (e.g. cards) legitimately use a scalar "columns" setting.
+            // Preserve nested column-slice arrays for elements that store nested columns in
+            // the object-based `columns` key (including custom elements like flex_columns).
+            // Scalar `columns` settings are ignored by the object-check below.
             var existingNestedColumns = null;
             var oldData = $slice.data('slice-data');
             if (oldData) {
                 if (typeof oldData === 'string') {
                     try { oldData = JSON.parse(oldData); } catch(e) {}
                 }
-                if (sliceType === 'columns' && oldData && oldData.columns && typeof oldData.columns === 'object') {
+                if (oldData && oldData.columns && typeof oldData.columns === 'object') {
                     existingNestedColumns = oldData.columns;
                 }
             }
@@ -1991,7 +1992,6 @@
             });
 
             if (
-                sliceType === 'columns' &&
                 existingNestedColumns !== null &&
                 (typeof sliceData.columns === 'undefined' || sliceData.columns === null)
             ) {
