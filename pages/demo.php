@@ -215,10 +215,12 @@ $demoMarkup .= '</div>';
 $demoMarkup .= '<div class="builder-hero__content">';
 $demoMarkup .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
 $demoMarkup .= '<div>';
-$demoMarkup .= '<p class="builder-hero__kicker">Builder</p>';
-$demoMarkup .= '<h2 class="builder-hero__title">Demo-Editor zum Arbeiten</h2>';
-$demoMarkup .= '<p class="builder-hero__lead">Hier kannst du mit dem echten Builder-Editor arbeiten. Er ist bewusst auf Demo- und Default-Bausteine begrenzt und speichert nichts dauerhaft.</p>';
+$demoMarkup .= '<p class="builder-hero__kicker">Builder AddOn · Version ' . rex_escape((string) $addon->getVersion()) . '</p>';
+$demoMarkup .= '<h2 class="builder-hero__title">Willkommen im Builder-Einstieg</h2>';
+$demoMarkup .= '<p class="builder-hero__lead">Das ist der zentrale Einstieg in das AddOn. Du arbeitest hier direkt mit dem echten Builder-Editor und siehst sofort, wie sich Inhalte verhalten. Die Demo bleibt bewusst ohne dauerhafte Speicherung.</p>';
 $demoMarkup .= '<div class="builder-hero__chips">';
+$demoMarkup .= '<span class="builder-chip">AddOn-Einstieg</span>';
+$demoMarkup .= '<span class="builder-chip">Version ' . rex_escape((string) $addon->getVersion()) . '</span>';
 $demoMarkup .= '<span class="builder-chip">Demo-Editor</span>';
 $demoMarkup .= '<span class="builder-chip">Readonly-Speicherung</span>';
 $demoMarkup .= '<span class="builder-chip">Starter-Elemente</span>';
@@ -248,11 +250,11 @@ $demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bo
 $demoMarkup .= '</div>';
 
 $demoMarkup .= '<style>';
-$demoMarkup .= '.builder-demo-page .slice-rendered > header{max-width:760px;margin:0 auto 28px;padding:0 8px;text-align:center;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header{max-width:760px;margin:0 0 28px;padding:0 8px;text-align:left;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered > header p:first-child{margin:0 0 10px;color:#b86118;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered > header h1,.builder-demo-page .slice-rendered > header h2,.builder-demo-page .slice-rendered > header h3,.builder-demo-page .slice-rendered > header h4{margin:0 0 14px;color:#23364a;font-weight:800;line-height:1.08;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered > header mark{padding:0 .18em;border-radius:.35em;background:#ffe3b8;color:#23364a;}';
-$demoMarkup .= '.builder-demo-page .slice-rendered > header p:last-child{margin:0 auto;color:#5f7693;font-size:18px;line-height:1.65;max-width:680px;}';
+$demoMarkup .= '.builder-demo-page .slice-rendered > header p:last-child{margin:0;color:#5f7693;font-size:18px;line-height:1.65;max-width:680px;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider{margin:20px 0 26px;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider-text{display:inline-block;padding:6px 14px;border-radius:999px;background:#edf5ff;color:#31506f;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}';
 $demoMarkup .= '.builder-demo-page .slice-rendered .cb-divider hr{margin-top:10px;border:0;border-top:1px solid #d5e2f0;}';
@@ -277,7 +279,7 @@ $demoMarkup .= '@media (prefers-color-scheme: dark){body.rex-has-theme:not(.rex-
 $demoMarkup .= '</style>';
 
 $builderHtml = $builder->getEditor();
-$demoMarkup .= '<div style="max-width:1400px;margin:0 auto;width:100%;">';
+$demoMarkup .= '<div style="max-width:1400px;margin:0;width:100%;">';
 $demoMarkup .= $builderHtml;
 $demoMarkup .= '</div>';
 

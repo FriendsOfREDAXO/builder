@@ -27,6 +27,8 @@ if (rex_addon::get('yform')->isAvailable() && class_exists(rex_yform_manager_tab
 
 ksort($availableYformTables, SORT_NATURAL | SORT_FLAG_CASE);
 
+$currentMode = \FriendsOfREDAXO\Builder\Config\ElementModeResolver::getElementMode();
+
 // Formular verarbeiten
 if (rex_post('save', 'bool')) {
     $addon->setConfig('theme', rex_post('theme', 'string', ''));
@@ -60,7 +62,7 @@ if (rex_post('save', 'bool')) {
         is_array($enabledElementAddons) ? $enabledElementAddons : []
     ), static fn (string $value): bool => $value !== '')));
 
-    if (\FriendsOfREDAXO\Builder\Config\ElementModeResolver::getElementMode() === 'replace') {
+    if ($currentMode === 'replace') {
         $enabledElementAddons = array_values(array_filter(
             $enabledElementAddons,
             static fn (string $addonKey): bool => $addonKey !== 'builder'
@@ -69,12 +71,14 @@ if (rex_post('save', 'bool')) {
 
     $addon->setConfig('enabled_element_addons', $enabledElementAddons);
 
-    $replaceKeepCoreElements = rex_post('replace_keep_core_elements', 'array', []);
-    $replaceKeepCoreElements = array_values(array_unique(array_filter(array_map(
-        static fn ($value): string => trim((string) $value),
-        is_array($replaceKeepCoreElements) ? $replaceKeepCoreElements : []
-    ), static fn (string $value): bool => $value !== '')));
-    $addon->setConfig('replace_keep_core_elements', $replaceKeepCoreElements);
+    if ($currentMode === 'replace') {
+        $replaceKeepCoreElements = rex_post('replace_keep_core_elements', 'array', []);
+        $replaceKeepCoreElements = array_values(array_unique(array_filter(array_map(
+            static fn ($value): string => trim((string) $value),
+            is_array($replaceKeepCoreElements) ? $replaceKeepCoreElements : []
+        ), static fn (string $value): bool => $value !== '')));
+        $addon->setConfig('replace_keep_core_elements', $replaceKeepCoreElements);
+    }
 
     echo rex_view::success(rex_i18n::msg('builder_settings_saved'));
     
@@ -208,7 +212,6 @@ $content .= '<legend>' . rex_i18n::msg('builder_general_settings') . '</legend>'
 $formElements = [];
 
 // Aktiver Modus anzeigen (merge oder replace)
-$currentMode = \FriendsOfREDAXO\Builder\Config\ElementModeResolver::getElementMode();
 $modeLabel = $currentMode === 'merge' ? rex_i18n::msg('builder_mode_merge', 'Merge (Demo + Custom)') : rex_i18n::msg('builder_mode_replace', 'Replace (nur Custom)');
 
 if ($currentMode === 'replace') {
@@ -221,7 +224,7 @@ $n['field'] = '<p class="form-control-static"><span class="label label-' . ($cur
 $n['note'] = 'Wird per Extension Point BUILDER_ELEMENT_MODE definiert. Aktuell: <code>' . rex_escape($currentMode) . '</code>. Bei Konflikten hat <code>replace</code> Vorrang vor <code>merge</code>.';
 $formElements[] = $n;
 
-// Theme-Auswahl (nur wenn Theme-Provider verfügbar)
+$themeFormElements = [];
 if ($hasThemeProvider) {
     $n = [];
     $n['label'] = '<label for="theme">' . rex_i18n::msg('builder_theme') . '</label>';
@@ -232,7 +235,7 @@ if ($hasThemeProvider) {
     }
     $n['field'] .= '</select>';
     $n['note'] = rex_i18n::msg('builder_theme_notice');
-    $formElements[] = $n;
+    $themeFormElements[] = $n;
 
     if ($availableYformTables !== []) {
         $tableThemeField = '<div class="table-responsive">';
@@ -261,7 +264,7 @@ if ($hasThemeProvider) {
         $n['label'] = '<label>' . rex_i18n::msg('builder_theme_per_table') . '</label>';
         $n['field'] = $tableThemeField;
         $n['note'] = rex_i18n::msg('builder_theme_per_table_notice');
-        $formElements[] = $n;
+        $themeFormElements[] = $n;
     }
 }
 
@@ -329,19 +332,25 @@ $n['note'] = rex_i18n::msg('builder_enabled_element_addons_notice');
 $formElements[] = $n;
 
 // Ausnahmen: einzelne Haupt-Addon-Elemente auch im Replace-Modus erlauben
-$n = [];
-$n['label'] = '<label for="replace_keep_core_elements">' . rex_i18n::msg('builder_replace_keep_core_elements') . '</label>';
-$n['field'] = '<input type="hidden" name="replace_keep_core_elements[]" value="">';
-$n['field'] .= '<select class="form-control" id="replace_keep_core_elements" name="replace_keep_core_elements[]" multiple size="8">';
-foreach ($coreElementOptions as $elementKey => $elementLabel) {
-    $selected = in_array($elementKey, $replaceKeepCoreElements, true) ? ' selected' : '';
-    $n['field'] .= '<option value="' . rex_escape($elementKey) . '"' . $selected . '>'
-        . rex_escape($elementLabel . ' (' . $elementKey . ')')
-        . '</option>';
+if ($currentMode === 'replace') {
+    $n = [];
+    $n['label'] = '<label for="replace_keep_core_elements">' . rex_i18n::msg('builder_replace_keep_core_elements') . '</label>';
+    $n['field'] = '<input type="hidden" name="replace_keep_core_elements[]" value="">';
+    $n['field'] .= '<select class="form-control" id="replace_keep_core_elements" name="replace_keep_core_elements[]" multiple size="8">';
+    foreach ($coreElementOptions as $elementKey => $elementLabel) {
+        $selected = in_array($elementKey, $replaceKeepCoreElements, true) ? ' selected' : '';
+        $n['field'] .= '<option value="' . rex_escape($elementKey) . '"' . $selected . '>'
+            . rex_escape($elementLabel . ' (' . $elementKey . ')')
+            . '</option>';
+    }
+    $n['field'] .= '</select>';
+    $n['note'] = rex_i18n::msg('builder_replace_keep_core_elements_notice');
+    $formElements[] = $n;
 }
-$n['field'] .= '</select>';
-$n['note'] = rex_i18n::msg('builder_replace_keep_core_elements_notice');
-$formElements[] = $n;
+
+foreach ($themeFormElements as $themeFormElement) {
+    $formElements[] = $themeFormElement;
+}
 
 $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);

@@ -141,13 +141,27 @@
 .builder-chip {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 700;
-    color: #1f4b6d;
-    background: rgba(255, 255, 255, 0.74);
-    border: 1px solid rgba(255, 163, 48, 0.38);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #2f5572;
+    background: rgba(255, 255, 255, 0.46);
+    border: 1px solid rgba(73, 118, 151, 0.22);
+    box-shadow: none;
+    cursor: default;
+    user-select: none;
+}
+
+.builder-chip::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(213, 111, 0, 0.75);
 }
 
 .builder-hero__stats {
@@ -254,8 +268,12 @@ body.rex-theme-dark .builder-hero__kicker {
 
 body.rex-theme-dark .builder-chip {
     color: #d5e8f6;
-    background: rgba(17, 35, 48, 0.7);
-    border-color: rgba(255, 170, 74, 0.42);
+    background: rgba(17, 35, 48, 0.48);
+    border-color: rgba(112, 167, 206, 0.28);
+}
+
+body.rex-theme-dark .builder-chip::before {
+    background: rgba(255, 176, 86, 0.82);
 }
 
 .builder-demo-page {

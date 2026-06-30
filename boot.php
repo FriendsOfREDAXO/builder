@@ -155,6 +155,10 @@ if (rex::isBackend()) {
     if ('builder/demo' === rex_be_controller::getCurrentPage()) {
         rex_view::addJsFile($assetUrl('demo.js'));
     }
+
+    if ('builder/modules' === rex_be_controller::getCurrentPage()) {
+        rex_view::addJsFile($assetUrl('js/modules-page.js'));
+    }
 }
 
 // Assets für Frontend einbinden (CSS für Elemente)

@@ -68,6 +68,13 @@ function normalizeFramework(string $framework): string
     return $framework !== '' ? $framework : 'uikit';
 }
 
+function isValidBuilderModuleKey(string $moduleKey): bool
+{
+    $moduleKey = trim($moduleKey);
+
+    return (bool) preg_match('/^(?:yfcb_|cb_)[a-z0-9_]+$/i', $moduleKey);
+}
+
 // Helper: Generiert Modul-Code für ein Element
 function generateModuleCode(string $elementKey, string $framework, int $valueId = 1): string
 {
@@ -192,6 +199,10 @@ if (rex_post('update_all_modules', 'bool')) {
         $fullModuleName = 'Builder';
     }
 
+    if ($moduleMode === 'full' && !isValidBuilderModuleKey($fullModuleKey)) {
+        echo rex_view::error('Ungültiger Modul-Key "' . rex_escape($fullModuleKey) . '": Erlaubt sind nur Keys im Format <code>yfcb_...</code> oder <code>cb_...</code> mit Buchstaben, Zahlen und Unterstrich.');
+    } else {
+
     $updatedModules = [];
     $skippedModules = [];
 
@@ -221,15 +232,25 @@ if (rex_post('update_all_modules', 'bool')) {
         } else {
             $sql = rex_sql::factory();
             $sql->setQuery(
-                'SELECT id, `key`, `name` FROM ' . rex::getTable('module') . ' WHERE `key` LIKE :prefix',
-                [':prefix' => 'yfcb_%']
+                'SELECT id, `key`, `name` FROM ' . rex::getTable('module') . ' WHERE `key` LIKE :prefixYfcb OR `key` LIKE :prefixCb',
+                [':prefixYfcb' => 'yfcb_%', ':prefixCb' => 'cb_%']
             );
 
             while ($sql->hasNext()) {
                 $moduleKey = (string) $sql->getValue('key');
                 $moduleName = (string) $sql->getValue('name');
-                // Elementname aus Key ableiten: yfcb_cards → cards
-                $elementKey = substr($moduleKey, 5);
+
+                // Elementname aus Key ableiten: yfcb_cards -> cards, cb_cards -> cards
+                if (str_starts_with($moduleKey, 'yfcb_')) {
+                    $elementKey = substr($moduleKey, 5);
+                } elseif (str_starts_with($moduleKey, 'cb_')) {
+                    $elementKey = substr($moduleKey, 3);
+                } else {
+                    $skippedModules[] = $moduleName . ' (ungültiger Key)';
+                    $sql->next();
+                    continue;
+                }
+
                 $configPath = resolveElementConfigPath($elementKey);
 
                 if (!file_exists($configPath)) {
@@ -276,6 +297,7 @@ PHP;
         $message .= '</ul>';
         echo rex_view::warning('Übersprungen (Element-Config fehlt): ' . $message);
     }
+    }
 }
 
 // Module erstellen
@@ -301,8 +323,11 @@ if (rex_post('create_modules', 'bool')) {
     if ($fullModuleName === '') {
         $fullModuleName = 'Builder';
     }
+
+    if ($moduleMode === 'full' && !isValidBuilderModuleKey($fullModuleKey)) {
+        echo rex_view::error('Ungültiger Modul-Key "' . rex_escape($fullModuleKey) . '": Erlaubt sind nur Keys im Format <code>yfcb_...</code> oder <code>cb_...</code> mit Buchstaben, Zahlen und Unterstrich.');
+    } elseif ($moduleMode === 'full') {
     
-    if ($moduleMode === 'full') {
         $inputCode = generateFullBuilderInputCode($framework, $valueId, $selectedElements);
         $outputCode = generateFullBuilderOutputCode($framework, $valueId, $selectedElements);
 
@@ -419,6 +444,8 @@ PHP;
 $elements = [];
 $elementsByCategory = [];
 $elementSourceMeta = [];
+$elementDescriptionMeta = [];
+$elementVersionMeta = [];
 $elementPaths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
 $coreElementsPath = realpath(rex_path::addon('builder', 'elements')) ?: '';
 foreach ($elementPaths as $pathKey => $basePath) {
@@ -455,12 +482,16 @@ foreach ($elementPaths as $pathKey => $basePath) {
         }
 
         $label = (string) $config['label'];
+        $description = isset($config['description']) ? trim((string) $config['description']) : '';
+        $version = isset($config['version']) ? trim((string) $config['version']) : '';
         $category = isset($config['category']) ? trim((string) $config['category']) : 'allgemein';
         if ($category === '' || $category === '-') {
             $category = 'allgemein';
         }
 
         $elements[$dir] = $label;
+        $elementDescriptionMeta[$dir] = $description;
+        $elementVersionMeta[$dir] = $version;
         $isExternal = $coreElementsPath === '' ? $pathKey !== 'core' : ($resolvedBasePath !== $coreElementsPath);
         $elementSourceMeta[$dir] = [
             'is_external' => $isExternal,
@@ -536,41 +567,108 @@ $hero .= '</div>';
 $hero .= '</section>';
 
 echo '<div style="margin-bottom:16px;">' . $hero . '</div>';
+echo '<div style="margin:-4px 0 14px; text-align:right;"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#builder-elements-overview-modal"><i class="fa fa-th-list"></i> Aktuell verfügbare Elemente und Infos</button></div>';
 
+$requestedMode = rex_request('module_mode', 'string', 'full');
+$currentModuleMode = $requestedMode === 'single' ? 'single' : 'full';
 $currentFramework = normalizeFramework(rex_request('framework', 'string', 'uikit'));
+$currentValueId = rex_request('value_id', 'int', 1);
+if ($currentValueId < 1 || $currentValueId > 20) {
+    $currentValueId = 1;
+}
+
+$currentFullModuleName = trim(rex_request('full_module_name', 'string', 'Builder'));
+if ($currentFullModuleName === '') {
+    $currentFullModuleName = 'Builder';
+}
+
+$currentFullModuleKey = trim(rex_request('full_module_key', 'string', 'yfcb_builder'));
+if ($currentFullModuleKey === '') {
+    $currentFullModuleKey = 'yfcb_builder';
+}
+
+$selectedElementsRaw = rex_request('elements', 'array', []);
+$selectedElementsLookup = [];
+foreach ($selectedElementsRaw as $selectedElementRaw) {
+    $selectedElement = trim((string) $selectedElementRaw);
+    if ($selectedElement !== '') {
+        $selectedElementsLookup[$selectedElement] = true;
+    }
+}
+
+$updatableModules = [];
+try {
+    $moduleSql = rex_sql::factory();
+    $moduleSql->setQuery(
+        'SELECT `key`, `name` FROM ' . rex::getTable('module') . ' WHERE `key` LIKE :prefixYfcb OR `key` LIKE :prefixCb ORDER BY `name` ASC',
+        [':prefixYfcb' => 'yfcb_%', ':prefixCb' => 'cb_%']
+    );
+
+    while ($moduleSql->hasNext()) {
+        $updatableModules[] = [
+            'key' => (string) $moduleSql->getValue('key'),
+            'name' => (string) $moduleSql->getValue('name'),
+        ];
+        $moduleSql->next();
+    }
+} catch (Exception $e) {
+    $updatableModules = [];
+}
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', 'Module erstellen/aktualisieren', false);
 
 $content = '';
-$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post">';
+$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" id="builder-modules-form">';
 
 // Modus-Auswahl
 $content .= '<div class="form-group">';
 $content .= '<label for="module_mode"><strong>Modus</strong></label>';
 $content .= '<select class="form-control" id="module_mode" name="module_mode">';
-$content .= '<option value="single">Einzelmodul pro Element</option>';
-$content .= '<option value="full">Ein Full-Builder-Modul</option>';
+$content .= '<option value="full"' . ($currentModuleMode === 'full' ? ' selected="selected"' : '') . '>Full-Builder-Modul (empfohlen)</option>';
+$content .= '<option value="single"' . ($currentModuleMode === 'single' ? ' selected="selected"' : '') . '>Einzelmodul pro Element</option>';
 $content .= '</select>';
-$content .= '<small class="help-block">Im Einzelmodus wird für jedes ausgewählte Element ein Modul erzeugt. Im Full-Builder-Modus wird ein einziges Modul erzeugt; die Auswahl unten begrenzt dabei optional die erlaubten Elemente.</small>';
+$content .= '<small class="help-block">Der Full-Builder ist vorausgewählt und für die meisten Projekte der schnellste Einstieg. Im Einzelmodus wird pro Element ein separates Modul erzeugt.</small>';
 $content .= '</div>';
 
 // Full-Builder Modulname/Key
-$content .= '<div class="row">';
+$content .= '<div id="full-builder-fields" class="row">';
 $content .= '<div class="col-sm-6">';
 $content .= '<div class="form-group">';
 $content .= '<label for="full_module_name"><strong>Full-Builder Modulname</strong></label>';
-$content .= '<input class="form-control" id="full_module_name" name="full_module_name" value="Builder">';
+$content .= '<input class="form-control" id="full_module_name" name="full_module_name" value="' . rex_escape($currentFullModuleName) . '">';
 $content .= '</div>';
 $content .= '</div>';
 $content .= '<div class="col-sm-6">';
 $content .= '<div class="form-group">';
 $content .= '<label for="full_module_key"><strong>Full-Builder Modul-Key</strong></label>';
-$content .= '<input class="form-control" id="full_module_key" name="full_module_key" value="yfcb_builder">';
-$content .= '<small class="help-block">Wird nur im Full-Builder-Modus verwendet.</small>';
+$content .= '<input class="form-control" id="full_module_key" name="full_module_key" value="' . rex_escape($currentFullModuleKey) . '" pattern="^(yfcb_|cb_).+" required="required">';
+$content .= '<small class="help-block">Wird nur im Full-Builder-Modus verwendet. Muss mit <code>yfcb_</code> oder <code>cb_</code> beginnen.</small>';
 $content .= '</div>';
 $content .= '</div>';
+$content .= '</div>';
+
+$content .= '<div id="full-builder-existing-module" class="form-group">';
+$content .= '<label for="existing_module_preset"><strong>Vorhandenes Modul übernehmen (optional)</strong></label>';
+if ($updatableModules === []) {
+    $content .= '<select class="form-control" id="existing_module_preset" disabled="disabled">';
+    $content .= '<option value="">Keine bestehenden yfcb_*/cb_*-Module gefunden</option>';
+    $content .= '</select>';
+    $content .= '<small class="help-block">Sobald ein bestehendes yfcb_*- oder cb_*-Modul vorhanden ist, kannst du hier Key und Name direkt übernehmen.</small>';
+} else {
+    $content .= '<select class="form-control" id="existing_module_preset">';
+    $content .= '<option value="">Bitte vorhandenes Modul auswählen …</option>';
+    foreach ($updatableModules as $updatableModule) {
+        $moduleName = $updatableModule['name'];
+        $moduleKey = $updatableModule['key'];
+        $content .= '<option value="' . rex_escape($moduleKey) . '" data-module-key="' . rex_escape($moduleKey) . '" data-module-name="' . rex_escape($moduleName) . '">';
+        $content .= rex_escape($moduleName . ' (' . $moduleKey . ')');
+        $content .= '</option>';
+    }
+    $content .= '</select>';
+    $content .= '<small class="help-block">Auswahl übernimmt Modul-Key und Modulname in die beiden Felder oben.</small>';
+}
 $content .= '</div>';
 
 // Framework-Auswahl
@@ -590,7 +688,7 @@ $content .= '<div class="form-group">';
 $content .= '<label for="value_id"><strong>REX_VALUE Slot</strong></label>';
 $content .= '<select class="form-control" id="value_id" name="value_id">';
 for ($i = 1; $i <= 20; ++$i) {
-    $selected = (1 === $i) ? ' selected="selected"' : '';
+    $selected = ($currentValueId === $i) ? ' selected="selected"' : '';
     $content .= '<option value="' . $i . '"' . $selected . '>REX_VALUE[' . $i . ']</option>';
 }
 $content .= '</select>';
@@ -608,9 +706,9 @@ if (empty($elements)) {
     $content .= '<p class="builder-modules-picker__empty">Keine Elemente gefunden.</p>';
 } else {
     $content .= '<div class="form-group builder-modules-picker__actions">';
-    $content .= '<button type="button" class="btn btn-xs btn-default" onclick="document.querySelectorAll(\'.element-checkbox\').forEach(c => c.checked = true);">Alle auswählen</button>';
+    $content .= '<button type="button" id="builder-elements-select-all" class="btn btn-xs btn-default">Alle auswählen</button>';
     $content .= ' ';
-    $content .= '<button type="button" class="btn btn-xs btn-default" onclick="document.querySelectorAll(\'.element-checkbox\').forEach(c => c.checked = false);">Alle abwählen</button>';
+    $content .= '<button type="button" id="builder-elements-deselect-all" class="btn btn-xs btn-default">Alle abwählen</button>';
     $content .= '</div>';
     
     foreach ($elementsByCategory as $category => $categoryElements) {
@@ -628,7 +726,8 @@ if (empty($elements)) {
             $badgeText = $isExternal ? 'extern' : 'intern';
             $content .= '<div class="checkbox builder-modules-picker__item">';
             $content .= '<label>';
-            $content .= '<input type="checkbox" class="element-checkbox" name="elements[]" value="' . rex_escape($elementKey) . '">';
+            $isSelected = isset($selectedElementsLookup[$elementKey]);
+            $content .= '<input type="checkbox" class="element-checkbox" name="elements[]" value="' . rex_escape($elementKey) . '"' . ($isSelected ? ' checked="checked"' : '') . '>';
             $content .= ' <strong>' . rex_escape($elementLabel) . '</strong> ';
             $content .= '<span class="label ' . $badgeClass . '">' . $badgeText . '</span> ';
             $content .= '<small class="builder-modules-picker__source">(' . rex_escape($source) . ')</small> ';
@@ -651,13 +750,86 @@ $content .= ' ';
 $content .= '<button type="submit" name="update_all_modules" value="1" class="btn btn-default">';
 $content .= '<i class="fa fa-refresh"></i> Bestehende Module aktualisieren';
 $content .= '</button>';
-$content .= '<p class="help-block">Im Einzelmodus werden alle vorhandenen <code>yfcb_*</code>-Module aktualisiert. Im Full-Builder-Modus wird nur das konfigurierte Full-Builder-Modul aktualisiert.</p>';
+$content .= '<p class="help-block">Im Einzelmodus werden alle vorhandenen <code>yfcb_*</code>- und <code>cb_*</code>-Module aktualisiert. Im Full-Builder-Modus wird nur das konfigurierte Full-Builder-Modul aktualisiert.</p>';
 $content .= '</div>';
 
 $content .= '</form>';
 
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
+
+$overviewModalBody = '';
+$overviewModalBody .= '<div class="builder-overview-modal">';
+$overviewModalBody .= '<p class="help-block">Übersicht der aktuell registrierten Builder-Elemente inklusive Quelle und Modul-Key.</p>';
+
+if ($elements === []) {
+    $overviewModalBody .= '<p class="text-muted">Keine Elemente gefunden.</p>';
+} else {
+    $overviewModalBody .= '<p style="margin:0 0 12px;">';
+    $overviewModalBody .= '<strong>Elemente:</strong> ' . rex_escape((string) $totalElements) . ' · ';
+    $overviewModalBody .= '<strong>Kategorien:</strong> ' . rex_escape((string) $totalCategories) . ' · ';
+    $overviewModalBody .= '<strong>Externe Quellen:</strong> ' . rex_escape((string) $totalExternalElements);
+    $overviewModalBody .= '</p>';
+
+    foreach ($elementsByCategory as $category => $categoryElements) {
+        $overviewModalBody .= '<div class="panel panel-default" style="margin-bottom:10px;">';
+        $overviewModalBody .= '<div class="panel-heading" style="padding:8px 12px;">';
+        $overviewModalBody .= '<strong>' . rex_escape((string) $category) . '</strong> ';
+        $overviewModalBody .= '<span class="label label-default">' . rex_escape((string) count($categoryElements)) . '</span>';
+        $overviewModalBody .= '</div>';
+        $overviewModalBody .= '<div class="panel-body" style="padding:10px 12px;">';
+
+        foreach ($categoryElements as $elementKey => $elementLabel) {
+            $moduleKey = 'yfcb_' . $elementKey;
+            $elementDescription = trim((string) ($elementDescriptionMeta[$elementKey] ?? ''));
+            $elementVersion = trim((string) ($elementVersionMeta[$elementKey] ?? ''));
+            $sourceInfo = $elementSourceMeta[$elementKey] ?? ['is_external' => false, 'source' => 'core'];
+            $isExternal = (bool) ($sourceInfo['is_external'] ?? false);
+            $source = (string) ($sourceInfo['source'] ?? 'core');
+            $sourceTypeText = $isExternal ? 'extern' : 'intern';
+            $sourceTypeBadgeClass = $isExternal ? 'label-info' : 'label-success';
+
+            $overviewModalBody .= '<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #eef2f5;">';
+            $overviewModalBody .= '<div style="flex:1 1 auto;min-width:0;"><strong>' . rex_escape((string) $elementLabel) . '</strong>';
+            if ($elementDescription !== '') {
+                $overviewModalBody .= '<div class="text-muted" style="font-size:12px;line-height:1.4;margin-top:2px;">' . rex_escape($elementDescription) . '</div>';
+            }
+            $overviewModalBody .= '<div class="text-muted" style="font-size:12px;line-height:1.5;margin-top:3px;">';
+            $overviewModalBody .= '<strong>Version:</strong> ' . rex_escape($elementVersion !== '' ? $elementVersion : '-') . '<br>';
+            $overviewModalBody .= '<strong>Modul-Key:</strong> <code>' . rex_escape($moduleKey) . '</code>';
+            $overviewModalBody .= '</div>';
+            $overviewModalBody .= '</div>';
+            $overviewModalBody .= '<div style="flex:0 0 auto;white-space:nowrap;text-align:right;align-self:flex-start;">';
+            $overviewModalBody .= '<span class="label ' . $sourceTypeBadgeClass . '" style="margin-right:4px;">' . rex_escape($sourceTypeText) . '</span>';
+            $overviewModalBody .= '<span class="label label-default">' . rex_escape($source) . '</span>';
+            $overviewModalBody .= '</div>';
+            $overviewModalBody .= '</div>';
+        }
+
+        $overviewModalBody .= '</div>';
+        $overviewModalBody .= '</div>';
+    }
+}
+
+$overviewModalBody .= '</div>';
+
+$overviewModal = '';
+$overviewModal .= '<div class="modal fade" id="builder-elements-overview-modal" tabindex="-1" role="dialog" aria-labelledby="builder-elements-overview-modal-label">';
+$overviewModal .= '<div class="modal-dialog modal-lg" role="document">';
+$overviewModal .= '<div class="modal-content">';
+$overviewModal .= '<div class="modal-header">';
+$overviewModal .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+$overviewModal .= '<h4 class="modal-title" id="builder-elements-overview-modal-label">Aktuell verfügbare Elemente und Infos</h4>';
+$overviewModal .= '</div>';
+$overviewModal .= '<div class="modal-body" style="max-height:70vh;overflow:auto;">' . $overviewModalBody . '</div>';
+$overviewModal .= '<div class="modal-footer">';
+$overviewModal .= '<button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>';
+$overviewModal .= '</div>';
+$overviewModal .= '</div>';
+$overviewModal .= '</div>';
+$overviewModal .= '</div>';
+
+echo $overviewModal;
 
 // Info-Box
 $infoContent = '<p><i class="fa fa-info-circle"></i> ';
