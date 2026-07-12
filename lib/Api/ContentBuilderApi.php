@@ -546,9 +546,9 @@ class ContentBuilderApi extends rex_api_function
                 $accordionConfig = $modalConfig['accordion'];
             }
 
-            $initialOpen = (string) ($accordionConfig['initial'] ?? 'first');
+            $initialOpen = (string) ($accordionConfig['initial'] ?? 'none');
             if (!in_array($initialOpen, ['first', 'all', 'none'], true)) {
-                $initialOpen = 'first';
+                $initialOpen = 'none';
             }
 
             $singleOpen = array_key_exists('single_open', $accordionConfig)
@@ -575,8 +575,8 @@ class ContentBuilderApi extends rex_api_function
                     default => $fieldsetIndex === 0,
                 };
 
-                echo '<fieldset class="builder-fieldset' . ($isOpen ? ' accordion-open' : '') . '">';
-                echo '<legend class="builder-fieldset-legend" tabindex="0" role="button" aria-expanded="' . ($isOpen ? 'true' : 'false') . '">';
+                echo '<div class="builder-fieldset' . ($isOpen ? ' accordion-open' : '') . '">';
+                echo '<button type="button" class="builder-fieldset-legend" aria-expanded="' . ($isOpen ? 'true' : 'false') . '">';
                 echo '<span class="builder-fieldset-legend-main">';
                 if ($fsIcon !== '') {
                     echo '<span class="builder-fieldset-legend-icon"><i class="fa ' . rex_escape((string) $fsIcon) . '"></i></span>';
@@ -584,7 +584,7 @@ class ContentBuilderApi extends rex_api_function
                 echo '<span class="builder-fieldset-legend-label">' . rex_escape((string) $fsLabel) . '</span>';
                 echo '</span>';
                 echo '<span class="builder-fieldset-legend-toggle" aria-hidden="true">▼</span>';
-                echo '</legend>';
+                echo '</button>';
 
                 echo '<div class="builder-fieldset-body' . ($isOpen ? '' : ' accordion-collapsed') . '">';
                 $modalFieldMap = [];
@@ -602,7 +602,7 @@ class ContentBuilderApi extends rex_api_function
                     }
                 );
                 echo '</div>';
-                echo '</fieldset>';
+                echo '</div>';
                 $fieldsetIndex++;
             }
 

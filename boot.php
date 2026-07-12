@@ -37,6 +37,18 @@ if (rex_addon::get('media_manager')->isAvailable()) {
 // Theme-Provider Integration: konfiguriertes Backend-Theme anwenden
 if (rex::isBackend()) {
     $addon = rex_addon::get('builder');
+    $assetUrl = static function (string $assetPath) use ($addon): string {
+        $url = $addon->getAssetsUrl($assetPath);
+        $file = $addon->getAssetsPath($assetPath);
+        if (is_file($file)) {
+            $mtime = filemtime($file);
+            if (false !== $mtime) {
+                $url .= '?v=' . $mtime;
+            }
+        }
+
+        return $url;
+    };
     
     $configuredTheme = (string) $addon->getConfig('theme', '');
     if ($configuredTheme !== '') {
@@ -45,8 +57,8 @@ if (rex::isBackend()) {
     }
     
     // Fieldset Akkordeon Assets laden
-    rex_view::addCssFile($addon->getAssetsUrl('fieldset-accordion.css'));
-    rex_view::addJsFile($addon->getAssetsUrl('fieldset-accordion.js'));
+    rex_view::addCssFile($assetUrl('fieldset-accordion.css'));
+    rex_view::addJsFile($assetUrl('fieldset-accordion.js'));
 }
 
 if (rex::isBackend() && rex_addon::get('focuspoint')->isAvailable()) {

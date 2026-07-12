@@ -19,7 +19,7 @@
     if (value === 'all' || value === 'none' || value === 'first') {
       return value;
     }
-    return 'first';
+    return 'none';
   }
 
   function setOpenState(fieldset, open) {
@@ -74,12 +74,12 @@
     setOpenState(fieldset, true);
   }
 
-  function initAccordions(root) {
+  function initAccordions(root, force) {
     var scope = root || document;
     var containers = scope.querySelectorAll('.builder-fieldsets');
 
     containers.forEach(function (container) {
-      if (container.getAttribute('data-accordion-initialized') === '1') {
+      if (!force && container.getAttribute('data-accordion-initialized') === '1') {
         return;
       }
 
@@ -122,15 +122,15 @@
   });
 
   document.addEventListener('shown.bs.modal', function (event) {
-    initAccordions(event.target);
+    initAccordions(event.target, true);
   });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
-      initAccordions(document);
+      initAccordions(document, false);
     });
   } else {
-    initAccordions(document);
+    initAccordions(document, false);
   }
 
   window.builderInitAccordions = initAccordions;
