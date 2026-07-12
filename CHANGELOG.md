@@ -4,6 +4,14 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.0.0-beta7] - 2026-07-12
+
+### Repeater-Modals und Farb-UX
+
+- Neues Feld `color` im Builder ergänzt (kompakter Color-Picker mit Hex-Anzeige).
+- Repeater-Modals unterstützen jetzt `modal_size` (`sm`, `md`, `lg`, `xl`, `full`).
+- Grundlage für breitere, element-spezifische Optionen-Modals (z. B. im ECharts-Element) geschaffen.
+
 ## [1.0.0-beta3] - 2026-06-26
 
 ### YForm-Listen-Profile und Doku

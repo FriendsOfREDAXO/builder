@@ -94,6 +94,14 @@ class SmartLink
             return 'url';
         }
 
+        if (preg_match('/^mailto:/i', $value) === 1) {
+            return 'mail';
+        }
+
+        if (preg_match('/^tel:/i', $value) === 1) {
+            return 'tel';
+        }
+
         if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
             return 'mail';
         }
@@ -134,11 +142,31 @@ class SmartLink
         }
 
         if ($type === 'mail') {
-            return 'mailto:' . $value;
+            $mailValue = preg_replace('/^mailto:\s*/i', '', $value);
+            if (!is_string($mailValue)) {
+                return '';
+            }
+
+            $mailValue = trim($mailValue);
+            if ($mailValue === '') {
+                return '';
+            }
+
+            return 'mailto:' . $mailValue;
         }
 
         if ($type === 'tel') {
-            return 'tel:' . preg_replace('/[^\d\+]/', '', $value);
+            $telValue = preg_replace('/^tel:\s*/i', '', $value);
+            if (!is_string($telValue)) {
+                return '';
+            }
+
+            $normalized = preg_replace('/[^\d\+]/', '', $telValue);
+            if (!is_string($normalized) || $normalized === '') {
+                return '';
+            }
+
+            return 'tel:' . $normalized;
         }
 
         if ($type === 'media') {
@@ -146,7 +174,12 @@ class SmartLink
                 return $value;
             }
 
-            return rex_url::media($value);
+            $mediaValue = self::normalizeMediaValue($value);
+            if ($mediaValue === '') {
+                return '';
+            }
+
+            return rex_url::media($mediaValue);
         }
 
         if ($type === 'yform') {
@@ -189,12 +222,20 @@ class SmartLink
 
     public static function isMediaPdf(string $mediaFile): bool
     {
-        return strtolower(pathinfo($mediaFile, PATHINFO_EXTENSION)) === 'pdf';
+        $normalized = self::normalizeMediaValue($mediaFile);
+        if ($normalized === '') {
+            $normalized = (string) parse_url($mediaFile, PHP_URL_PATH);
+        }
+
+        return strtolower(pathinfo($normalized, PATHINFO_EXTENSION)) === 'pdf';
     }
 
     public static function buildPdfJsHref(string $mediaFile): string
     {
-        $mediaUrl = rex_url::media($mediaFile);
+        $normalized = self::normalizeMediaValue($mediaFile);
+        $mediaUrl = preg_match('@^https?://@i', $mediaFile) === 1
+            ? $mediaFile
+            : rex_url::media($normalized);
         if (!rex_addon::get('pdfout')->isAvailable()) {
             return $mediaUrl;
         }
@@ -224,14 +265,55 @@ class SmartLink
 
     private static function looksLikeMedia(string $value): bool
     {
+        $normalized = self::normalizeMediaValue($value);
+
+        if ($normalized !== '') {
+            $media = rex_media::get($normalized);
+            if ($media !== null) {
+                return true;
+            }
+        }
+
         $media = rex_media::get($value);
         if ($media !== null) {
             return true;
         }
 
-        $ext = strtolower(pathinfo($value, PATHINFO_EXTENSION));
+        $pathSource = $normalized !== '' ? $normalized : ((string) parse_url($value, PHP_URL_PATH));
+        $ext = strtolower(pathinfo($pathSource, PATHINFO_EXTENSION));
 
         return in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'pdf', 'mp4', 'webm', 'mov', 'avi'], true);
+    }
+
+    private static function normalizeMediaValue(string $value): string
+    {
+        $resolved = trim($value);
+        if ($resolved === '') {
+            return '';
+        }
+
+        if (preg_match('@^redaxo://media/(.+)$@i', $resolved, $matches) === 1) {
+            $resolved = (string) $matches[1];
+        }
+
+        if (preg_match('@^media://(.+)$@i', $resolved, $matches) === 1) {
+            $resolved = (string) $matches[1];
+        }
+
+        $path = (string) parse_url($resolved, PHP_URL_PATH);
+        if ($path !== '' && str_contains($path, '/media/')) {
+            $pos = strrpos($path, '/media/');
+            if ($pos !== false) {
+                $resolved = substr($path, $pos + 7);
+            }
+        }
+
+        $resolved = ltrim($resolved, '/');
+        if (str_starts_with($resolved, 'media/')) {
+            $resolved = substr($resolved, 6);
+        }
+
+        return trim($resolved);
     }
 
     /**

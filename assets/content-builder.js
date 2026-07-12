@@ -560,6 +560,11 @@
             $(document).on('shown.bs.modal', 'body > .modal', function() {
                 var $modal = $(this);
                 self.applyConditionalFieldVisibility($modal);
+
+                if (typeof window.builderInitAccordions === 'function') {
+                    window.builderInitAccordions($modal[0]);
+                }
+
                 self.ensureEditorsReady($modal);
             });
 
@@ -1794,7 +1799,36 @@
             return $targets;
         },
 
-        getConditionalFieldValue: function($conditionalField, $scope, sourceFieldName) {
+        getConditionalOwnerScope: function($scope) {
+            if (!$scope || $scope.length === 0) {
+                return $scope;
+            }
+
+            var $modal = $scope.hasClass('modal') ? $scope : $scope.closest('.modal');
+            if ($modal.length === 0) {
+                return $scope;
+            }
+
+            var modalId = String($modal.attr('id') || '');
+            if (!modalId.length) {
+                return $scope;
+            }
+
+            var selector = '[data-target="#' + modalId + '"] , [data-bs-target="#' + modalId + '"]';
+            var $trigger = $(selector).first();
+            if ($trigger.length === 0) {
+                return $scope;
+            }
+
+            var $ownerForm = $trigger.closest('.slice-edit-form');
+            if ($ownerForm.length > 0) {
+                return $ownerForm;
+            }
+
+            return $scope;
+        },
+
+        getConditionalFieldValue: function($conditionalField, $scope, sourceFieldName, $sourceScope) {
             var localSelector = '.repeater-item, .modal, .slice-edit-form';
             var $localRoot = $conditionalField.closest(localSelector).first();
             var actualValue = null;
@@ -1807,6 +1841,10 @@
                 actualValue = this.getConditionalSourceValue($scope, sourceFieldName);
             }
 
+            if (actualValue === null && $sourceScope && $sourceScope.length > 0 && !$sourceScope.is($scope)) {
+                actualValue = this.getConditionalSourceValue($sourceScope, sourceFieldName);
+            }
+
             return actualValue;
         },
 
@@ -1816,6 +1854,8 @@
             if (!$scope || $scope.length === 0) {
                 return;
             }
+
+            var $sourceScope = self.getConditionalOwnerScope($scope);
 
             self.getConditionalTargets($scope).each(function() {
                 var $conditionalField = $(this);
@@ -1844,7 +1884,7 @@
                     }
 
                     var expectedValue = conditions[sourceFieldName];
-                    var actualValue = self.getConditionalFieldValue($conditionalField, $scope, sourceFieldName);
+                    var actualValue = self.getConditionalFieldValue($conditionalField, $scope, sourceFieldName, $sourceScope);
 
                     if (actualValue === null || !self.matchesConditionalRule(actualValue, expectedValue)) {
                         visible = false;

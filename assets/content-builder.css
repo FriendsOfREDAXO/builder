@@ -1727,6 +1727,36 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     align-items: center;
 }
 
+.cb-color-field {
+    max-width: 180px;
+}
+
+.cb-color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cb-color-input {
+    width: 36px;
+    min-width: 36px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.cb-color-code {
+    width: 86px;
+    min-width: 86px;
+    height: 30px;
+    padding: 3px 6px;
+    font-family: Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    text-transform: lowercase;
+}
+
 .color-swatch-item {
     position: relative;
 }
@@ -1768,6 +1798,18 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
 /* Fix für Bootstrap Modal - verhindert Springen */
 .modal-open {
     padding-right: 0 !important;
+}
+
+/* Larger settings modals configurable via settings_modal.modal_size */
+.modal-dialog.modal-xl {
+    width: 96%;
+    max-width: 1400px;
+}
+
+.modal-dialog.modal-builder-full {
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 12px auto;
 }
 
 body.modal-open {

@@ -243,6 +243,7 @@ class FieldRegistry
             new BeLinkField(),
             new RadioImageField(),
             new ColorSwatchesField(),
+            new ColorField(),
             new BeTableSelectField(),
             new YFormPickerField(),
             new SmartLinkField(),

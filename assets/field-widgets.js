@@ -5,6 +5,33 @@
 (function($) {
     'use strict';
 
+    function updateColorFieldUi($root) {
+        var $scope = $root && $root.length ? $root : $(document);
+        $scope.find('[data-cb-color-field="1"]').each(function() {
+            var $field = $(this);
+            var $input = $field.find('.cb-color-input');
+            var $dot = $field.find('.cb-color-dot');
+            var $code = $field.find('.cb-color-code');
+
+            if ($input.length === 0) {
+                return;
+            }
+
+            var val = ($input.val() || '').toString().trim().toLowerCase();
+            if (!/^#[0-9a-f]{6}$/.test(val)) {
+                val = '#3b82f6';
+                $input.val(val);
+            }
+
+            if ($dot.length) {
+                $dot.css('background-color', val);
+            }
+            if ($code.length) {
+                $code.val(val);
+            }
+        });
+    }
+
     function detectLinkType(value) {
         var v = (value || '').trim();
         if (v === '') {
@@ -463,6 +490,19 @@
         startSmartLinkSync($widget);
         smartLinkSerialize($widget);
     }
+
+    $(document).on('input change', '.cb-color-input', function() {
+        updateColorFieldUi($(this).closest('[data-cb-color-field="1"]'));
+    });
+
+    $(document).on('rex:ready', function(e) {
+        var $root = e && e.target ? $(e.target) : $(document);
+        updateColorFieldUi($root);
+    });
+
+    $(function() {
+        updateColorFieldUi($(document));
+    });
 
     function parseTableEditorConfig($widget) {
         var defaults = {

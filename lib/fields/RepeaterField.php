@@ -254,9 +254,10 @@ class RepeaterField extends FieldAbstract
         $modalConfig = $fieldConfig['item_modal'];
         $label = $modalConfig['label'] ?? 'Erweiterte Optionen';
         $icon = $modalConfig['icon'] ?? 'fa-ellipsis-h';
+        $dialogClass = $this->resolveModalDialogClass($modalConfig);
 
         echo '<div class="modal fade" id="' . $modalId . '" tabindex="-1" role="dialog">';
-        echo '<div class="modal-dialog" role="document">';
+        echo '<div class="' . rex_escape($dialogClass) . '" role="document">';
         echo '<div class="modal-content">';
         echo '<div class="modal-header">';
         echo '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>';
@@ -309,9 +310,10 @@ class RepeaterField extends FieldAbstract
         $modalId = $itemId . '_' . $modalKey;
         $label = $modalConfig['label'] ?? 'Optionen';
         $icon = $modalConfig['icon'] ?? 'fa-sliders';
+        $dialogClass = $this->resolveModalDialogClass($modalConfig);
 
         echo '<div class="modal fade" id="' . $modalId . '" tabindex="-1" role="dialog">';
-        echo '<div class="modal-dialog" role="document">';
+        echo '<div class="' . rex_escape($dialogClass) . '" role="document">';
         echo '<div class="modal-content">';
         echo '<div class="modal-header">';
         echo '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>';
@@ -355,6 +357,7 @@ class RepeaterField extends FieldAbstract
         $modalConfig = $fieldConfig['item_modal'];
         $label = $modalConfig['label'] ?? 'Erweiterte Optionen';
         $icon = $modalConfig['icon'] ?? 'fa-cog';
+        $dialogClass = $this->resolveModalDialogClass($modalConfig);
 
         echo '<div class="form-group">';
         echo '<button type="button" class="btn btn-default btn-sm btn-block" data-toggle="modal" data-target="#' . $modalId . '">';
@@ -363,7 +366,7 @@ class RepeaterField extends FieldAbstract
         echo '</div>';
 
         echo '<div class="modal fade" id="' . $modalId . '" tabindex="-1" role="dialog">';
-        echo '<div class="modal-dialog" role="document">';
+        echo '<div class="' . rex_escape($dialogClass) . '" role="document">';
         echo '<div class="modal-content">';
         echo '<div class="modal-header">';
         echo '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>';
@@ -396,5 +399,27 @@ class RepeaterField extends FieldAbstract
         echo '</div>';
         echo '</div>';
         echo '</div>';
+    }
+
+    /**
+     * @param array<string, mixed> $modalConfig
+     */
+    protected function resolveModalDialogClass(array $modalConfig): string
+    {
+        $size = strtolower(trim((string) ($modalConfig['modal_size'] ?? 'md')));
+        $allowed = ['sm', 'md', 'lg', 'xl', 'full'];
+        if (!in_array($size, $allowed, true)) {
+            $size = 'md';
+        }
+
+        if ($size === 'full') {
+            return 'modal-dialog modal-lg modal-builder-full';
+        }
+
+        if ($size === 'md') {
+            return 'modal-dialog';
+        }
+
+        return 'modal-dialog modal-' . $size;
     }
 }

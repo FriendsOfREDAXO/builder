@@ -1021,6 +1021,17 @@ body.rex-theme-dark {
     .slice-edit-form .ck.ck-editor__main {
         border-color: #404448 !important;
     }
+
+    .cb-color-dot {
+        border-color: rgba(255, 255, 255, 0.35);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+    }
+
+    .cb-color-code {
+        background: #2a3542;
+        border-color: #465468;
+        color: #d9e2ef;
+    }
 }
 
 @media (prefers-color-scheme: dark) {

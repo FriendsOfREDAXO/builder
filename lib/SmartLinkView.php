@@ -81,7 +81,9 @@ class SmartLinkView
             return null;
         }
 
-        $extension = strtolower(rex_file::extension(parse_url($value, PHP_URL_PATH) ?: $value));
+        $href = SmartLink::buildHref($item);
+        $valuePath = (string) parse_url($value, PHP_URL_PATH);
+        $extension = strtolower(rex_file::extension($valuePath !== '' ? $valuePath : $value));
 
         if (preg_match('@^https?://@i', $value) === 1) {
             if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'], true)) {
@@ -105,7 +107,9 @@ class SmartLinkView
             return null;
         }
 
-        $media = rex_media::get($value);
+            $mediaName = (string) parse_url($href, PHP_URL_PATH);
+            $mediaName = preg_replace('@^.*/media/@', '', $mediaName) ?? '';
+            $media = $mediaName !== '' ? rex_media::get($mediaName) : null;
         if ($media === null) {
             return null;
         }
@@ -114,14 +118,14 @@ class SmartLinkView
             $previewType = \FriendsOfREDAXO\Builder\Config\MediaTypeRegistry::buildVirtualType('starter_cards_16_9', 800);
             return [
                 'kind' => 'image',
-                'src' => rex_media_manager::getUrl($previewType, $value),
+                    'src' => rex_media_manager::getUrl($previewType, $mediaName),
             ];
         }
 
         if (in_array($extension, ['mp4', 'webm', 'mov'], true)) {
             return [
                 'kind' => 'video',
-                'src' => rex_url::media($value),
+                    'src' => rex_url::media($mediaName),
             ];
         }
 
