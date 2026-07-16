@@ -131,6 +131,7 @@ if (trim((string) $wrapper_max_width) !== '') {
      data-online-toggle="<?= $enableOnlineToggle ? '1' : '0' ?>"
      data-element-search="<?= $addon->getConfig('enable_element_search') ? '1' : '0' ?>"
      data-legacy-mode="<?= $legacy_is_active ? '1' : '0' ?>"
+    data-element-defaults='<?= rex_escape($element_defaults_json) ?>'
      data-available-elements='<?= rex_escape(json_encode($available_elements, JSON_UNESCAPED_UNICODE)) ?>'>
     <?php if ($label): ?>
         <label class="control-label" for="<?= $field_id ?>"><?= $label ?></label>
