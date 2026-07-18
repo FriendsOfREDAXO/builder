@@ -81,6 +81,7 @@
                     baseline = currentValue;
                     $builder.attr('data-cb-persist-baseline', baseline);
                     $builder.attr('data-cb-persist-dirty', '0');
+                    $builder.attr('data-cb-edit-dirty', '0');
                     self.setPersistState($builder, 'clean');
                     return;
                 }
@@ -94,6 +95,32 @@
             });
 
             this.initPersistLeaveGuard();
+        },
+
+        getPersistStateBuilder: function($scope) {
+            var $builder = $scope.closest('.yform-content-builder');
+            if ($builder.length > 0) {
+                return $builder;
+            }
+
+            var $modal = $scope.closest('#nested-slice-edit-modal');
+            if ($modal.length > 0) {
+                var $editingSlice = $modal.data('editing-slice');
+                if ($editingSlice && $editingSlice.length > 0) {
+                    return $editingSlice.closest('.yform-content-builder');
+                }
+            }
+
+            return $();
+        },
+
+        syncPersistState: function($builder) {
+            if (!$builder || $builder.length === 0) {
+                return;
+            }
+
+            var isDirty = $builder.attr('data-cb-persist-dirty') === '1' || $builder.attr('data-cb-edit-dirty') === '1';
+            this.setPersistState($builder, isDirty ? 'dirty' : 'clean');
         },
 
         setPersistState: function($builder, state) {
@@ -128,7 +155,41 @@
             }
 
             $builder.attr('data-cb-persist-dirty', '1');
-            this.setPersistState($builder, 'dirty');
+            this.syncPersistState($builder);
+        },
+
+        markPersistClean: function($builder) {
+            if (!$builder || $builder.length === 0) {
+                return;
+            }
+
+            var $hiddenField = $builder.find('.content-builder-data').first();
+            if ($hiddenField.length > 0) {
+                $builder.attr('data-cb-persist-baseline', String($hiddenField.val() || ''));
+            }
+
+            $builder.attr('data-cb-persist-dirty', '0');
+            this.syncPersistState($builder);
+        },
+
+        markEditDirty: function($scope) {
+            var $builder = this.getPersistStateBuilder($scope);
+            if ($builder.length === 0) {
+                return;
+            }
+
+            $builder.attr('data-cb-edit-dirty', '1');
+            this.syncPersistState($builder);
+        },
+
+        clearEditDirty: function($scope) {
+            var $builder = this.getPersistStateBuilder($scope);
+            if ($builder.length === 0) {
+                return;
+            }
+
+            $builder.attr('data-cb-edit-dirty', '0');
+            this.syncPersistState($builder);
         },
 
         initPersistLeaveGuard: function() {
@@ -138,7 +199,7 @@
             persistGuardInitialized = true;
 
             $(window).on('beforeunload.yfcbPersistGuard', function(event) {
-                var hasDirtyBuilder = $('.yform-content-builder[data-cb-persist-dirty="1"]').length > 0;
+                var hasDirtyBuilder = $('.yform-content-builder[data-cb-persist-dirty="1"], .yform-content-builder[data-cb-edit-dirty="1"]').length > 0;
                 if (!hasDirtyBuilder) {
                     return;
                 }
@@ -539,6 +600,7 @@
                 '.slice-edit-form :input',
                 function() {
                     var $editForm = $(this).closest('.slice-edit-form');
+                    self.markEditDirty($(this));
                     self.applyConditionalFieldVisibility($editForm);
                 }
             );
@@ -552,6 +614,7 @@
                 function() {
                     var $modal = $(this).closest('.modal');
                     if ($modal.length > 0) {
+                        self.markEditDirty($(this));
                         self.applyConditionalFieldVisibility($modal);
                     }
                 }
@@ -774,6 +837,11 @@
                 });
 
                 self.updateHiddenField();
+
+                $builders.each(function() {
+                    ContentBuilder.markPersistClean($(this));
+                });
+
                 return true;
             });
 
@@ -834,20 +902,38 @@
             $(document).on('click', '.btn-slice-cancel', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                var $slice = $(this).closest('.content-builder-slice');
-                if ($slice.length === 0) {
-                    var $modal = $(this).closest('#nested-slice-edit-modal');
-                    if ($modal.length > 0) {
-                        $slice = $modal.data('editing-slice');
-                    }
+                var $button = $(this);
+
+                if ($button.data('yfcbCancelHandling') === true) {
+                    return false;
                 }
-                if ($slice && $slice.length) {
-                    var confirmMsg = $(this).data('confirm');
-                    if (confirmMsg && !confirm(confirmMsg)) {
-                        return false;
+
+                $button.data('yfcbCancelHandling', true);
+
+                try {
+                    var $slice = $button.closest('.content-builder-slice');
+                    if ($slice.length === 0) {
+                        var $modal = $button.closest('#nested-slice-edit-modal');
+                        if ($modal.length > 0) {
+                            $slice = $modal.data('editing-slice');
+                        }
                     }
-                    self.cancelEdit($slice);
+
+                    if ($slice && $slice.length) {
+                        var confirmMsg = 'Bearbeitung abbrechen? Alle Änderungen gehen verloren.';
+                        if (confirmMsg && !confirm(confirmMsg)) {
+                            return false;
+                        }
+                        self.clearEditDirty($button);
+                        self.cancelEdit($slice);
+                    }
+                } finally {
+                    window.setTimeout(function() {
+                        $button.removeData('yfcbCancelHandling');
+                    }, 0);
                 }
+
+                return false;
             });
             
             // Media Browser Events
@@ -1911,6 +1997,7 @@
             // Hidden Field updaten
             this.updateHiddenField();
             this.markPersistDirty($slice);
+            this.clearEditDirty($slice);
             
             // Section-Klassen aktualisieren (falls Section gespeichert wurde)
             this.updateSectionClasses();
@@ -2193,6 +2280,8 @@
                 $slice.find('.slice-rendered').show();
                 $slice.find('.slice-toolbar').show();
             }
+
+            this.clearEditDirty($slice);
         },
 
         deleteSlice: function($slice) {
