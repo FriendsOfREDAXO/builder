@@ -4,6 +4,13 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+
+## [1.0.0-beta8] - 2026-07-23
+
+### Repeater-Modals und Farb-UX
+
+- JS refactored
+
 ## [1.0.0-beta7] - 2026-07-12
 
 ### Repeater-Modals und Farb-UX
@@ -31,7 +38,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [1.0.0-beta1] - 2026-06-25
 
-### Initial Release
+### 1st Beta
 
 - Erstveröffentlichung des Addons `builder`.
 - Page- und Contentbuilder für REDAXO mit modularen Elementen.
