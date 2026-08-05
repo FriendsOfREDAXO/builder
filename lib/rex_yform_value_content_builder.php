@@ -2027,7 +2027,11 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             'name' => 'content_builder',
             'values' => $values,
             'description' => 'Slice-based Content Builder',
-            'db_type' => ['text'],
+            // mediumtext (16 MB) als Standard, da 'text' (max. 65.535 Byte) bei umfangreichen
+            // eingefügten Inhalten (z. B. Word-Paste) die JSON-Slice-Struktur abschneiden
+            // und das Feld beim erneuten Öffnen leer erscheinen lassen kann. 'text' und 'longtext'
+            // bleiben im Tabellen-Manager als Datenbank-Feldtyp wählbar.
+            'db_type' => ['mediumtext', 'text', 'longtext'],
         ];
     }
 

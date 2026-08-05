@@ -4,8 +4,14 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [Unreleased]
+
+### Fix
+
+- `content_builder`-Feld: Standard-Datenbanktyp von `text` (max. 65.535 Byte) auf `mediumtext` (max. 16 MB) umgestellt. Bei umfangreichen eingefügten Inhalten (z. B. Word-Paste) konnte die JSON-Slice-Struktur beim Speichern abgeschnitten werden, wodurch das Feld nach dem erneuten Öffnen leer erschien.
 
 ## [1.0.0-beta8] - 2026-07-23
+
 
 ### Repeater-Modals und Farb-UX
 
