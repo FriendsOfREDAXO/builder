@@ -2,31 +2,25 @@
     'use strict';
 
     function initModulesPage() {
-        var $form = $('#builder-modules-form');
-        if ($form.length === 0) {
+        var $fullForm = $('#builder-modules-form-full');
+        var $singleForm = $('#builder-modules-form-single');
+        if ($fullForm.length === 0 && $singleForm.length === 0) {
             return;
         }
 
-        var $modeField = $('#module_mode');
-        var $fullBuilderFields = $('#full-builder-fields');
-        var $fullBuilderExistingModule = $('#full-builder-existing-module');
-        var $existingModulePreset = $('#existing_module_preset');
+        var $existingModulePreset = $('#builder-full-existing-module-preset');
         var $fullModuleNameField = $('#full_module_name');
         var $fullModuleKeyField = $('#full_module_key');
-        var $selectAllButton = $('#builder-elements-select-all');
-        var $deselectAllButton = $('#builder-elements-deselect-all');
 
-        function setFullBuilderVisibility(mode) {
-            var isFull = mode === 'full';
-            $fullBuilderFields.toggle(isFull);
-            $fullBuilderExistingModule.toggle(isFull);
+        function bindSelectButtons(selectAllId, deselectAllId, checkboxSelector) {
+            $(selectAllId).off('click.builderModules').on('click.builderModules', function () {
+                $(checkboxSelector).prop('checked', true);
+            });
+
+            $(deselectAllId).off('click.builderModules').on('click.builderModules', function () {
+                $(checkboxSelector).prop('checked', false);
+            });
         }
-
-        setFullBuilderVisibility($modeField.val());
-
-        $modeField.off('change.builderModules').on('change.builderModules', function () {
-            setFullBuilderVisibility($(this).val());
-        });
 
         $existingModulePreset.off('change.builderModules').on('change.builderModules', function () {
             var $selectedOption = $(this).find('option:selected');
@@ -40,17 +34,10 @@
             if (selectedName !== '') {
                 $fullModuleNameField.val(selectedName);
             }
-
-            $modeField.val('full').trigger('change.builderModules');
         });
 
-        $selectAllButton.off('click.builderModules').on('click.builderModules', function () {
-            $('.element-checkbox').prop('checked', true);
-        });
-
-        $deselectAllButton.off('click.builderModules').on('click.builderModules', function () {
-            $('.element-checkbox').prop('checked', false);
-        });
+        bindSelectButtons('#builder-elements-select-all-full', '#builder-elements-deselect-all-full', '.builder-element-checkbox-full');
+        bindSelectButtons('#builder-elements-select-all-single', '#builder-elements-deselect-all-single', '.builder-element-checkbox-single');
     }
 
     $(document).on('rex:ready', initModulesPage);

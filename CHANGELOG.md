@@ -6,6 +6,14 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-07
+
+### Changed
+
+- Modulseite aufgeteilt: eigene Bereiche für Buildermodul (Full Builder) und Einzelmodule inkl. klarer Übersichtsseite als Einstieg.
+- Demo-Flow verschlankt: direkter Einstieg in den Editor, kürzere Hinweistexte und fokussierter Button "Eigene Elemente testen".
+- Demo-Elementauswahl über expliziten Test-Button statt klassischem Formular-Submit, um irreführende Navigation in die Struktur zu vermeiden.
+
 ### Fix
 
 - `content_builder`-Feld: Standard-Datenbanktyp von `text` (max. 65.535 Byte) auf `mediumtext` (max. 16 MB) umgestellt. Bei umfangreichen eingefügten Inhalten (z. B. Word-Paste) konnte die JSON-Slice-Struktur beim Speichern abgeschnitten werden, wodurch das Feld nach dem erneuten Öffnen leer erschien.

@@ -8,6 +8,136 @@
 
 $addon = rex_addon::get('builder');
 
+/**
+ * @return array{
+ *   elements: array<string, string>,
+ *   by_category: array<string, array<string, string>>,
+ *   source_meta: array<string, array{is_external: bool, source: string}>
+ * }
+ */
+function collectRegisteredDemoElements(): array
+{
+    $elements = [];
+    $elementsByCategory = [];
+    $elementSourceMeta = [];
+
+    $elementPaths = \FriendsOfREDAXO\Builder\Config\ElementRegistry::getElementPaths();
+    $coreElementsPath = realpath(rex_path::addon('builder', 'elements')) ?: '';
+
+    foreach ($elementPaths as $pathKey => $basePath) {
+        $basePath = rtrim((string) $basePath, '/');
+        if (!is_dir($basePath)) {
+            continue;
+        }
+
+        $resolvedBasePath = realpath($basePath) ?: $basePath;
+        $dirs = scandir($basePath);
+        if (!is_array($dirs)) {
+            continue;
+        }
+
+        foreach ($dirs as $dir) {
+            if ($dir === '.' || $dir === '..' || str_starts_with($dir, '.')) {
+                continue;
+            }
+
+            if (isset($elements[$dir])) {
+                continue;
+            }
+
+            $configPath = $basePath . '/' . $dir . '/config.php';
+            if (!is_file($configPath)) {
+                continue;
+            }
+
+            $config = include $configPath;
+            if (!is_array($config) || !isset($config['label'])) {
+                continue;
+            }
+
+            $label = (string) $config['label'];
+            $category = isset($config['category']) ? trim((string) $config['category']) : 'allgemein';
+            if ($category === '' || $category === '-') {
+                $category = 'allgemein';
+            }
+
+            $elements[$dir] = $label;
+            $isExternal = $coreElementsPath === '' ? $pathKey !== 'core' : ($resolvedBasePath !== $coreElementsPath);
+            $elementSourceMeta[$dir] = [
+                'is_external' => $isExternal,
+                'source' => (string) $pathKey,
+            ];
+
+            if (!isset($elementsByCategory[$category])) {
+                $elementsByCategory[$category] = [];
+            }
+            $elementsByCategory[$category][$dir] = $label;
+        }
+    }
+
+    asort($elements);
+    foreach ($elementsByCategory as $category => $categoryElements) {
+        asort($categoryElements);
+        $elementsByCategory[$category] = $categoryElements;
+    }
+
+    uksort($elementsByCategory, static function ($a, $b) {
+        if ($a === 'allgemein') {
+            return -1;
+        }
+        if ($b === 'allgemein') {
+            return 1;
+        }
+
+        return strcasecmp((string) $a, (string) $b);
+    });
+
+    return [
+        'elements' => $elements,
+        'by_category' => $elementsByCategory,
+        'source_meta' => $elementSourceMeta,
+    ];
+}
+
+$availableDemoElementsData = collectRegisteredDemoElements();
+$availableDemoElements = $availableDemoElementsData['elements'];
+$availableDemoElementsByCategory = $availableDemoElementsData['by_category'];
+$availableDemoElementSourceMeta = $availableDemoElementsData['source_meta'];
+
+$defaultAllowedElements = ['starter_headline', 'starter_text', 'divider', 'columns', 'starter_cards'];
+$requestedDemoElements = rex_request('demo_elements', 'array', []);
+$applyDemoSelection = rex_request('apply_demo_elements', 'bool');
+
+$selectedAllowedElements = [];
+if ($requestedDemoElements === []) {
+    foreach ($defaultAllowedElements as $defaultElement) {
+        if (isset($availableDemoElements[$defaultElement])) {
+            $selectedAllowedElements[] = $defaultElement;
+        }
+    }
+} else {
+    foreach ($requestedDemoElements as $requestedElement) {
+        $elementKey = trim((string) $requestedElement);
+        if ($elementKey !== '' && isset($availableDemoElements[$elementKey])) {
+            $selectedAllowedElements[] = $elementKey;
+        }
+    }
+    $selectedAllowedElements = array_values(array_unique($selectedAllowedElements));
+}
+
+if ($selectedAllowedElements === []) {
+    $selectedAllowedElements = array_keys($availableDemoElements);
+}
+
+$selectedAllowedElementLookup = [];
+foreach ($selectedAllowedElements as $selectedAllowedElement) {
+    $selectedAllowedElementLookup[$selectedAllowedElement] = true;
+}
+
+$totalRegisteredElements = count($availableDemoElements);
+$selectedRegisteredElements = count($selectedAllowedElements);
+$demoSelectionResetUrl = rex_url::backendPage('builder/main');
+
 $initialSlices = [
     [
         'id' => 'slice_intro',
@@ -120,7 +250,7 @@ $initialSlices = [
                                         'type' => 'starter_text',
                                         'online' => true,
                                         'data' => [
-                                            'text' => '<p>Auch diese kleine Neben-Spalte bleibt editierbar und nutzt nur Demo-/Default-Elemente.</p>',
+                                            'text' => '<p>Auch diese kleine Neben-Spalte bleibt editierbar und nutzt Demo-Elemente aus der aktuellen Auswahl.</p>',
                                             'enable_section' => false,
                                             'enable_container' => false,
                                         ],
@@ -194,12 +324,18 @@ $initialSlices = [
     ],
 ];
 
+if ($applyDemoSelection) {
+    // Bei aktiver Auswahl startet die Demo bewusst leer,
+    // damit nur die ausgewählten Elemente getestet werden.
+    $initialSlices = [];
+}
+
 $builder = \FriendsOfREDAXO\Builder\Module::createWithValue(1, null, [
     'framework' => 'plain',
     'wrapper_max_width' => '1400px',
     'label' => 'Builder Demo',
-    'description' => 'Demo-Editor mit echten Starter- und Default-Elementen',
-    'allowed_elements' => ['starter_headline', 'starter_text', 'divider', 'columns', 'starter_cards'],
+    'description' => 'Demo-Editor mit frei wählbaren, registrierten Builder-Elementen',
+    'allowed_elements' => $selectedAllowedElements,
     'initial_slices' => $initialSlices,
 ]);
 
@@ -217,18 +353,18 @@ $demoMarkup .= '<div class="builder-hero__logo" aria-hidden="true"></div>';
 $demoMarkup .= '<div>';
 $demoMarkup .= '<p class="builder-hero__kicker">Builder AddOn · Version ' . rex_escape((string) $addon->getVersion()) . '</p>';
 $demoMarkup .= '<h2 class="builder-hero__title">Willkommen im Builder-Einstieg</h2>';
-$demoMarkup .= '<p class="builder-hero__lead">Das ist der zentrale Einstieg in das AddOn. Du arbeitest hier direkt mit dem echten Builder-Editor und siehst sofort, wie sich Inhalte verhalten. Die Demo bleibt bewusst ohne dauerhafte Speicherung.</p>';
+$demoMarkup .= '<p class="builder-hero__lead">Das ist der zentrale Einstieg in das AddOn. Du arbeitest hier direkt mit dem echten Builder-Editor und kannst per Auswahl auch eigene registrierte Elemente testen. Die Demo bleibt bewusst ohne dauerhafte Speicherung.</p>';
 $demoMarkup .= '<div class="builder-hero__chips">';
 $demoMarkup .= '<span class="builder-chip">AddOn-Einstieg</span>';
 $demoMarkup .= '<span class="builder-chip">Version ' . rex_escape((string) $addon->getVersion()) . '</span>';
 $demoMarkup .= '<span class="builder-chip">Demo-Editor</span>';
 $demoMarkup .= '<span class="builder-chip">Readonly-Speicherung</span>';
-$demoMarkup .= '<span class="builder-chip">Starter-Elemente</span>';
+$demoMarkup .= '<span class="builder-chip">Registrierte Elemente auswählbar</span>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '<div class="builder-hero__stats">';
-$demoMarkup .= '<div class="builder-stat"><strong>5</strong><span>Start-Bausteine</span></div>';
-$demoMarkup .= '<div class="builder-stat"><strong>5</strong><span>Erlaubte Elemente</span></div>';
+$demoMarkup .= '<div class="builder-stat"><strong>' . rex_escape((string) $totalRegisteredElements) . '</strong><span>Registrierte Elemente</span></div>';
+$demoMarkup .= '<div class="builder-stat"><strong>' . rex_escape((string) $selectedRegisteredElements) . '</strong><span>Aktiv für Demo</span></div>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '</section>';
@@ -237,7 +373,8 @@ $demoMarkup .= '<div class="builder-demo-panel">';
 $demoMarkup .= '<div style="display: flex; justify-content: space-between; align-items: center;">';
 $demoMarkup .= '<div>';
 $demoMarkup .= '<h3>Arbeiten in der Demo</h3>';
-$demoMarkup .= '<p class="text-muted">Du kannst die vorhandenen Elemente bearbeiten, neue Demo-Bausteine hinzufügen und die verschachtelte Spaltenstruktur direkt im Builder verändern. Die Demo rendert absichtlich mit dem framework-neutralen Plain-Template und speichert nichts dauerhaft.</p>';
+$demoMarkup .= '<p class="text-muted">Bearbeite vorhandene Elemente und füge neue Bausteine hinzu. Die Demo speichert nichts dauerhaft.</p>';
+$demoMarkup .= '<p style="margin:0;"><a class="btn btn-default" href="#builder-demo-element-selection"><i class="fa fa-arrow-down"></i> Eigene Elemente testen</a></p>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '<div style="white-space: nowrap; margin-left: 20px;">';
 $demoMarkup .= '<label style="display: flex; align-items: center; gap: 8px; margin: 0; font-weight: normal; cursor: pointer;">';
@@ -246,7 +383,7 @@ $demoMarkup .= '<span style="font-size: 14px;">Kompaktmodus</span>';
 $demoMarkup .= '</label>';
 $demoMarkup .= '</div>';
 $demoMarkup .= '</div>';
-$demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bottom: 0;">Für die Demo wird ein installiertes TinyMCE-Addon empfohlen, damit die Textbausteine direkt im Editor bearbeitet werden können.</div>';
+$demoMarkup .= '<div class="alert alert-info" style="margin-top: 12px; margin-bottom: 0;"><strong>Hinweis:</strong> Für die Demo wird ein installiertes TinyMCE-Addon empfohlen. Für sauberes Rendering von Text-Bausteinen sollte außerdem ein Plain-Template verfügbar sein, sonst kann es bei der Ausgabe zu Darstellungsfehlern kommen.</div>';
 $demoMarkup .= '</div>';
 
 $demoMarkup .= '<style>';
@@ -283,12 +420,59 @@ $demoMarkup .= '<div style="max-width:1400px;margin:0;width:100%;">';
 $demoMarkup .= $builderHtml;
 $demoMarkup .= '</div>';
 
+$demoMarkup .= '<div id="builder-demo-element-selection" class="builder-demo-panel">';
+$demoMarkup .= '<h3>Elemente für diese Demo auswählen</h3>';
+$demoMarkup .= '<p class="text-muted">Wähle hier aus allen registrierten Elementen die Bausteine, die im Editor zum Testen verfügbar sein sollen.</p>';
+$demoMarkup .= '<p class="help-block" style="margin-top:0;">Hinweis: Beim Hinzufügen von Text-Bausteinen sollte ein Plain-Template vorhanden sein, damit die Ausgabe im Frontend sauber gerendert wird.</p>';
+$demoMarkup .= '<div style="margin-bottom:14px;">';
+
+if ($availableDemoElementsByCategory === []) {
+    $demoMarkup .= '<p class="text-muted">Keine registrierten Elemente gefunden.</p>';
+} else {
+    foreach ($availableDemoElementsByCategory as $category => $categoryElements) {
+        $demoMarkup .= '<div style="margin:0 0 10px; padding:10px; border:1px solid #dbe6f1; border-radius:10px;">';
+        $demoMarkup .= '<div style="margin:0 0 8px;"><strong>' . rex_escape((string) $category) . '</strong> <span class="label label-default">' . rex_escape((string) count($categoryElements)) . '</span></div>';
+
+        foreach ($categoryElements as $elementKey => $elementLabel) {
+            $sourceMeta = $availableDemoElementSourceMeta[$elementKey] ?? ['is_external' => false, 'source' => 'core'];
+            $isExternal = (bool) ($sourceMeta['is_external'] ?? false);
+            $source = (string) ($sourceMeta['source'] ?? 'core');
+            $sourceBadgeClass = $isExternal ? 'label-info' : 'label-success';
+            $sourceBadgeText = $isExternal ? 'extern' : 'intern';
+            $isChecked = isset($selectedAllowedElementLookup[$elementKey]);
+
+            $demoMarkup .= '<div class="checkbox" style="margin:0 0 6px;">';
+            $demoMarkup .= '<label>';
+            $demoMarkup .= '<input type="checkbox" name="demo_elements[]" value="' . rex_escape($elementKey) . '"' . ($isChecked ? ' checked="checked"' : '') . '> ';
+            $demoMarkup .= '<strong>' . rex_escape((string) $elementLabel) . '</strong> ';
+            $demoMarkup .= '<span class="label ' . $sourceBadgeClass . '">' . $sourceBadgeText . '</span> ';
+            $demoMarkup .= '<small>(' . rex_escape($source) . ')</small> ';
+            $demoMarkup .= '<small class="text-muted">[' . rex_escape($elementKey) . ']</small>';
+            $demoMarkup .= '</label>';
+            $demoMarkup .= '</div>';
+        }
+
+        $demoMarkup .= '</div>';
+    }
+}
+
+$demoMarkup .= '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+$demoMarkup .= '<button type="button" class="btn btn-primary" id="builder-apply-elements-test"><i class="fa fa-flask"></i> Eigene Elemente testen</button>';
+$demoMarkup .= '<a href="' . $demoSelectionResetUrl . '" class="btn btn-default">Standardauswahl wiederherstellen</a>';
+$demoMarkup .= '</div>';
+$demoMarkup .= '<p class="help-block" style="margin-top:8px;">Nach Klick auf "Eigene Elemente testen" startet der Editor leer und nur mit deinen ausgewählten Elementen.</p>';
+$demoMarkup .= '</div>';
+$demoMarkup .= '</div>';
+
 // JavaScript für Kompaktmodus-Toggle
 $demoMarkup .= '<script nonce="' . rex_response::getNonce() . '">';
 $demoMarkup .= 'document.addEventListener("DOMContentLoaded", function() {';
 $demoMarkup .= '  const toggle = document.getElementById("builder-compact-mode-toggle");';
 $demoMarkup .= '  const builderElement = document.querySelector(".yform-content-builder");';
+$demoMarkup .= '  const selectionRoot = document.getElementById("builder-demo-element-selection");';
+$demoMarkup .= '  const applySelectionButton = document.getElementById("builder-apply-elements-test");';
 $demoMarkup .= '  if (!toggle || !builderElement) return;';
+$demoMarkup .= '  const saveBlockedMsg = "In der Demo werden keine Inhalte gespeichert. Bitte nutze dafür ein echtes Modul in der Struktur.";';
 $demoMarkup .= '  const savedState = localStorage.getItem("builder-demo-compact-mode") === "1";';
 $demoMarkup .= '  toggle.checked = savedState;';
 $demoMarkup .= '  if (savedState) {';
@@ -304,6 +488,40 @@ $demoMarkup .= '      builderElement.classList.remove("compact-mode");';
 $demoMarkup .= '      localStorage.setItem("builder-demo-compact-mode", "0");';
 $demoMarkup .= '    }';
 $demoMarkup .= '  });';
+$demoMarkup .= '  if (selectionRoot && applySelectionButton) {';
+$demoMarkup .= '    applySelectionButton.addEventListener("click", function() {';
+$demoMarkup .= '      const currentUrl = new URL(window.location.href);';
+$demoMarkup .= '      currentUrl.searchParams.set("page", "builder/main");';
+$demoMarkup .= '      currentUrl.searchParams.set("apply_demo_elements", "1");';
+$demoMarkup .= '      currentUrl.searchParams.delete("demo_elements[]");';
+$demoMarkup .= '      const selected = selectionRoot.querySelectorAll("input[name=\"demo_elements[]\"]:checked");';
+$demoMarkup .= '      selected.forEach(function(input) {';
+$demoMarkup .= '        if (!(input instanceof HTMLInputElement)) return;';
+$demoMarkup .= '        currentUrl.searchParams.append("demo_elements[]", input.value);';
+$demoMarkup .= '      });';
+$demoMarkup .= '      window.location.href = currentUrl.toString();';
+$demoMarkup .= '    });';
+$demoMarkup .= '  }';
+$demoMarkup .= '  document.addEventListener("click", function(event) {';
+$demoMarkup .= '    const target = event.target;';
+$demoMarkup .= '    if (!(target instanceof Element)) return;';
+$demoMarkup .= '    const saveButton = target.closest("button[name=save], .btn-save");';
+$demoMarkup .= '    if (!saveButton) return;';
+$demoMarkup .= '    if (!builderElement.contains(saveButton)) return;';
+$demoMarkup .= '    event.preventDefault();';
+$demoMarkup .= '    event.stopPropagation();';
+$demoMarkup .= '    window.alert(saveBlockedMsg);';
+$demoMarkup .= '  }, true);';
+$demoMarkup .= '  document.addEventListener("submit", function(event) {';
+$demoMarkup .= '    const form = event.target;';
+$demoMarkup .= '    if (!(form instanceof HTMLFormElement)) return;';
+$demoMarkup .= '    if (!builderElement.contains(form)) return;';
+$demoMarkup .= '    const action = String(form.getAttribute("action") || "").toLowerCase();';
+$demoMarkup .= '    if (action.indexOf("page=structure") === -1 && !form.querySelector("button[name=save], .btn-save")) return;';
+$demoMarkup .= '    event.preventDefault();';
+$demoMarkup .= '    event.stopPropagation();';
+$demoMarkup .= '    window.alert(saveBlockedMsg);';
+$demoMarkup .= '  }, true);';
 $demoMarkup .= '});';
 $demoMarkup .= '</script>';
 
@@ -312,7 +530,7 @@ $demoMarkup .= '<h3>Was diese Demo bewusst nicht macht</h3>';
 $demoMarkup .= '<ul class="builder-demo-list">';
 $demoMarkup .= '<li>keine dauerhafte Speicherung in Datenbank oder JSON</li>';
 $demoMarkup .= '<li>keine produktive Modulbearbeitung</li>';
-$demoMarkup .= '<li>nur Demo- und Default-Elemente als Auswahl</li>';
+$demoMarkup .= '<li>nur aktuell ausgewählte, registrierte Elemente sind im Hinzufügen-Menü verfügbar</li>';
 $demoMarkup .= '</ul>';
 $demoMarkup .= '</div>';
 

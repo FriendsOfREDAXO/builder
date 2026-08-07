@@ -569,8 +569,6 @@ $hero .= '</section>';
 echo '<div style="margin-bottom:16px;">' . $hero . '</div>';
 echo '<div style="margin:-4px 0 14px; text-align:right;"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#builder-elements-overview-modal"><i class="fa fa-th-list"></i> Aktuell verfügbare Elemente und Infos</button></div>';
 
-$requestedMode = rex_request('module_mode', 'string', 'full');
-$currentModuleMode = $requestedMode === 'single' ? 'single' : 'full';
 $currentFramework = normalizeFramework(rex_request('framework', 'string', 'uikit'));
 $currentValueId = rex_request('value_id', 'int', 1);
 if ($currentValueId < 1 || $currentValueId > 20) {
@@ -596,6 +594,23 @@ foreach ($selectedElementsRaw as $selectedElementRaw) {
     }
 }
 
+$modulesPageView = 'all';
+if (isset($builderModulesView) && is_string($builderModulesView)) {
+    $modulesPageView = trim($builderModulesView);
+} else {
+    $modulesPageView = trim(rex_request('builder_modules_view', 'string', 'all'));
+}
+if (!in_array($modulesPageView, ['all', 'full', 'single'], true)) {
+    $modulesPageView = 'all';
+}
+
+$showFullPanel = $modulesPageView === 'full';
+$showSinglePanel = $modulesPageView === 'single';
+
+$builderModulesOverviewUrl = rex_url::backendPage('builder/modules');
+$builderModulesFullUrl = rex_url::backendPage('builder/modules_builder');
+$builderModulesSingleUrl = rex_url::backendPage('builder/modules_single');
+
 $updatableModules = [];
 try {
     $moduleSql = rex_sql::factory();
@@ -617,23 +632,105 @@ try {
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
-$fragment->setVar('title', 'Module erstellen/aktualisieren', false);
+
+$buildElementPicker = static function (string $checkboxClass, string $selectAllId, string $deselectAllId, array $selectedLookup) use ($elementsByCategory, $elementSourceMeta): string {
+    $html = '';
+    $html .= '<div class="builder-modules-picker">';
+
+    if ($elementsByCategory === []) {
+        $html .= '<p class="builder-modules-picker__empty">Keine Elemente gefunden.</p>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    $html .= '<div class="form-group builder-modules-picker__actions">';
+    $html .= '<button type="button" id="' . rex_escape($selectAllId) . '" class="btn btn-xs btn-default">Alle auswählen</button>';
+    $html .= ' ';
+    $html .= '<button type="button" id="' . rex_escape($deselectAllId) . '" class="btn btn-xs btn-default">Alle abwählen</button>';
+    $html .= '</div>';
+
+    foreach ($elementsByCategory as $category => $categoryElements) {
+        $html .= '<div class="builder-modules-picker__category">';
+        $html .= '<strong class="builder-modules-picker__category-title">' . rex_escape((string) $category) . '</strong> ';
+        $html .= '<span class="label label-default">' . count($categoryElements) . '</span>';
+        $html .= '</div>';
+
+        foreach ($categoryElements as $elementKey => $elementLabel) {
+            $moduleKey = 'yfcb_' . $elementKey;
+            $sourceInfo = $elementSourceMeta[$elementKey] ?? ['is_external' => false, 'source' => 'core'];
+            $isExternal = (bool) ($sourceInfo['is_external'] ?? false);
+            $source = (string) ($sourceInfo['source'] ?? 'core');
+            $badgeClass = $isExternal ? 'label-info' : 'label-success';
+            $badgeText = $isExternal ? 'extern' : 'intern';
+            $isSelected = isset($selectedLookup[$elementKey]);
+
+            $html .= '<div class="checkbox builder-modules-picker__item">';
+            $html .= '<label>';
+            $html .= '<input type="checkbox" class="' . rex_escape($checkboxClass) . '" name="elements[]" value="' . rex_escape($elementKey) . '"' . ($isSelected ? ' checked="checked"' : '') . '>';
+            $html .= ' <strong>' . rex_escape((string) $elementLabel) . '</strong> ';
+            $html .= '<span class="label ' . $badgeClass . '">' . $badgeText . '</span> ';
+            $html .= '<small class="builder-modules-picker__source">(' . rex_escape($source) . ')</small> ';
+            $html .= '<small class="builder-modules-picker__key">(Key: ' . rex_escape($moduleKey) . ')</small>';
+            $html .= '</label>';
+            $html .= '</div>';
+        }
+    }
+
+    $html .= '</div>';
+
+    return $html;
+};
+
+$sectionTitle = 'Module erstellen - klar getrennte Modi';
+if ($modulesPageView === 'full') {
+    $sectionTitle = 'Buildermodul (Full Builder)';
+} elseif ($modulesPageView === 'single') {
+    $sectionTitle = 'Einzelmodule pro Element';
+}
+$fragment->setVar('title', $sectionTitle, false);
 
 $content = '';
-$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" id="builder-modules-form">';
-
-// Modus-Auswahl
-$content .= '<div class="form-group">';
-$content .= '<label for="module_mode"><strong>Modus</strong></label>';
-$content .= '<select class="form-control" id="module_mode" name="module_mode">';
-$content .= '<option value="full"' . ($currentModuleMode === 'full' ? ' selected="selected"' : '') . '>Full-Builder-Modul (empfohlen)</option>';
-$content .= '<option value="single"' . ($currentModuleMode === 'single' ? ' selected="selected"' : '') . '>Einzelmodul pro Element</option>';
-$content .= '</select>';
-$content .= '<small class="help-block">Der Full-Builder ist vorausgewählt und für die meisten Projekte der schnellste Einstieg. Im Einzelmodus wird pro Element ein separates Modul erzeugt.</small>';
+$content .= '<div class="btn-group" role="group" aria-label="Modulbereiche" style="margin:0 0 14px;">';
+$content .= '<a class="btn btn-default' . ($modulesPageView === 'all' ? ' active' : '') . '" href="' . rex_escape($builderModulesOverviewUrl) . '"><i class="fa fa-compass"></i> Übersicht</a>';
+$content .= '<a class="btn btn-default' . ($modulesPageView === 'full' ? ' active' : '') . '" href="' . rex_escape($builderModulesFullUrl) . '"><i class="fa fa-cubes"></i> Buildermodul</a>';
+$content .= '<a class="btn btn-default' . ($modulesPageView === 'single' ? ' active' : '') . '" href="' . rex_escape($builderModulesSingleUrl) . '"><i class="fa fa-th-large"></i> Einzelmodule</a>';
 $content .= '</div>';
 
-// Full-Builder Modulname/Key
-$content .= '<div id="full-builder-fields" class="row">';
+$content .= $modulesPageView === 'all' ? '<p class="help-block">Diese Übersichtsseite enthält bewusst keine Formulare mehr. Öffne bitte den gewünschten Bereich über die Buttons oben.</p>' : '';
+
+if ($modulesPageView === 'all') {
+    $content .= '<div class="row" style="margin-top:8px;">';
+    $content .= '<div class="col-sm-6">';
+    $content .= '<div class="panel panel-primary">';
+    $content .= '<div class="panel-heading"><strong>Buildermodul (Full Builder)</strong></div>';
+    $content .= '<div class="panel-body">';
+    $content .= '<p>Ein zentrales Modul mit frei definierter erlaubter Elementliste für den redaktionellen Einsatz.</p>';
+    $content .= '<p><a class="btn btn-primary" href="' . rex_escape($builderModulesFullUrl) . '"><i class="fa fa-cubes"></i> Zur Buildermodul-Seite</a></p>';
+    $content .= '</div>';
+    $content .= '</div>';
+    $content .= '</div>';
+    $content .= '<div class="col-sm-6">';
+    $content .= '<div class="panel panel-default">';
+    $content .= '<div class="panel-heading"><strong>Einzelmodule</strong></div>';
+    $content .= '<div class="panel-body">';
+    $content .= '<p>Pro ausgewähltem Element wird ein eigenes REDAXO-Modul erstellt oder aktualisiert.</p>';
+    $content .= '<p><a class="btn btn-default" href="' . rex_escape($builderModulesSingleUrl) . '"><i class="fa fa-th-large"></i> Zur Einzelmodul-Seite</a></p>';
+    $content .= '</div>';
+    $content .= '</div>';
+    $content .= '</div>';
+    $content .= '</div>';
+}
+
+if ($showFullPanel) {
+$content .= '<div class="panel panel-primary">';
+$content .= '<div class="panel-heading"><strong>Bereich A · Buildermodul (Full Builder)</strong></div>';
+$content .= '<div class="panel-body">';
+$content .= '<p class="help-block">Nutze diesen Bereich, wenn Redakteure in einem einzigen Modul mehrere Builder-Elemente kombinieren sollen.</p>';
+$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" id="builder-modules-form-full">';
+$content .= '<input type="hidden" name="module_mode" value="full">';
+
+$content .= '<div class="row" id="full-builder-fields">';
 $content .= '<div class="col-sm-6">';
 $content .= '<div class="form-group">';
 $content .= '<label for="full_module_name"><strong>Full-Builder Modulname</strong></label>';
@@ -650,14 +747,14 @@ $content .= '</div>';
 $content .= '</div>';
 
 $content .= '<div id="full-builder-existing-module" class="form-group">';
-$content .= '<label for="existing_module_preset"><strong>Vorhandenes Modul übernehmen (optional)</strong></label>';
+$content .= '<label for="builder-full-existing-module-preset"><strong>Vorhandenes Buildermodul übernehmen (optional)</strong></label>';
 if ($updatableModules === []) {
-    $content .= '<select class="form-control" id="existing_module_preset" disabled="disabled">';
+    $content .= '<select class="form-control" id="builder-full-existing-module-preset" disabled="disabled">';
     $content .= '<option value="">Keine bestehenden yfcb_*/cb_*-Module gefunden</option>';
     $content .= '</select>';
     $content .= '<small class="help-block">Sobald ein bestehendes yfcb_*- oder cb_*-Modul vorhanden ist, kannst du hier Key und Name direkt übernehmen.</small>';
 } else {
-    $content .= '<select class="form-control" id="existing_module_preset">';
+    $content .= '<select class="form-control" id="builder-full-existing-module-preset">';
     $content .= '<option value="">Bitte vorhandenes Modul auswählen …</option>';
     foreach ($updatableModules as $updatableModule) {
         $moduleName = $updatableModule['name'];
@@ -695,65 +792,81 @@ $content .= '</select>';
 $content .= '<small class="help-block">Legt fest, in welchem VALUE-Feld das Modul seine JSON-Daten speichert und lädt.</small>';
 $content .= '</div>';
 
-// Elemente auswählen
 $content .= '<div class="form-group">';
-$content .= '<label><strong>Elemente auswählen</strong></label>';
-$content .= '<p class="help-block">Im Einzelmodus werden dafür einzelne REDAXO-Module erzeugt. Im Full-Builder-Modus dient die Auswahl als erlaubte Elementliste.</p>';
+$content .= '<label><strong>Erlaubte Elemente für das Buildermodul</strong></label>';
+$content .= '<p class="help-block">Nur diese Elemente sind später im Full-Builder-Modul auswählbar.</p>';
 $content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
-$content .= '<div class="builder-modules-picker">';
-
-if (empty($elements)) {
-    $content .= '<p class="builder-modules-picker__empty">Keine Elemente gefunden.</p>';
-} else {
-    $content .= '<div class="form-group builder-modules-picker__actions">';
-    $content .= '<button type="button" id="builder-elements-select-all" class="btn btn-xs btn-default">Alle auswählen</button>';
-    $content .= ' ';
-    $content .= '<button type="button" id="builder-elements-deselect-all" class="btn btn-xs btn-default">Alle abwählen</button>';
-    $content .= '</div>';
-    
-    foreach ($elementsByCategory as $category => $categoryElements) {
-        $content .= '<div class="builder-modules-picker__category">';
-        $content .= '<strong class="builder-modules-picker__category-title">' . rex_escape($category) . '</strong> ';
-        $content .= '<span class="label label-default">' . count($categoryElements) . '</span>';
-        $content .= '</div>';
-
-        foreach ($categoryElements as $elementKey => $elementLabel) {
-            $moduleKey = 'yfcb_' . $elementKey;
-            $sourceInfo = $elementSourceMeta[$elementKey] ?? ['is_external' => false, 'source' => 'core'];
-            $isExternal = (bool) ($sourceInfo['is_external'] ?? false);
-            $source = (string) ($sourceInfo['source'] ?? 'core');
-            $badgeClass = $isExternal ? 'label-info' : 'label-success';
-            $badgeText = $isExternal ? 'extern' : 'intern';
-            $content .= '<div class="checkbox builder-modules-picker__item">';
-            $content .= '<label>';
-            $isSelected = isset($selectedElementsLookup[$elementKey]);
-            $content .= '<input type="checkbox" class="element-checkbox" name="elements[]" value="' . rex_escape($elementKey) . '"' . ($isSelected ? ' checked="checked"' : '') . '>';
-            $content .= ' <strong>' . rex_escape($elementLabel) . '</strong> ';
-            $content .= '<span class="label ' . $badgeClass . '">' . $badgeText . '</span> ';
-            $content .= '<small class="builder-modules-picker__source">(' . rex_escape($source) . ')</small> ';
-            $content .= '<small class="builder-modules-picker__key">(Key: ' . rex_escape($moduleKey) . ')</small>';
-            $content .= '</label>';
-            $content .= '</div>';
-        }
-    }
-}
-
-$content .= '</div>';
+$content .= $buildElementPicker('builder-element-checkbox-full', 'builder-elements-select-all-full', 'builder-elements-deselect-all-full', $selectedElementsLookup);
 $content .= '</div>';
 
-// Buttons
 $content .= '<div class="form-group">';
 $content .= '<button type="submit" name="create_modules" value="1" class="btn btn-primary">';
-$content .= '<i class="fa fa-plus"></i> Module erstellen';
+$content .= '<i class="fa fa-plus"></i> Buildermodul erstellen/aktualisieren';
 $content .= '</button>';
 $content .= ' ';
 $content .= '<button type="submit" name="update_all_modules" value="1" class="btn btn-default">';
-$content .= '<i class="fa fa-refresh"></i> Bestehende Module aktualisieren';
+$content .= '<i class="fa fa-refresh"></i> Bestehendes Buildermodul aktualisieren';
 $content .= '</button>';
-$content .= '<p class="help-block">Im Einzelmodus werden alle vorhandenen <code>yfcb_*</code>- und <code>cb_*</code>-Module aktualisiert. Im Full-Builder-Modus wird nur das konfigurierte Full-Builder-Modul aktualisiert.</p>';
+$content .= '<p class="help-block">Aktualisieren wirkt hier nur auf den angegebenen Full-Builder-Modul-Key.</p>';
 $content .= '</div>';
 
 $content .= '</form>';
+$content .= '</div>';
+$content .= '</div>';
+}
+
+if ($showSinglePanel) {
+$content .= '<div class="panel panel-default">';
+$content .= '<div class="panel-heading"><strong>Bereich B · Einzelmodule pro Element</strong></div>';
+$content .= '<div class="panel-body">';
+$content .= '<p class="help-block">Nutze diesen Bereich, wenn jedes Element als eigenes REDAXO-Modul zur Verfügung stehen soll.</p>';
+$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" id="builder-modules-form-single">';
+$content .= '<input type="hidden" name="module_mode" value="single">';
+
+$content .= '<div class="form-group">';
+$content .= '<label for="framework_single"><strong>Framework</strong></label>';
+$content .= '<input class="form-control" id="framework_single" name="framework" list="builder-framework-options-single" value="' . rex_escape($currentFramework) . '">';
+$content .= '<datalist id="builder-framework-options-single">';
+$content .= '<option value="uikit">';
+$content .= '<option value="bootstrap">';
+$content .= '<option value="plain">';
+$content .= '</datalist>';
+$content .= '<small class="help-block">Vorschläge: uikit, bootstrap, plain. Du kannst hier auch einen freien Template-Key eintragen.</small>';
+$content .= '</div>';
+
+$content .= '<div class="form-group">';
+$content .= '<label for="value_id_single"><strong>REX_VALUE Slot</strong></label>';
+$content .= '<select class="form-control" id="value_id_single" name="value_id">';
+for ($i = 1; $i <= 20; ++$i) {
+    $selected = ($currentValueId === $i) ? ' selected="selected"' : '';
+    $content .= '<option value="' . $i . '"' . $selected . '>REX_VALUE[' . $i . ']</option>';
+}
+$content .= '</select>';
+$content .= '<small class="help-block">Legt fest, in welchem VALUE-Feld das Einzelmodul seine JSON-Daten speichert und lädt.</small>';
+$content .= '</div>';
+
+$content .= '<div class="form-group">';
+$content .= '<label><strong>Elemente für Einzelmodule</strong></label>';
+$content .= '<p class="help-block">Für jedes ausgewählte Element wird ein eigenes Modul mit Key <code>yfcb_[element]</code> erstellt oder aktualisiert.</p>';
+$content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
+$content .= $buildElementPicker('builder-element-checkbox-single', 'builder-elements-select-all-single', 'builder-elements-deselect-all-single', $selectedElementsLookup);
+$content .= '</div>';
+
+$content .= '<div class="form-group">';
+$content .= '<button type="submit" name="create_modules" value="1" class="btn btn-primary">';
+$content .= '<i class="fa fa-plus"></i> Einzelmodule erstellen/aktualisieren';
+$content .= '</button>';
+$content .= ' ';
+$content .= '<button type="submit" name="update_all_modules" value="1" class="btn btn-default">';
+$content .= '<i class="fa fa-refresh"></i> Alle bestehenden Einzelmodule aktualisieren';
+$content .= '</button>';
+$content .= '<p class="help-block">Aktualisieren wirkt hier auf alle vorhandenen <code>yfcb_*</code>- und <code>cb_*</code>-Module.</p>';
+$content .= '</div>';
+
+$content .= '</form>';
+$content .= '</div>';
+$content .= '</div>';
+}
 
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
@@ -834,13 +947,12 @@ echo $overviewModal;
 // Info-Box
 $infoContent = '<p><i class="fa fa-info-circle"></i> ';
 $infoContent .= '<strong>So funktioniert es:</strong><br>';
-$infoContent .= '1. Wähle die gewünschten Elemente aus<br>';
-$infoContent .= '2. Wähle den Modus (Einzelmodule oder Full Builder)<br>';
-$infoContent .= '3. Wähle dein Framework (UIkit oder Bootstrap)<br>';
-$infoContent .= '4. Klicke auf "Module erstellen"<br>';
-$infoContent .= '5. Die Module werden automatisch in der REDAXO-Datenbank angelegt und sind sofort einsatzbereit<br>';
+$infoContent .= '1. Entscheide zuerst zwischen Bereich A (Buildermodul) und Bereich B (Einzelmodule)<br>';
+$infoContent .= '2. Konfiguriere im gewählten Bereich Framework, Value-Slot und Elemente<br>';
+$infoContent .= '3. Klicke auf den passenden Erstellen- oder Aktualisieren-Button des Bereichs<br>';
+$infoContent .= '4. Die Module werden automatisch in der REDAXO-Datenbank angelegt und sind sofort einsatzbereit<br>';
 $infoContent .= '<br>';
-$infoContent .= '<strong>Module Key Format:</strong> Einzelmodule verwenden <code>yfcb_[element-name]</code> (z.B. yfcb_cards). Für den Full Builder kannst du Key und Name frei festlegen.<br>';
+$infoContent .= '<strong>Module Key Format:</strong> Einzelmodule verwenden <code>yfcb_[element-name]</code> (z.B. yfcb_cards). Für das Buildermodul kannst du Key und Name frei festlegen.<br>';
 $infoContent .= 'Du kannst die Module in deinen REDAXO-Seiten verwenden, indem du sie in dein Seitenlayout einbindest.';
 $infoContent .= '</p>';
 
