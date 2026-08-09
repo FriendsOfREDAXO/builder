@@ -82,11 +82,7 @@
                 }
 
                 var editFormVisible = $editForm.is(':visible');
-                var renderedVisible = $slice.children('.slice-rendered:visible').length > 0;
-                var toolbarVisible = $slice.children('.slice-toolbar:visible').length > 0;
-                var likelyEditing = !renderedVisible || !toolbarVisible;
-
-                if (editFormVisible || likelyEditing) {
+                if (editFormVisible) {
                     hasOpenInlineEditor = true;
                     return false;
                 }
@@ -107,6 +103,22 @@
             return false;
         },
 
+        isNestedSlice: function($slice) {
+            if (!$slice || $slice.length === 0) {
+                return false;
+            }
+
+            return $slice.parents('.content-builder-slice').length > 0;
+        },
+
+        getParentSlice: function($slice) {
+            if (!$slice || $slice.length === 0) {
+                return $();
+            }
+
+            return $slice.parents('.content-builder-slice').first();
+        },
+
         updateBlockSubmitGuard: function($builder) {
             if (!$builder || $builder.length === 0) {
                 return;
@@ -118,13 +130,20 @@
             }
 
             var $footer = $form.find('.rex-form-panel-footer').first();
-            var $toolbar = $footer.find('.btn-toolbar').first();
-            if ($toolbar.length === 0) {
+            if ($footer.length === 0) {
+                $footer = $form.find('.panel-footer').first();
+            }
+            if ($footer.length === 0) {
                 return;
             }
 
+            var $toolbar = $footer.find('.btn-toolbar').first();
+            if ($toolbar.length === 0) {
+                $toolbar = $footer;
+            }
+
             var hasOpenEditors = this.hasOpenEditorsForBuilder($builder);
-            var $saveButtons = $toolbar.find('.btn-save, .btn-apply, input.btn-save, input.btn-apply');
+            var $saveButtons = $footer.find('.btn-save, .btn-apply, input.btn-save, input.btn-apply, button[name="save"], button[name="apply"], input[name="save"], input[name="apply"]');
 
             var $guard = $toolbar.find('.yfcb-block-save-guard').first();
             if ($guard.length === 0) {
@@ -192,7 +211,7 @@
                 return false;
             }
 
-            return $form.find('.rex-form-panel-footer .btn-save, .rex-form-panel-footer .btn-apply, .rex-form-panel-footer input.btn-save, .rex-form-panel-footer input.btn-apply').length > 0;
+            return $form.find('.rex-form-panel-footer .btn-save, .rex-form-panel-footer .btn-apply, .rex-form-panel-footer input.btn-save, .rex-form-panel-footer input.btn-apply, .panel-footer .btn-save, .panel-footer .btn-apply, .panel-footer input.btn-save, .panel-footer input.btn-apply, .panel-footer button[name="save"], .panel-footer button[name="apply"], .panel-footer input[name="save"], .panel-footer input[name="apply"]').length > 0;
         },
 
         initPersistIndicators: function() {
@@ -1011,16 +1030,37 @@
             $(document).on('click', '.btn-slice-save', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                var fromNestedModal = false;
                 var $slice = $(this).closest('.content-builder-slice');
                 if ($slice.length === 0) {
                     var $modal = $(this).closest('#nested-slice-edit-modal');
                     if ($modal.length > 0) {
                         $slice = $modal.data('editing-slice');
+                        fromNestedModal = true;
                     }
                 }
                 if ($slice && $slice.length) {
                     self.saveSlice($slice);
                     self.updateAllBlockSubmitGuards();
+
+                    if (fromNestedModal) {
+                        var $parentSlice = self.getParentSlice($slice);
+                        if ($parentSlice.length > 0) {
+                            var $parentEditForm = $parentSlice.children('.slice-edit-form');
+                            if ($parentEditForm.length > 0 && $parentEditForm.is(':visible')) {
+                                self.cancelEdit($parentSlice);
+                            }
+                        }
+
+                        // Bei verschachtelten Modals laufen Bootstrap-Hide und DOM-Reparenting
+                        // asynchron. Mehrere Nachlaeufe verhindern einen festhaengenden Guard.
+                        window.setTimeout(function() {
+                            self.updateAllBlockSubmitGuards();
+                        }, 450);
+                        window.setTimeout(function() {
+                            self.updateAllBlockSubmitGuards();
+                        }, 900);
+                    }
                 }
             });
 
@@ -1542,7 +1582,7 @@
 
         editSlice: function($slice) {
             var self = this;
-            var isNested = $slice.closest('.content-builder-column-slices').length > 0;
+            var isNested = this.isNestedSlice($slice);
             
             if (isNested) {
                 var $modal = $('#nested-slice-edit-modal');
@@ -1575,6 +1615,8 @@
                                 self.cancelEdit($editingSlice);
                             }
                         }
+
+                        self.updateAllBlockSubmitGuards();
                     });
                 }
                 
@@ -1582,6 +1624,7 @@
                 var $editForm = $slice.children('.slice-edit-form');
                 $modal.find('.modal-body').empty().append($editForm);
                 $editForm.show();
+                $editForm.find('.btn-slice-save-and-apply').remove();
                 
                 if ($editForm.children().length === 0) {
                     this.loadSliceForm($slice);
@@ -1634,11 +1677,12 @@
             var self = this;
             var sliceType = $slice.data('slice-type');
             var sliceData = this.getSliceData($slice);
-            var isNested = $slice.closest('.content-builder-column-slices').length > 0;
+            var isNested = this.isNestedSlice($slice);
             var $editForm = isNested ? $('#nested-slice-edit-modal .modal-body > .slice-edit-form') : $slice.children('.slice-edit-form');
             var $builder = $slice.closest('.yform-content-builder');
             var availableElementsRaw = $builder.attr('data-available-elements') || '{}';
-            var ownerHasBlockActions = this.hasBlockSubmitActions($builder) ? '1' : '0';
+            // In verschachtelten Spalten-Editoren ist nur "Element speichern" sinnvoll.
+            var ownerHasBlockActions = (!isNested && this.hasBlockSubmitActions($builder)) ? '1' : '0';
             
             
             // YForm-Formular per AJAX laden
@@ -1661,6 +1705,10 @@
                     var cleanedHtml = $response.html();
                     
                     $editForm.html(cleanedHtml);
+
+                    if (isNested) {
+                        $editForm.find('.btn-slice-save-and-apply').remove();
+                    }
 
                     $editForm.find('input[id^="REX_MEDIA_"]').each(function() {
                         var $input = $(this);
@@ -2155,6 +2203,15 @@
             this.scrollToSlice($slice);
             this.glowEffect($slice);
             this.updateAllBlockSubmitGuards();
+
+            // Einige UI-Teile (Bootstrap Modal/Fade, DOM-Reparenting) laufen asynchron.
+            // Nachlaeufe verhindern festhaengende Guard-Zustaende.
+            window.setTimeout(function() {
+                self.updateAllBlockSubmitGuards();
+            }, 260);
+            window.setTimeout(function() {
+                self.updateAllBlockSubmitGuards();
+            }, 620);
         },
 
         submitOwnerForm: function($slice, preferApply) {
@@ -2199,7 +2256,7 @@
 
         collectSliceDataFromForm: function($slice) {
             var self = this;
-            var isNested = $slice.closest('.content-builder-column-slices').length > 0;
+            var isNested = this.isNestedSlice($slice);
             var $editForm = isNested ? $('#nested-slice-edit-modal .modal-body > .slice-edit-form') : $slice.children('.slice-edit-form');
 
             if (!isNested && ($editForm.length === 0 || !$editForm.is(':visible'))) {
@@ -2496,8 +2553,9 @@
         },
 
         cancelEdit: function($slice) {
+            var self = this;
             this.cleanupElementMenuTooltips($(document.body));
-            var isNested = $slice.closest('.content-builder-column-slices').length > 0;
+            var isNested = this.isNestedSlice($slice);
             
             if (isNested) {
                 var $modal = $('#nested-slice-edit-modal');
@@ -2505,6 +2563,12 @@
                 var $editForm = $modal.find('.modal-body > .slice-edit-form');
                 $slice.append($editForm.hide());
                 $modal.modal('hide');
+
+                // Bootstrap hide-Transition ist asynchron. Danach Guard erneut
+                // berechnen, damit Warnung/Buttons sicher den finalen Zustand zeigen.
+                window.setTimeout(function() {
+                    self.updateAllBlockSubmitGuards();
+                }, 380);
             } else {
                 this.destroyTinyMCEInContainer($slice);
                 $slice.children('.slice-edit-form').hide();

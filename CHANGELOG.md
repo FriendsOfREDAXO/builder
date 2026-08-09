@@ -21,6 +21,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ### Behavior
 
 - Element-Speichern vor Formular-Speichern wird im Workflow nun klar erzwungen: Solange ein Element-Editor offen ist, bleibt Formular-Speichern gesperrt und zeigt eine eindeutige Meldung.
+- Nested-Editor-Workflow verallgemeinert: Das Freigeben von Speichern/Übernehmen nach „Element speichern“ funktioniert jetzt hierarchiebasiert für alle verschachtelten Elemente, inklusive zukünftiger eigener Columns-ähnlicher Typen.
 
 ## [1.0.1] - 2026-08-07
 
