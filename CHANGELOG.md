@@ -6,6 +6,22 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-08-09
+
+### Changed
+
+- UX im Content-Builder verbessert: kurze, klare und mehrsprachige Button-Bezeichnungen für Element- und Formularspeicherung.
+- Hinweistexte für Bearbeitungs- und Speicherfluss vereinheitlicht und i18n-fähig gemacht.
+- Fixierte YForm-Speicherleiste auf Positionierung reduziert, damit das Original-Design erhalten bleibt.
+
+### Added
+
+- Neues i18n-Mapping (`BUILDER_I18N`) für clientseitige Hinweise und Bestätigungsdialoge im Builder-JavaScript.
+
+### Behavior
+
+- Element-Speichern vor Formular-Speichern wird im Workflow nun klar erzwungen: Solange ein Element-Editor offen ist, bleibt Formular-Speichern gesperrt und zeigt eine eindeutige Meldung.
+
 ## [1.0.1] - 2026-08-07
 
 ### Changed

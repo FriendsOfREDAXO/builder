@@ -1,5 +1,5 @@
 package: builder
-version: '1.0.2'
+version: '1.0.3'
 author: 'Friends of REDAXO'
 supportpage: 'https://klxm.de'
 license: MIT
@@ -26,17 +26,19 @@ page:
             perm: builder[]
             hidden: true
         modules:
-            title: 'Module (Übersicht)'
+            title: 'Module'
             icon: rex-icon fa-code
             perm: admin
         modules_builder:
             title: 'Buildermodul (Full Builder)'
             icon: rex-icon fa-cubes
             perm: admin
+            hidden: true
         modules_single:
             title: 'Einzelmodule'
             icon: rex-icon fa-th-large
             perm: admin
+            hidden: true
         settings:
             title: 'translate:builder_settings'
             icon: rex-icon fa-cog

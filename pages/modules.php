@@ -99,9 +99,6 @@ use FriendsOfREDAXO\Builder\Module;
 echo Module::createByValueId('{$elementKey}', {$valueId}, '{$framework}')->renderInput();
 ?>
 PHP;
-
-    $code = str_replace("'{$framework}'", $frameworkCode, $code);
-    
     return $code;
 }
 
@@ -165,7 +162,8 @@ function generateFullBuilderOutputCode(string $framework, int $valueId, array $a
 <?php
 use FriendsOfREDAXO\Builder\Module;
 
-\$builder = Module::createWithValue({$valueId}, Module::getSliceValueForModule({$valueId}), [
+\$slice = \$this->getCurrentSlice();
+\$builder = Module::createWithValue({$valueId}, \$slice->getValue({$valueId}), [
     'framework' => {$frameworkCode},
     'allowed_elements' => {$allowedElementsCode},
 ]);
@@ -633,7 +631,7 @@ try {
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
 
-$buildElementPicker = static function (string $checkboxClass, string $selectAllId, string $deselectAllId, array $selectedLookup) use ($elementsByCategory, $elementSourceMeta): string {
+$buildElementPicker = static function (string $checkboxClass, string $scopeSelector, array $selectedLookup) use ($elementsByCategory, $elementSourceMeta): string {
     $html = '';
     $html .= '<div class="builder-modules-picker">';
 
@@ -645,9 +643,9 @@ $buildElementPicker = static function (string $checkboxClass, string $selectAllI
     }
 
     $html .= '<div class="form-group builder-modules-picker__actions">';
-    $html .= '<button type="button" id="' . rex_escape($selectAllId) . '" class="btn btn-xs btn-default">Alle auswählen</button>';
+    $html .= '<button type="button" class="btn btn-xs btn-default" data-builder-checkbox-toggle="check" data-builder-checkbox-target=".' . rex_escape($checkboxClass) . '" data-builder-checkbox-scope="' . rex_escape($scopeSelector) . '">Alle auswählen</button>';
     $html .= ' ';
-    $html .= '<button type="button" id="' . rex_escape($deselectAllId) . '" class="btn btn-xs btn-default">Alle abwählen</button>';
+    $html .= '<button type="button" class="btn btn-xs btn-default" data-builder-checkbox-toggle="uncheck" data-builder-checkbox-target=".' . rex_escape($checkboxClass) . '" data-builder-checkbox-scope="' . rex_escape($scopeSelector) . '">Alle abwählen</button>';
     $html .= '</div>';
 
     foreach ($elementsByCategory as $category => $categoryElements) {
@@ -796,7 +794,7 @@ $content .= '<div class="form-group">';
 $content .= '<label><strong>Erlaubte Elemente für das Buildermodul</strong></label>';
 $content .= '<p class="help-block">Nur diese Elemente sind später im Full-Builder-Modul auswählbar.</p>';
 $content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
-$content .= $buildElementPicker('builder-element-checkbox-full', 'builder-elements-select-all-full', 'builder-elements-deselect-all-full', $selectedElementsLookup);
+$content .= $buildElementPicker('builder-element-checkbox-full', '#builder-modules-form-full', $selectedElementsLookup);
 $content .= '</div>';
 
 $content .= '<div class="form-group">';
@@ -849,7 +847,7 @@ $content .= '<div class="form-group">';
 $content .= '<label><strong>Elemente für Einzelmodule</strong></label>';
 $content .= '<p class="help-block">Für jedes ausgewählte Element wird ein eigenes Modul mit Key <code>yfcb_[element]</code> erstellt oder aktualisiert.</p>';
 $content .= '<p class="help-block"><span class="label label-success">intern</span> aus builder · <span class="label label-info">extern</span> aus registrierten Addons/Pfaden</p>';
-$content .= $buildElementPicker('builder-element-checkbox-single', 'builder-elements-select-all-single', 'builder-elements-deselect-all-single', $selectedElementsLookup);
+$content .= $buildElementPicker('builder-element-checkbox-single', '#builder-modules-form-single', $selectedElementsLookup);
 $content .= '</div>';
 
 $content .= '<div class="form-group">';

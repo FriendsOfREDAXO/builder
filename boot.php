@@ -148,6 +148,10 @@ if (rex::isBackend()) {
     rex_view::addJsFile($assetUrl('content-builder.js'));
     rex_view::addJsFile($assetUrl('media-browser.js'));
     rex_view::addJsFile($assetUrl('field-widgets.js'));
+    rex_view::setJsProperty('BUILDER_I18N', [
+        'sliceGuardMustApplyFirst' => rex_i18n::msg('builder_slice_guard_save_after_apply'),
+        'sliceCancelConfirm' => rex_i18n::msg('builder_slice_cancel_confirm'),
+    ]);
 
     // YForm Manager Assets laden (für YFormPickerField)
     if (rex_addon::get('yform')->isAvailable()) {
@@ -168,7 +172,7 @@ if (rex::isBackend()) {
         rex_view::addJsFile($assetUrl('demo.js'));
     }
 
-    if ('builder/modules' === rex_be_controller::getCurrentPage()) {
+    if (in_array(rex_be_controller::getCurrentPage(), ['builder/modules', 'builder/modules_builder', 'builder/modules_single'], true)) {
         rex_view::addJsFile($assetUrl('js/modules-page.js'));
     }
 }

@@ -315,11 +315,16 @@ class ContentBuilderApi extends rex_api_function
             );
         }
 
+        $showApplyBlockButton = rex_request::post('owner_has_block_actions', 'int', 0) === 1;
+
         echo '<div class="form-group slice-form-actions">';
-        echo '<div class="slice-form-actions-note"><i class="fa fa-info-circle"></i> Diese Aktion übernimmt nur dieses Element in den Builder.</div>';
+        echo '<div class="slice-form-actions-note"><i class="fa fa-info-circle"></i> ' . rex_escape(rex_i18n::msg('builder_slice_action_note')) . '</div>';
         echo '<div class="btn-group pull-right cb-slice-action-group">';
-        echo '<button type="button" class="btn btn-success btn-slice-save cb-btn-apply"><i class="fa fa-check"></i> Element übernehmen</button>';
-        echo '<button type="button" class="btn btn-danger btn-slice-cancel cb-btn-cancel"><i class="fa fa-times"></i> Bearbeitung verwerfen</button>';
+        echo '<button type="button" class="btn btn-success btn-slice-save cb-btn-apply"><i class="fa fa-check"></i> ' . rex_escape(rex_i18n::msg('builder_slice_button_apply_element')) . '</button>';
+        if ($showApplyBlockButton) {
+            echo '<button type="button" class="btn btn-primary btn-slice-save-and-apply cb-btn-apply-block"><i class="fa fa-check-square-o"></i> ' . rex_escape(rex_i18n::msg('builder_slice_button_apply_form')) . '</button>';
+        }
+        echo '<button type="button" class="btn btn-danger btn-slice-cancel cb-btn-cancel"><i class="fa fa-times"></i> ' . rex_escape(rex_i18n::msg('builder_slice_button_cancel')) . '</button>';
         echo '</div>';
         echo '<div class="clearfix"></div>';
         echo '</div>';

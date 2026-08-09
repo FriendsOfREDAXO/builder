@@ -83,6 +83,13 @@ builder_section_unnamed = Unnamed
 
 builder_save = Save
 builder_cancel = Cancel
+builder_slice_action_note = Element save updates only this element.
+builder_slice_button_apply_element = Save element
+builder_slice_button_apply_form = Save form
+builder_slice_button_cancel = Cancel
+builder_slice_guard_save_after_apply = Save element first, then save form.
+builder_slice_cancel_confirm = Cancel editing? All changes will be lost.
+builder_slice_persist_hint = Save element updates only the current element in the builder. Changes are stored permanently only when the form is saved.
 
 builder_general_settings = General Settings
 

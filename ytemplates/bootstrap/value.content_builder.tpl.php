@@ -160,7 +160,7 @@ if (trim((string) $wrapper_max_width) !== '') {
             </div>
             <div class="yform-cb-persist-hint">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <span>Element übernehmen speichert nur das aktuelle Element im Builder. Dauerhaft gespeichert wird erst beim Speichern des gesamten Formulars.</span>
+                <span><?= rex_escape(rex_i18n::msg('builder_slice_persist_hint')) ?></span>
             </div>
         </div>
     <?php endif; ?>

@@ -1125,6 +1125,14 @@ body.rex-theme-dark .yform-cb-persist-status.is-saving {
     float: right;
 }
 
+form.yfcb-has-sticky-footer .rex-form-panel-footer,
+form.yfcb-yform-sticky-footer .rex-form-panel-footer,
+form.yfcb-yform-sticky-footer .panel-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 110;
+}
+
 #nested-slice-edit-modal .slice-form-actions {
     position: sticky;
     bottom: 0;

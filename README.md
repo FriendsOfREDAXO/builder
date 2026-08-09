@@ -40,7 +40,7 @@ Dort lassen sich zum Beispiel anpassen:
 - Hintergrundoptionen
 - Layout-Einstellungen
 
-Mit **Element übernehmen** werden die Änderungen in den Builder übernommen.
+Mit **Element speichern** werden die Änderungen in den Builder übernommen.
 
 Wichtig: Dadurch ist das Element noch nicht endgültig gespeichert. Dauerhaft gespeichert wird erst, wenn das gesamte Formular oder der Datensatz gespeichert wird.
 
@@ -88,8 +88,24 @@ Im Kompaktmodus wird der Builder platzsparender dargestellt. Das ist hilfreich b
 
 Im Builder gibt es zwei Ebenen:
 
-- **Element übernehmen**: übernimmt Änderungen nur in den aktuellen Builder-Inhalt.
+- **Element speichern**: übernimmt Änderungen nur in den aktuellen Builder-Inhalt.
 - **Formular speichern** bzw. **Datensatz speichern**: speichert den gesamten Inhalt dauerhaft.
+
+### Neuer Speicher-Workflow (wichtig)
+
+Damit keine Änderungen verloren gehen, ist der Ablauf jetzt bewusst geführt:
+
+1. Element öffnen und bearbeiten.
+2. Mit **Element speichern** das Element in den Builder übernehmen.
+3. Danach mit **Formular speichern** oder **Datensatz speichern** dauerhaft sichern.
+
+Solange ein Element-Editor noch offen ist, bleibt das Formular-Speichern gesperrt.
+Ihr seht dann einen Hinweis wie:
+
+- **Erst Element speichern, dann Formular speichern.**
+
+Zusätzlich gibt es im Element-Editor den Button **Formular speichern**.
+Damit wird zuerst das aktuelle Element gesichert und anschließend direkt das Formular gespeichert.
 
 Wenn der Builder verlassen wird, ohne das gesamte Formular zu speichern, gehen ungespeicherte Änderungen verloren.
 

@@ -14,6 +14,7 @@
     
     // API-URL für AJAX-Requests (rex_api_function)
     var apiUrl = '/redaxo/index.php?rex-api-call=content_builder';
+    var i18n = (window.BUILDER_I18N && typeof window.BUILDER_I18N === 'object') ? window.BUILDER_I18N : {};
 
     var ContentBuilder = {
 
@@ -48,6 +49,8 @@
                 this.initDropdownZIndex();
                 eventsInitialized = true;
             }
+            this.initYFormStickyFooter();
+            this.initStickyOwnerFooter();
             this.initElementMenuTooltips();
             this.initMoveButtons();
             this.initGridViews();
@@ -61,6 +64,135 @@
             }
 
             this.syncAllLegacyHiddenFields();
+            this.updateAllBlockSubmitGuards();
+        },
+
+        hasOpenEditorsForBuilder: function($builder) {
+            if (!$builder || $builder.length === 0) {
+                return false;
+            }
+
+            var hasOpenInlineEditor = false;
+
+            $builder.find('.content-builder-slice').each(function() {
+                var $slice = $(this);
+                var $editForm = $slice.find('.slice-edit-form').first();
+                if ($editForm.length === 0) {
+                    return;
+                }
+
+                var editFormVisible = $editForm.is(':visible');
+                var renderedVisible = $slice.children('.slice-rendered:visible').length > 0;
+                var toolbarVisible = $slice.children('.slice-toolbar:visible').length > 0;
+                var likelyEditing = !renderedVisible || !toolbarVisible;
+
+                if (editFormVisible || likelyEditing) {
+                    hasOpenInlineEditor = true;
+                    return false;
+                }
+            });
+
+            if (hasOpenInlineEditor) {
+                return true;
+            }
+
+            var $modal = $('#nested-slice-edit-modal');
+            if ($modal.length > 0 && $modal.is(':visible')) {
+                var $editingSlice = $modal.data('editing-slice');
+                if ($editingSlice && $editingSlice.length > 0 && $editingSlice.closest('.yform-content-builder').is($builder)) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        updateBlockSubmitGuard: function($builder) {
+            if (!$builder || $builder.length === 0) {
+                return;
+            }
+
+            var $form = $builder.closest('form');
+            if ($form.length === 0) {
+                return;
+            }
+
+            var $footer = $form.find('.rex-form-panel-footer').first();
+            var $toolbar = $footer.find('.btn-toolbar').first();
+            if ($toolbar.length === 0) {
+                return;
+            }
+
+            var hasOpenEditors = this.hasOpenEditorsForBuilder($builder);
+            var $saveButtons = $toolbar.find('.btn-save, .btn-apply, input.btn-save, input.btn-apply');
+
+            var $guard = $toolbar.find('.yfcb-block-save-guard').first();
+            if ($guard.length === 0) {
+                var guardText = i18n.sliceGuardMustApplyFirst || 'Erst Element speichern, dann Formular speichern.';
+                $guard = $('<span class="btn btn-warning yfcb-block-save-guard" style="display:none; margin-left:5px; white-space:nowrap; pointer-events:none;"><i class="fa fa-exclamation-triangle"></i> ' + guardText + '</span>');
+                $toolbar.append($guard);
+            }
+
+            if (hasOpenEditors) {
+                $saveButtons.hide().prop('disabled', true);
+                $guard.show();
+            } else {
+                $saveButtons.show().prop('disabled', false);
+                $guard.hide();
+            }
+        },
+
+        updateAllBlockSubmitGuards: function() {
+            var self = this;
+            $('.yform-content-builder').each(function() {
+                self.updateBlockSubmitGuard($(this));
+            });
+        },
+
+        initStickyOwnerFooter: function() {
+            $('.yform-content-builder').each(function() {
+                var $builder = $(this);
+                var $form = $builder.closest('form');
+
+                if ($form.length === 0) {
+                    return;
+                }
+
+                $form.addClass('yfcb-has-sticky-footer');
+            });
+        },
+
+        initYFormStickyFooter: function() {
+            var search = window.location.search || '';
+            var params = new URLSearchParams(search);
+            var page = String(params.get('page') || '').toLowerCase();
+
+            if (page.indexOf('yform/') !== 0) {
+                return;
+            }
+
+            $('form').each(function() {
+                var $form = $(this);
+                var $footer = $form.find('.rex-form-panel-footer, .panel-footer').first();
+                if ($footer.length === 0) {
+                    return;
+                }
+
+                $form.addClass('yfcb-yform-sticky-footer');
+            });
+        },
+
+        hasBlockSubmitActions: function($builder) {
+            if (!$builder || $builder.length === 0) {
+                return false;
+            }
+
+            var $form = $builder.closest('form');
+            if ($form.length === 0) {
+                return false;
+            }
+
+            return $form.find('.rex-form-panel-footer .btn-save, .rex-form-panel-footer .btn-apply, .rex-form-panel-footer input.btn-save, .rex-form-panel-footer input.btn-apply').length > 0;
         },
 
         initPersistIndicators: function() {
@@ -814,27 +946,19 @@
                     return true;
                 }
 
+                var blocked = false;
+
                 $builders.each(function() {
                     var $builder = $(this);
-
-                    $builder.find('.content-builder-slice').each(function() {
-                        var $slice = $(this);
-                        var $editForm = $slice.find('.slice-edit-form:visible');
-
-                        if ($editForm.length > 0) {
-                            self.collectSliceDataFromForm($slice);
-                        }
-                    });
-
-                    // Modales Formular synchronisieren, falls für dieses Builder-Feld geöffnet
-                    var $modal = $('#nested-slice-edit-modal');
-                    if ($modal.length > 0 && $modal.is(':visible')) {
-                        var $editingSlice = $modal.data('editing-slice');
-                        if ($editingSlice && $editingSlice.length > 0 && $editingSlice.closest('.yform-content-builder').is($builder)) {
-                            self.collectSliceDataFromForm($editingSlice);
-                        }
+                    ContentBuilder.updateBlockSubmitGuard($builder);
+                    if (ContentBuilder.hasOpenEditorsForBuilder($builder)) {
+                        blocked = true;
                     }
                 });
+
+                if (blocked) {
+                    return false;
+                }
 
                 self.updateHiddenField();
 
@@ -851,6 +975,7 @@
                 e.stopPropagation();
                 var $slice = $(this).closest('.content-builder-slice');
                 self.editSlice($slice);
+                self.updateAllBlockSubmitGuards();
             });
 
             // Neues Slice hinzufügen (am Ende)
@@ -895,6 +1020,26 @@
                 }
                 if ($slice && $slice.length) {
                     self.saveSlice($slice);
+                    self.updateAllBlockSubmitGuards();
+                }
+            });
+
+            // Element übernehmen und anschließend den gesamten Block übernehmen
+            $(document).on('click', '.btn-slice-save-and-apply', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $slice = $(this).closest('.content-builder-slice');
+                if ($slice.length === 0) {
+                    var $modal = $(this).closest('#nested-slice-edit-modal');
+                    if ($modal.length > 0) {
+                        $slice = $modal.data('editing-slice');
+                    }
+                }
+
+                if ($slice && $slice.length) {
+                    self.saveSlice($slice);
+                    self.submitOwnerForm($slice, true);
                 }
             });
 
@@ -920,12 +1065,13 @@
                     }
 
                     if ($slice && $slice.length) {
-                        var confirmMsg = 'Bearbeitung abbrechen? Alle Änderungen gehen verloren.';
+                        var confirmMsg = i18n.sliceCancelConfirm || 'Bearbeitung abbrechen? Alle Änderungen gehen verloren.';
                         if (confirmMsg && !confirm(confirmMsg)) {
                             return false;
                         }
                         self.clearEditDirty($button);
                         self.cancelEdit($slice);
+                        self.updateAllBlockSubmitGuards();
                     }
                 } finally {
                     window.setTimeout(function() {
@@ -1490,7 +1636,9 @@
             var sliceData = this.getSliceData($slice);
             var isNested = $slice.closest('.content-builder-column-slices').length > 0;
             var $editForm = isNested ? $('#nested-slice-edit-modal .modal-body > .slice-edit-form') : $slice.children('.slice-edit-form');
-            var availableElementsRaw = $slice.closest('.yform-content-builder').attr('data-available-elements') || '{}';
+            var $builder = $slice.closest('.yform-content-builder');
+            var availableElementsRaw = $builder.attr('data-available-elements') || '{}';
+            var ownerHasBlockActions = this.hasBlockSubmitActions($builder) ? '1' : '0';
             
             
             // YForm-Formular per AJAX laden
@@ -1501,7 +1649,8 @@
                     action: 'load_slice_form',
                     slice_type: sliceType,
                     slice_data: sliceData,
-                    available_elements: availableElementsRaw
+                    available_elements: availableElementsRaw,
+                    owner_has_block_actions: ownerHasBlockActions
                 },
                 dataType: 'html',
                 success: function(response) {
@@ -2005,12 +2154,62 @@
             // Zur gespeicherten Slice scrollen und Glow-Effekt
             this.scrollToSlice($slice);
             this.glowEffect($slice);
+            this.updateAllBlockSubmitGuards();
+        },
+
+        submitOwnerForm: function($slice, preferApply) {
+            var $builder = $slice.closest('.yform-content-builder');
+            if ($builder.length === 0) {
+                return;
+            }
+
+            var $form = $builder.closest('form');
+            if ($form.length === 0) {
+                return;
+            }
+
+            var submitter = null;
+            if (preferApply) {
+                submitter = $form.find('.btn-apply[type="submit"], input.btn-apply[type="submit"]').get(0) || null;
+            }
+
+            if (!submitter) {
+                submitter = $form.find('.btn-save[type="submit"], input.btn-save[type="submit"]').get(0)
+                    || $form.find('button[type="submit"], input[type="submit"]').get(0)
+                    || null;
+            }
+
+            var formEl = $form.get(0);
+            if (!formEl) {
+                return;
+            }
+
+            if (submitter && typeof formEl.requestSubmit === 'function') {
+                formEl.requestSubmit(submitter);
+                return;
+            }
+
+            if (submitter) {
+                submitter.click();
+                return;
+            }
+
+            $form.trigger('submit');
         },
 
         collectSliceDataFromForm: function($slice) {
             var self = this;
             var isNested = $slice.closest('.content-builder-column-slices').length > 0;
             var $editForm = isNested ? $('#nested-slice-edit-modal .modal-body > .slice-edit-form') : $slice.children('.slice-edit-form');
+
+            if (!isNested && ($editForm.length === 0 || !$editForm.is(':visible'))) {
+                var $visibleEditForm = $slice.find('.slice-edit-form:visible').first();
+                if ($visibleEditForm.length > 0) {
+                    $editForm = $visibleEditForm;
+                } else if ($editForm.length === 0) {
+                    $editForm = $slice.find('.slice-edit-form').first();
+                }
+            }
             var sliceData = {};
             var sliceType = String($slice.data('slice-type') || '');
 
@@ -2071,6 +2270,10 @@
                 }
             });
 
+            // Editor-Inhalte (auch aus ausgelagerten Modals) vor dem Einsammeln
+            // in die zugrunde liegenden Textareas zurückschreiben.
+            this.syncEditorsInInputCollection($allInputs);
+
             $allInputs.each(function() {
                 var $field = $(this);
                 var name = $field.attr('name');
@@ -2129,6 +2332,34 @@
             $slice.data('slice-data', sliceData);
 
             return sliceData;
+        },
+
+        syncEditorsInInputCollection: function($inputs) {
+            var $textareas = $inputs.filter('textarea');
+
+            $textareas.filter('.cke5-editor').each(function() {
+                var $textarea = $(this);
+                var textareaId = $textarea.attr('id');
+
+                if (textareaId && typeof ckeditors !== 'undefined' && ckeditors[textareaId]) {
+                    $textarea.val(ckeditors[textareaId].getData());
+                    return;
+                }
+
+                var inlineEditor = $textarea.data('ycb-cke5-editor');
+                if (inlineEditor && typeof inlineEditor.getData === 'function') {
+                    $textarea.val(inlineEditor.getData());
+                }
+            });
+
+            $textareas.filter('.tiny-editor').each(function() {
+                var $textarea = $(this);
+                var textareaId = $textarea.attr('id');
+
+                if (textareaId && typeof tinymce !== 'undefined' && tinymce.get(textareaId)) {
+                    $textarea.val(tinymce.get(textareaId).getContent());
+                }
+            });
         },
         
         /**
@@ -2282,6 +2513,7 @@
             }
 
             this.clearEditDirty($slice);
+            this.updateAllBlockSubmitGuards();
         },
 
         deleteSlice: function($slice) {

@@ -83,6 +83,13 @@ builder_section_unnamed = Unbenannt
 
 builder_save = Speichern
 builder_cancel = Abbrechen
+builder_slice_action_note = Element speichern wirkt nur auf dieses Element.
+builder_slice_button_apply_element = Element speichern
+builder_slice_button_apply_form = Formular speichern
+builder_slice_button_cancel = Abbrechen
+builder_slice_guard_save_after_apply = Erst Element speichern, dann Formular speichern.
+builder_slice_cancel_confirm = Bearbeitung abbrechen? Alle Änderungen gehen verloren.
+builder_slice_persist_hint = Element speichern aktualisiert nur dieses Element im Builder. Dauerhaft gespeichert wird erst beim Speichern des Formulars.
 
 builder_empty = Noch keine Elemente vorhanden. Füge unten ein Element hinzu.
 builder_delete_confirm = Element wirklich löschen?

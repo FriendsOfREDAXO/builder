@@ -198,40 +198,48 @@ class Module
      */
     public static function getSliceValueForModule(int $valueId = 1): string
     {
-        // Wenn Gridblock geladen ist, verwende REX_VALUE als Fallback (Gridblock-Sicherheit)
-        $useGridblockFallback = rex_addon::get('gridblock')?->isAvailable() ?? false;
-        
-        if ($useGridblockFallback) {
-            // Gridblock-Kontext: REX_VALUE mit Try-Catch auf getCurrentSlice()
-            try {
-                $slice = rex_article_content::getCurrentSlice();
-                if ($slice && $slice->getId() > 0) {
-                    $value = $slice->getValue($valueId);
-                    if ($value !== null && $value !== '') {
-                        return (string) $value;
-                    }
-                }
-            } catch (Throwable $e) {
-                // getCurrentSlice() nicht verfügbar - Fallback auf REX_VALUE
-            }
-            
-            return 'REX_VALUE[id=' . $valueId . ' output=html]';
+        $slot = $valueId;
+        if ($slot < 1 || $slot > 20) {
+            $slot = 1;
         }
-        
-        // Nicht-Gridblock: Direkt getCurrentSlice() (Modern, future-proof)
-        try {
-            $slice = rex_article_content::getCurrentSlice();
-            if ($slice && $slice->getId() > 0) {
-                $value = $slice->getValue($valueId);
+
+        // Bevorzugt den aktuellen Modul-Renderkontext (z. B. content/edit-Listenansicht),
+        // da dieser in einigen Situationen zuverlässiger ist als der statische Artikel-Content-Kontext.
+        $contextSlice = self::resolveCurrentSliceFromRenderContext();
+        if ($contextSlice !== null) {
+            try {
+                $value = $contextSlice->getValue($slot);
                 if ($value !== null && $value !== '') {
                     return (string) $value;
                 }
+            } catch (Throwable $e) {
+                // Fallback auf weitere Strategien
             }
-        } catch (Throwable $e) {
-            // getCurrentSlice() nicht verfügbar - leer zurückgeben (kein REX_VALUE Fallback)
         }
-        
-        return '';
+
+        return self::loadRawValueFromModuleContext($slot);
+    }
+
+    protected static function resolveCurrentSliceFromRenderContext(): ?object
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
+        foreach ($trace as $frame) {
+            $object = $frame['object'] ?? null;
+            if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
+                continue;
+            }
+
+            try {
+                $slice = $object->getCurrentSlice();
+                if (is_object($slice) && method_exists($slice, 'getValue')) {
+                    return $slice;
+                }
+            } catch (Throwable $e) {
+                // Nächsten Kontext versuchen
+            }
+        }
+
+        return null;
     }
 
     /**

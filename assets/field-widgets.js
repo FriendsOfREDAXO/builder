@@ -5,6 +5,36 @@
 (function($) {
     'use strict';
 
+    var checkboxToggleInitialized = false;
+
+    function initCheckboxToggleActions() {
+        if (checkboxToggleInitialized) {
+            return;
+        }
+
+        checkboxToggleInitialized = true;
+
+        $(document).on('click.builderCheckboxToggle', '[data-builder-checkbox-toggle]', function(e) {
+            e.preventDefault();
+
+            var $trigger = $(this);
+            var targetSelector = String($trigger.attr('data-builder-checkbox-target') || '').trim();
+            var action = String($trigger.attr('data-builder-checkbox-toggle') || '').trim();
+            var scopeSelector = String($trigger.attr('data-builder-checkbox-scope') || '').trim();
+
+            if (targetSelector === '' || (action !== 'check' && action !== 'uncheck')) {
+                return;
+            }
+
+            var $scope = scopeSelector !== '' ? $(scopeSelector) : $(document);
+            if ($scope.length === 0) {
+                $scope = $(document);
+            }
+
+            $scope.find(targetSelector).prop('checked', action === 'check');
+        });
+    }
+
     function updateColorFieldUi($root) {
         var $scope = $root && $root.length ? $root : $(document);
         $scope.find('[data-cb-color-field="1"]').each(function() {
@@ -497,10 +527,12 @@
 
     $(document).on('rex:ready', function(e) {
         var $root = e && e.target ? $(e.target) : $(document);
+        initCheckboxToggleActions();
         updateColorFieldUi($root);
     });
 
     $(function() {
+        initCheckboxToggleActions();
         updateColorFieldUi($(document));
     });
 
