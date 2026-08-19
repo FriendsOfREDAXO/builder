@@ -219,7 +219,7 @@ class FieldRegistry
         self::registerDefaultFields();
 
         // Extension Point für zusätzliche Feldtypen
-        rex_extension::registerPoint(new rex_extension_point(
+        self::$fields = rex_extension::registerPoint(new rex_extension_point(
             'BUILDER_FIELDS',
             self::$fields
         ));
