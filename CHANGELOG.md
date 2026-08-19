@@ -6,6 +6,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+### Fix
+
+- `BUILDER_FIELDS`-Extension-Point war wirkungslos: `FieldRegistry::ensureInitialized()` rief `rex_extension::registerPoint()` auf, schrieb den Rückgabewert aber nie zurück in die interne Feldliste. Dadurch kamen über diesen Extension Point registrierte/überschriebene Feldtypen (siehe `API.md`, Abschnitt „Per Extension Point“) nie an. Rückgabewert wird jetzt wieder `self::$fields` zugewiesen (`lib/fields/FieldRegistry.php`).
+
 ## [1.0.3] - 2026-08-09
 
 ### Changed
