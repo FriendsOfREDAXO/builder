@@ -9,6 +9,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ### Fix
 
 - `BUILDER_FIELDS`-Extension-Point war wirkungslos: `FieldRegistry::ensureInitialized()` rief `rex_extension::registerPoint()` auf, schrieb den Rückgabewert aber nie zurück in die interne Feldliste. Dadurch kamen über diesen Extension Point registrierte/überschriebene Feldtypen (siehe `API.md`, Abschnitt „Per Extension Point“) nie an. Rückgabewert wird jetzt wieder `self::$fields` zugewiesen (`lib/fields/FieldRegistry.php`).
+- Element "Bild" (`elements/image/config.json`): Feld `media` nutzte den Typ `media`, für den kein Feldtyp registriert war und das Feld daher still auf ein reines Text-Eingabefeld zurückfiel. Auf den vorhandenen, registrierten Typ `be_media` umgestellt.
 
 ## [1.0.3] - 2026-08-09
 

@@ -5,7 +5,7 @@
   "fields": [
     {
       "name": "media",
-      "type": "media",
+      "type": "be_media",
       "label": "Bilddatei",
       "default": ""
     },
