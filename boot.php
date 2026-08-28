@@ -145,6 +145,7 @@ if (rex::isBackend()) {
         'action' => 'get_element_css',
         'framework' => 'bootstrap',
     ]));
+    rex_view::addJsFile($assetUrl('js/mediaplace-bridge.js'));
     rex_view::addJsFile($assetUrl('content-builder.js'));
     rex_view::addJsFile($assetUrl('media-browser.js'));
     rex_view::addJsFile($assetUrl('field-widgets.js'));

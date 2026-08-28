@@ -312,7 +312,23 @@
             var $row = $(this).closest('.cb-smart-link-row');
             var $wrap = $row.find('.cb-smart-link-target-wrap');
             var widgetId = ($wrap.data('link-widget-id') || '').toString();
-            if (widgetId === '' || typeof openREXMedia !== 'function') {
+            if (widgetId === '') {
+                return;
+            }
+
+            // MediaPlace-Weiche (siehe assets/js/mediaplace-bridge.js): bei aktivem
+            // Overlay direkt darueber picken statt das klassische Popup zu oeffnen.
+            if (typeof window.rex5MediaplaceBridge !== 'undefined' && window.rex5MediaplaceBridge.isActive()) {
+                window.rex5MediaplaceBridge.pick(function(filename) {
+                    if (!filename) {
+                        return;
+                    }
+                    applySelection($widget, $row, 'media', filename, filename, filename);
+                });
+                return;
+            }
+
+            if (typeof openREXMedia !== 'function') {
                 return;
             }
 

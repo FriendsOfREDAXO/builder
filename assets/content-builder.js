@@ -1331,6 +1331,66 @@
                 });
             }, 500);
             
+            // Oeffnen/Ansehen-Buttons des be_media-Feldes: kein inline onclick mehr
+            // (siehe BeMediaField.php / rex_yform_value_content_builder.php) --
+            // dieser einzige Handler entscheidet zwischen dem MediaPlace-Overlay
+            // (falls installiert und aktiv, siehe assets/js/mediaplace-bridge.js)
+            // und dem klassischen Medienpool-Popup.
+            $(document).on('click', '.rex-js-widget-media .btn-popup[data-cb-media-action]', function(e) {
+                e.preventDefault();
+
+                var $btn = $(this);
+                var action = $btn.data('cb-media-action');
+                var counter = $btn.data('cb-media-counter');
+                var inputId = $btn.data('input-id');
+                var $input = $('#' + inputId);
+                var currentValue = $input.val();
+                var rawTypes = $btn.attr('data-cb-media-types') || '';
+                var typesParam = rawTypes ? '&types=' + rawTypes : '';
+
+                var bridgeActive = typeof window.rex5MediaplaceBridge !== 'undefined' && window.rex5MediaplaceBridge.isActive();
+
+                if ('view' === action) {
+                    if (!currentValue) {
+                        return;
+                    }
+                    if (bridgeActive) {
+                        window.rex5MediaplaceBridge.show(currentValue);
+                        return;
+                    }
+                    if (typeof viewREXMedia === 'function') {
+                        viewREXMedia(counter, typesParam);
+                    }
+                    return;
+                }
+
+                if (!bridgeActive) {
+                    if (typeof openREXMedia === 'function') {
+                        openREXMedia(counter, typesParam);
+                    }
+                    return;
+                }
+
+                var extensions = typeof cbMediaplaceExtensionsFromAttr === 'function'
+                    ? cbMediaplaceExtensionsFromAttr(rawTypes)
+                    : [];
+                var pickOptions = {};
+                if (extensions.length) {
+                    pickOptions.allowedExtensions = extensions;
+                    var filterTab = typeof cbMediaplaceFilterForTypes === 'function' ? cbMediaplaceFilterForTypes(extensions) : null;
+                    if (filterTab) {
+                        pickOptions.filter = filterTab;
+                    }
+                }
+
+                window.rex5MediaplaceBridge.pick(function(filename) {
+                    if (!filename) {
+                        return;
+                    }
+                    $input.val(filename).trigger('change');
+                }, pickOptions);
+            });
+
             // Content Builder Media - Eigene Preview-Logik
             $(document).on('change', '.content-builder-media-input', function() {
                 var $input = $(this);

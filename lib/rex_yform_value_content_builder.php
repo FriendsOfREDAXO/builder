@@ -564,14 +564,13 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                 echo 'data-media-id="' . $mediaCounter . '" />';
                 echo '<span class="input-group-btn">';
                 
-                $openMediaParams = $types ? ", '&types=" . rex_escape($types) . "'" : '';
                 echo '<a href="#" class="btn btn-popup" ';
-                echo 'onclick="openREXMedia(' . $mediaCounter . $openMediaParams . '); return false;" ';
+                echo 'data-cb-media-action="open" data-input-id="' . $inputId . '" data-cb-media-counter="' . $mediaCounter . '" data-cb-media-types="' . rex_escape($types) . '" ';
                 echo 'title="' . rex_i18n::msg('var_media_open') . '">';
                 echo '<i class="rex-icon fa fa-folder-open"></i></a>';
-                
+
                 echo '<a href="#" class="btn btn-popup" ';
-                echo 'onclick="viewREXMedia(' . $mediaCounter . $openMediaParams . '); return false;" ';
+                echo 'data-cb-media-action="view" data-input-id="' . $inputId . '" data-cb-media-counter="' . $mediaCounter . '" data-cb-media-types="' . rex_escape($types) . '" ';
                 echo 'title="' . rex_i18n::msg('var_media_view') . '">';
                 echo '<i class="rex-icon fa fa-eye"></i></a>';
                 

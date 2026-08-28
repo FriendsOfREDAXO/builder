@@ -6,6 +6,12 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-28
+
+### Added
+
+- MediaPlace-Weiche für alle Medien-Picker (`be_media`-Feld, SmartLinkField-Medienauswahl): Ist das separate `mediaplace`-Addon (FriendsOfREDAXO) installiert und aktiv (`window.MP3`), öffnet sich dessen modernes Overlay statt des klassischen Medienpool-Popups – gleiches Muster wie bei `mform` (siehe dessen `assets/js/mediaplace-bridge.js`), eigene, unabhängige Bridge-Datei `assets/js/mediaplace-bridge.js`. Ohne MediaPlace bleibt das klassische Popup unverändert die Voreinstellung.
+
 ### Fix
 
 - `BUILDER_FIELDS`-Extension-Point war wirkungslos: `FieldRegistry::ensureInitialized()` rief `rex_extension::registerPoint()` auf, schrieb den Rückgabewert aber nie zurück in die interne Feldliste. Dadurch kamen über diesen Extension Point registrierte/überschriebene Feldtypen (siehe `API.md`, Abschnitt „Per Extension Point“) nie an. Rückgabewert wird jetzt wieder `self::$fields` zugewiesen (`lib/fields/FieldRegistry.php`).
