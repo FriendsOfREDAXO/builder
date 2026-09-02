@@ -6,6 +6,14 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-02
+
+> **Voraussetzung: [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace) ≥ 2.0.0.** Wer MediaPlace einsetzt, sollte vor diesem Update auf Version 2.0.0 oder neuer aktualisieren (siehe "Fix" unten) – mit einer älteren MediaPlace-Version wird das Overlay sonst nicht mehr erkannt und es öffnet sich wieder der klassische Medienpool-Popup.
+
+### Fix
+
+- **MediaPlace-Erkennung nutzte noch das alte globale JS-Objekt `MP3`:** `window.rex5MediaplaceBridge` in `assets/js/mediaplace-bridge.js` prüfte auf `MP3.open()`/`MP3.openFile()`, MediaPlace hat sein globales Overlay-Objekt seit Version 2.0.0 aber in `MP` umbenannt. Dadurch öffnete sich bei aktuellem MediaPlace wieder der klassische Medienpool-Popup statt des Overlays. Auf `MP` aktualisiert.
+
 ## [1.1.0] - 2026-08-28
 
 ### Added
