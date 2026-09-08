@@ -372,6 +372,10 @@ TemplateEngine::getAvailableFrameworks();
 | `BUILDER_EDITOR_PROFILES` | `element`, `field` | `string` | Editor-Profile pro Element |
 | `BUILDER_BUNDLED_ELEMENTS` | — | `array` | Bundled Element-Keys |
 | `BUILDER_ELEMENT_PATHS` | — | `array` | Pfade zu Element-Verzeichnissen |
+| `BUILDER_SLICE_PREVIEW_HTML` | `element_type`, `element_data`, `framework` | `string` | Backend-Slice-Vorschau-HTML umschließen/verändern |
+| `BUILDER_THEME_CHOICES` | — | `array<string,string>` | Theme-Auswahl fürs Tabelle-zu-Theme-Mapping |
+| `BUILDER_THEME_CONTEXT_SET` / `_RESET` | — | — | Aktiven Theme-Kontext für einen Request setzen/zurücksetzen |
+| `BUILDER_FRAMEWORK_NORMALIZE` | `framework` | `string` | Freien Framework-Namen validieren/umschreiben |
 
 Hinweise zur Mode-Semantik:
 

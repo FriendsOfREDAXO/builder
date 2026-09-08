@@ -339,7 +339,18 @@ class ContentBuilderApi extends rex_api_function
         $sliceType = rex_request::post('slice_type', 'string');
         $sliceData = rex_request::post('slice_data', 'array', []);
         $framework = rex_request::post('framework', 'string', 'bootstrap');
+        $tableName = rex_request::post('table_name', 'string', '');
         $availableElementsRaw = rex_request::post('available_elements', 'string', '');
+
+        // Theme-Kontext (Einstellungen > Content Builder, "table_themes"-Zuordnung)
+        // setzen, BEVOR das Element-Template inkludiert wird - genau wie
+        // rex_yform_value_content_builder::applyThemeContext() es beim normalen
+        // Formular-Rendering tut. Dieser AJAX-Live-Preview-Endpunkt (feuert bei jeder
+        // Formulareingabe im Slice-Editor, siehe assets/content-builder.js
+        // renderSlice()) hatte bislang KEINEN Theme-Kontext gesetzt - Addons, die
+        // BUILDER_SLICE_PREVIEW_HTML zur Isolation nutzen (z.B. Ncss\
+        // BuilderPreviewIsolation), sahen hier nie ein zugewiesenes Theme.
+        \FriendsOfREDAXO\Builder\Config\ThemeProviderBridge::applyThemeContextForTable($tableName);
 
         $elementPath = $this->getElementPath($sliceType);
         Helper::loadElementI18n($elementPath);
@@ -408,7 +419,28 @@ class ContentBuilderApi extends rex_api_function
                 $groupedAvailableElements[$category][$elementType] = $config;
             }
 
+            ob_start();
             include $templateFile;
+            $sliceHtml = ob_get_clean() ?: '';
+
+            // BUILDER_SLICE_PREVIEW_HTML: gleicher Extension Point wie in
+            // Helper::renderSliceBackend() und ModuleBuilder::renderEditorSlice() -
+            // dies ist der TATSAECHLICHE AJAX-Live-Preview-Renderpfad (rex-api-call=
+            // content_builder&action=render_slice, siehe assets/content-builder.js
+            // renderSlice()), der bislang NICHT abgedeckt war.
+            if (\rex_extension::isRegistered('BUILDER_SLICE_PREVIEW_HTML')) {
+                $sliceHtml = \rex_extension::registerPoint(new \rex_extension_point(
+                    'BUILDER_SLICE_PREVIEW_HTML',
+                    $sliceHtml,
+                    [
+                        'element_type' => $sliceType,
+                        'element_data' => $elementData,
+                        'framework' => $framework,
+                    ]
+                ));
+            }
+
+            echo $sliceHtml;
         } else {
             echo '<div class="alert alert-danger">Template nicht gefunden</div>';
         }

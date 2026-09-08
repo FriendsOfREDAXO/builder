@@ -401,6 +401,125 @@ Hinweis: Der Schluessel `theme` bestimmt die spaetere Quelle in den Builder-Eins
 
 ---
 
+### BUILDER_SLICE_PREVIEW_HTML ⭐
+
+Erlaubt anderen Addons, das gerenderte Backend-Vorschau-HTML eines Slices zu
+umschließen/verändern, bevor es ausgegeben wird - z. B. um fremdes CSS-Framework-
+Markup per Shadow DOM (`<div>`-Wrapper-Custom-Element) von REDAXOs eigenem Backend-CSS
+zu isolieren, ohne `builder` selbst zu verändern. Feuert an DREI Stellen, die jeweils
+einen Slice als Backend-Vorschau rendern:
+
+- `Helper::renderSliceBackend()` - verschachtelte Slices (z. B. innerhalb eines
+  `columns`-Elements).
+- `ModuleBuilder::renderEditorSlice()` - das normale Top-Level-Slice-Formular
+  (`.slice-rendered`).
+- `ContentBuilderApi::renderSlice()` - der tatsächliche AJAX-Live-Preview-Endpunkt
+  (`rex-api-call=content_builder&action=render_slice`), der bei jeder
+  Formulareingabe im Slice-Editor feuert (siehe `assets/content-builder.js`
+  `renderSlice()`) - in der Praxis der meistgenutzte der drei Pfade.
+
+**Aufruf-Kontext:**
+- Subject: `string` (das gerenderte Template-HTML des Slices)
+- Parameter: `element_type` (string), `element_data` (array), `framework` (string)
+- Return: `string` (das ggf. veränderte HTML)
+
+**Beispiel: Slice-Vorschau in ein eigenes Element wrappen**
+```php
+rex_extension::register('BUILDER_SLICE_PREVIEW_HTML', function (rex_extension_point $ep) {
+    $html = (string) $ep->getSubject();
+
+    // Nur eigene Klassen betreffen, sonst unveraendert durchreichen
+    if (!preg_match('/class="[^"]*\bmy-framework-/', $html)) {
+        return $html;
+    }
+
+    return '<my-isolated-preview>' . $html . '</my-isolated-preview>';
+});
+```
+
+---
+
+### BUILDER_THEME_CHOICES / BUILDER_THEME_CONTEXT_SET / BUILDER_THEME_CONTEXT_RESET ⭐
+
+Optionale Theme-Provider-Integration (`FriendsOfREDAXO\Builder\Config\ThemeProviderBridge`),
+damit `builder` selbst keine direkte Addon-Abhängigkeit zu einem Theme-System braucht.
+`builder`s eigene Einstellungsseite (Seite "Content Builder" > Tabelle-zu-Theme-
+Zuordnung) nutzt `getThemeChoices()` als Dropdown-Quelle und speichert pro YForm-
+Tabelle einen Theme-Namen (Addon-Config `table_themes`).
+
+- **`BUILDER_THEME_CHOICES`** - Subject: `array<string,string>` (theme_key => label),
+  Return: dasselbe Format, additiv erweitert. Ein Theme-Addon registriert hier seine
+  eigenen Themes, damit sie im Zuordnungs-Dropdown erscheinen.
+- **`BUILDER_THEME_CONTEXT_SET`** - Subject: `string` (der zugewiesene Theme-Name).
+  Ein Theme-Addon haelt sich daraus typischerweise einen eigenen statischen "aktiver
+  Theme-Kontext"-Wert, den es dann z. B. in einem `BUILDER_SLICE_PREVIEW_HTML`-Handler
+  liest, um das passende Theme-CSS in die Vorschau zu laden.
+- **`BUILDER_THEME_CONTEXT_RESET`** - kein Subject/Parameter, signalisiert "Kontext
+  zuruecksetzen" (wird von `ThemeProviderBridge::applyThemeContextForTable()` vor
+  jedem `setTheme()`-Aufruf gefeuert, damit ein Request ohne zugewiesenes Theme nicht
+  versehentlich den Kontext eines vorherigen Requests im selben PHP-Prozess erbt).
+
+`ThemeProviderBridge::applyThemeContextForTable(string $tableName)` kapselt die
+komplette Tabelle-zu-Theme-Auflösung (inkl. globalem Fallback-Theme) und feuert
+`BUILDER_THEME_CONTEXT_RESET`/`_SET` selbst - wird sowohl beim normalen Formular-
+Rendering (`rex_yform_value_content_builder::applyThemeContext()`) als auch im
+AJAX-Live-Preview (`ContentBuilderApi::renderSlice()`) aufgerufen, damit beide Pfade
+denselben Theme-Kontext sehen.
+
+**Beispiel: Eigene Themes anbieten + Kontext lesen**
+```php
+class MyThemeProvider
+{
+    private static ?string $activeTheme = null;
+
+    public static function register(): void
+    {
+        rex_extension::register('BUILDER_THEME_CHOICES', static function (rex_extension_point $ep) {
+            $choices = (array) $ep->getSubject();
+            $choices['my_theme_dark'] = 'Mein Theme (Dunkel)';
+            return $choices;
+        });
+
+        rex_extension::register('BUILDER_THEME_CONTEXT_SET', static function (rex_extension_point $ep) {
+            self::$activeTheme = trim((string) $ep->getSubject()) ?: null;
+        });
+
+        rex_extension::register('BUILDER_THEME_CONTEXT_RESET', static function () {
+            self::$activeTheme = null;
+        });
+    }
+
+    public static function activeTheme(): ?string
+    {
+        return self::$activeTheme;
+    }
+}
+```
+
+---
+
+### BUILDER_FRAMEWORK_NORMALIZE ⭐
+
+Erlaubt, den vom Nutzer im freien `framework`-Textfeld eingetragenen Wert zu
+validieren/umschreiben (z. B. Aliase auf den kanonischen Namen abbilden), bevor er
+für die Template-Suche verwendet wird.
+
+**Aufruf-Kontext:**
+- Subject: `string` (der Framework-Name)
+- Parameter: `framework` (derselbe Wert)
+- Return: `string` (der normalisierte Wert) - bei leerem/ungültigem Rückgabewert
+  bleibt der ursprüngliche Wert unverändert erhalten.
+
+```php
+rex_extension::register('BUILDER_FRAMEWORK_NORMALIZE', function (rex_extension_point $ep) {
+    $framework = trim((string) $ep->getSubject());
+    // Alias: "bs" -> "bootstrap"
+    return $framework === 'bs' ? 'bootstrap' : $framework;
+});
+```
+
+---
+
 ## Config-Klassen Nutzung
 
 ### FrameworkConfig
@@ -510,6 +629,15 @@ $frameworks = TemplateEngine::getAvailableFrameworks();
 | **Plain HTML** | ✅ plain.php | ❌ (nur UIkit) | — |
 
 ### Custom Framework hinzufügen (z.B. Tailwind)
+
+> Das `Framework`-Feld im `content_builder`-YForm-Feldtyp ist ein freies Textfeld
+> (kein festes `choice`-Dropdown mehr) - der eingetragene Name muss `builder` nicht
+> vorher bekannt sein. Der Wert steuert ausschließlich, welcher
+> `templates/<framework>.php`-Dateiname pro Element zuerst gesucht wird (Fallback-Kette:
+> `<framework>` → `plain` → `uikit` → `bootstrap`, siehe `renderSlice()` in
+> `lib/Api/ContentBuilderApi.php`). `ThemeProviderBridge::normalizeFramework()`
+> (Extension Point `BUILDER_FRAMEWORK_NORMALIZE`) kann den eingetragenen Namen bei
+> Bedarf zusätzlich validieren/umschreiben.
 
 **Step 1: Templates ergänzen**
 ```php

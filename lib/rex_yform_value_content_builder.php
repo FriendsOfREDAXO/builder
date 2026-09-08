@@ -1060,7 +1060,28 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                 }
                 $groupedAvailableElements[$category][$elementType] = $config;
             }
+
+            ob_start();
             include $templateFile;
+            $sliceHtml = ob_get_clean() ?: '';
+
+            // BUILDER_SLICE_PREVIEW_HTML: gleicher Extension Point wie in
+            // Helper::renderSliceBackend() und ModuleBuilder::renderEditorSlice() -
+            // dieser AJAX-Live-Preview-Pfad (feuert bei jeder Formulareingabe im
+            // Slice-Editor, siehe handleAjaxRequests()) wurde bislang NICHT abgedeckt.
+            if (rex_extension::isRegistered('BUILDER_SLICE_PREVIEW_HTML')) {
+                $sliceHtml = rex_extension::registerPoint(new rex_extension_point(
+                    'BUILDER_SLICE_PREVIEW_HTML',
+                    $sliceHtml,
+                    [
+                        'element_type' => $sliceType,
+                        'element_data' => $elementData,
+                        'framework' => $framework,
+                    ]
+                ));
+            }
+
+            echo $sliceHtml;
         } else {
             echo '<div class="alert alert-danger">Template nicht gefunden</div>';
         }
@@ -1224,7 +1245,12 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         }
         
         $addon = rex_addon::get('builder');
-        
+
+        $tableName = trim((string) $this->getParam('main_table', ''));
+        if ($tableName === '') {
+            $tableName = trim((string) $this->getParam('table_name', ''));
+        }
+
         return [
             'value' => $value,
             'field_type' => 'content_builder',
@@ -1236,6 +1262,14 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             'required' => $this->getElement('required') ? true : false,
             'description' => $this->getElement('description', ''),
             'framework' => $framework,
+            // Tabellenname der aktuellen YForm-Tabelle - wird im Template als
+            // data-table-name-Attribut ausgegeben und vom AJAX-Live-Preview
+            // (ContentBuilderApi::renderSlice(), assets/content-builder.js) als
+            // table_name-Parameter mitgeschickt. Kein Artikel/keine YRewrite-Domain
+            // fuer ein freies YForm-Formular vorhanden - andere Addons (z.B. ncss,
+            // siehe BuilderThemeProvider/DomainThemeManager) leiten daraus per
+            // BUILDER_THEME_CONTEXT_SET/table_themes-Zuordnung das passende Theme her.
+            'table_name' => $tableName,
             'available_elements' => $availableElements,
             'addon' => $addon,
             'legacy_mode_enabled' => $legacyEnabled,
@@ -1899,17 +1933,20 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         // Alle verfügbaren Elemente für Multiselect sammeln
         $elementChoices = $this->buildElementChoices();
         
-        // Framework-Einstellung
+        // Framework-Einstellung: freies Textfeld statt fester choice-Liste - der
+        // Wert steuert nur, welcher templates/<framework>.php-Dateiname pro Element
+        // zuerst gesucht wird (renderSlice()-Fallback-Kette: <framework> -> plain ->
+        // uikit -> bootstrap), ist also nicht auf die eingebauten 4 Werte beschraenkt.
+        // Andere Addons (z.B. ncss) liefern eigene templates/<eigenes-framework>.php-
+        // Dateien in ihren Elementen und wollen hier ihren eigenen Framework-Namen
+        // eintragen koennen, ohne dass builder ihn erst kennen/whitelisten muss -
+        // ThemeProviderBridge::normalizeFramework() (BUILDER_FRAMEWORK_NORMALIZE-EP)
+        // validiert/normalisiert bereits beliebige Strings, keine Aenderung noetig.
         $frameworkField = [
-            'type' => 'choice',
+            'type' => 'text',
             'label' => 'Framework',
-            'choices' => [
-                'bootstrap' => 'Bootstrap',
-                'uikit' => 'UIkit',
-                'tailwind' => 'Tailwind',
-                'plain' => 'Plain HTML'
-            ],
-            'default' => 'uikit'
+            'notice' => 'z.B. bootstrap, uikit, tailwind, plain oder ein eigener Framework-Name (z.B. ncss) - steuert, welche templates/&lt;framework&gt;.php-Datei pro Element gesucht wird.',
+            'default' => 'uikit',
         ];
         
         // Basis-Felder

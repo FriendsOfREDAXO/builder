@@ -2533,7 +2533,9 @@
 
         renderSlice: function($slice, sliceData) {
             var sliceType = $slice.data('slice-type');
-            var framework = $slice.closest('.yform-content-builder').data('framework') || 'bootstrap';
+            var $wrapper = $slice.closest('.yform-content-builder');
+            var framework = $wrapper.data('framework') || 'bootstrap';
+            var tableName = $wrapper.data('table-name') || '';
             
             // Section-Elemente im Backend speziell rendern
             if (sliceType === 'section') {
@@ -2601,7 +2603,8 @@
                     slice_type: sliceType,
                     slice_data: sliceData,
                     framework: framework,
-                    available_elements: ($slice.closest('.yform-content-builder').attr('data-available-elements') || '{}')
+                    table_name: tableName,
+                    available_elements: ($wrapper.attr('data-available-elements') || '{}')
                 },
                 success: function(response) {
                     $slice.find('.slice-rendered').html(response).show();

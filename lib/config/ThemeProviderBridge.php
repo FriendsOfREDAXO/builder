@@ -116,6 +116,39 @@ class ThemeProviderBridge
         return is_array($result) ? $result : [];
     }
 
+    /**
+     * Setzt den Theme-Kontext anhand der Tabelle-zu-Theme-Zuordnung (Einstellungen >
+     * Content Builder, addon-Config "table_themes") fuer eine gegebene YForm-
+     * Tabelle - gemeinsam genutzt von rex_yform_value_content_builder (Formular-
+     * Rendering) UND ContentBuilderApi::renderSlice() (AJAX-Live-Preview beim
+     * Bearbeiten eines Elements), damit BEIDE denselben Theme-Kontext sehen, ohne die
+     * Logik zweimal zu pflegen. Faellt auf den globalen "theme"-Fallback zurueck, wenn
+     * die Tabelle keine eigene Zuordnung hat; setzt gar keinen Kontext, wenn auch der
+     * Fallback leer ist (BUILDER_SLICE_PREVIEW_HTML-Consumer wie Ncss\
+     * BuilderThemeProvider fallen dann selbst auf ihre eigene Domain-Herleitung
+     * zurueck, siehe Ncss\BuilderPreviewIsolation::wrapIfNcss()).
+     */
+    public static function applyThemeContextForTable(string $tableName): void
+    {
+        $addon = \rex_addon::get('builder');
+
+        $tableTheme = '';
+        if ($tableName !== '') {
+            $rawMapping = $addon->getConfig('table_themes', []);
+            if (is_array($rawMapping) && array_key_exists($tableName, $rawMapping)) {
+                $tableTheme = trim((string) $rawMapping[$tableName]);
+            }
+        }
+
+        $fallbackTheme = trim((string) $addon->getConfig('theme', ''));
+        $theme = $tableTheme !== '' ? $tableTheme : $fallbackTheme;
+
+        self::resetThemeContext();
+        if ($theme !== '') {
+            self::setTheme($theme);
+        }
+    }
+
     public static function normalizeFramework(string $framework): string
     {
         $result = rex_extension::registerPoint(new \rex_extension_point(
