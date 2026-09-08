@@ -6,6 +6,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Neuer Extension Point `BUILDER_SLICE_PREVIEW_HTML`: `Helper::renderSliceBackend()` (die Vorschau eines Elements während es aktiv im Slice-Formular bearbeitet wird) rendert nun in einen Output-Buffer statt direkt zu `echo`en, und lässt das erzeugte HTML durch diesen Extension Point laufen, bevor es ausgegeben wird. Andere Addons können damit z. B. fremdes CSS-Framework-Markup (Bootstrap, ncss, ...) im Backend-Preview in ein eigenes Element (z. B. per Shadow DOM) einbetten, ohne `builder` selbst zu verändern. Betrifft `lib/Helper.php`.
+
 ## [1.1.1] - 2026-09-02
 
 > **Voraussetzung: [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace) ≥ 2.0.0.** Wer MediaPlace einsetzt, sollte vor diesem Update auf Version 2.0.0 oder neuer aktualisieren (siehe "Fix" unten) – mit einer älteren MediaPlace-Version wird das Overlay sonst nicht mehr erkannt und es öffnet sich wieder der klassische Medienpool-Popup.

@@ -824,11 +824,35 @@ class Helper
                     </div>
                 <?php else: ?>
                     <?php if ($templateFile !== ''): ?>
-                        <?php 
+                        <?php
                         if ($elementPath !== null) {
                             self::loadElementI18n($elementPath);
                         }
-                        include $templateFile; 
+                        // BUILDER_SLICE_PREVIEW_HTML: erlaubt anderen Addons, das gerenderte
+                        // Backend-Vorschau-HTML EINES Elements nachtraeglich zu umschliessen -
+                        // z.B. um Inhalte eines fremden CSS-Systems (ncss, ein Theme-Addon, ...)
+                        // per <ncss-container>/Shadow-DOM von REDAXOs eigenem Backend-CSS zu
+                        // isolieren, statt gegen dessen Cascade-Layer-Prioritaet anzukaempfen.
+                        // Bewusst NUR ums Template-Output (innerhalb von .slice-rendered), NICHT
+                        // um slice-toolbar/slice-edit-form - builder's eigenes JS (Bearbeiten-/
+                        // Loeschen-Buttons etc.) muss diese unveraendert im Light DOM finden.
+                        ob_start();
+                        include $templateFile;
+                        $sliceHtml = ob_get_clean() ?: '';
+
+                        if (rex_extension::isRegistered('BUILDER_SLICE_PREVIEW_HTML')) {
+                            $sliceHtml = rex_extension::registerPoint(new rex_extension_point(
+                                'BUILDER_SLICE_PREVIEW_HTML',
+                                $sliceHtml,
+                                [
+                                    'element_type' => $sliceType,
+                                    'element_data' => $elementData,
+                                    'framework' => $framework,
+                                ]
+                            ));
+                        }
+
+                        echo $sliceHtml;
                         ?>
                     <?php else: ?>
                         <div class="alert alert-danger">Template not found: <?= rex_escape($sliceType) ?></div>
