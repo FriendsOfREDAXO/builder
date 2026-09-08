@@ -7,6 +7,7 @@ use rex_addon;
 use rex_escape;
 use rex_exception;
 use rex_extension;
+use rex_extension_point;
 use rex_i18n;
 use rex_media;
 use rex_path;
@@ -1171,18 +1172,40 @@ class ModuleBuilder
             </div>
 
             <div class="slice-rendered">
-                <?php if ($isSection): ?>
-                    <?= $this->renderSectionPreview($elementData) ?>
-                <?php elseif ($templateFile !== null): ?>
-                    <?php
+                <?php
+                ob_start();
+                if ($isSection) {
+                    echo $this->renderSectionPreview($elementData);
+                } elseif ($templateFile !== null) {
                     $data = $elementData;
                     $config = $this->loadElementConfig($sliceType);
                     $framework = $this->framework;
                     include $templateFile;
-                    ?>
-                <?php else: ?>
-                    <div class="alert alert-danger"><?= rex_escape(Helper::t('builder_template_not_found', 'Template not found')) ?>: <?= rex_escape($sliceType) ?></div>
-                <?php endif; ?>
+                } else {
+                    ?><div class="alert alert-danger"><?= rex_escape(Helper::t('builder_template_not_found', 'Template not found')) ?>: <?= rex_escape($sliceType) ?></div><?php
+                }
+                $sliceHtml = (string) ob_get_clean();
+
+                // BUILDER_SLICE_PREVIEW_HTML: gleicher Extension Point wie in
+                // Helper::renderSliceBackend() (siehe dortiger Docblock) - erlaubt anderen
+                // Addons, das gerenderte Backend-Preview-HTML eines Top-Level-Slices zu
+                // wrappen/veraendern (z.B. Isolation via Shadow DOM), noch bevor es
+                // ausgegeben wird. Bewusst NUR ums Template-Output (innerhalb von
+                // .slice-rendered), NICHT um slice-toolbar/slice-edit-form.
+                if (rex_extension::isRegistered('BUILDER_SLICE_PREVIEW_HTML')) {
+                    $sliceHtml = rex_extension::registerPoint(new rex_extension_point(
+                        'BUILDER_SLICE_PREVIEW_HTML',
+                        $sliceHtml,
+                        [
+                            'element_type' => $sliceType,
+                            'element_data' => $elementData,
+                            'framework' => $this->framework,
+                        ]
+                    ));
+                }
+
+                echo $sliceHtml;
+                ?>
             </div>
 
             <div class="slice-edit-form" style="display: none;"></div>

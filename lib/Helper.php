@@ -4,6 +4,8 @@ namespace FriendsOfREDAXO\Builder;
 
 use rex_addon;
 use rex_escape;
+use rex_extension;
+use rex_extension_point;
 use Throwable;
 
 /**

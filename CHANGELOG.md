@@ -8,7 +8,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ### Added
 
-- Neuer Extension Point `BUILDER_SLICE_PREVIEW_HTML`: `Helper::renderSliceBackend()` (die Vorschau eines Elements während es aktiv im Slice-Formular bearbeitet wird) rendert nun in einen Output-Buffer statt direkt zu `echo`en, und lässt das erzeugte HTML durch diesen Extension Point laufen, bevor es ausgegeben wird. Andere Addons können damit z. B. fremdes CSS-Framework-Markup (Bootstrap, ncss, ...) im Backend-Preview in ein eigenes Element (z. B. per Shadow DOM) einbetten, ohne `builder` selbst zu verändern. Betrifft `lib/Helper.php`.
+- Neuer Extension Point `BUILDER_SLICE_PREVIEW_HTML`, jetzt an BEIDEN Stellen, die einen Slice als Backend-Vorschau rendern: `Helper::renderSliceBackend()` (verschachtelte Slices, z. B. innerhalb eines `columns`-Elements) UND `ModuleBuilder::renderEditorSlice()` (das normale Top-Level-Slice-Formular, `.slice-rendered`). Beide puffern ihr Template-Output jetzt statt direkt zu `echo`en und lassen es durch diesen Extension Point laufen, bevor es ausgegeben wird. Andere Addons können damit z. B. fremdes CSS-Framework-Markup (Bootstrap, ncss, ...) im Backend-Preview in ein eigenes Element (z. B. per Shadow DOM) einbetten, ohne `builder` selbst zu verändern. Betrifft `lib/Helper.php`, `lib/ModuleBuilder.php`.
 
 ## [1.1.1] - 2026-09-02
 
