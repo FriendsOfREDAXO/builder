@@ -167,7 +167,15 @@ if ($q !== '') {
                 return $matches[0];
             }
 
-            $url = rex_url::currentBackendPage(['func' => $builderDocFileMap[$fileName]]);
+            // rex_url::currentBackendPage() liefert bereits HTML-escapte Query-Parameter
+            // (&amp; statt &) - korrekt fuer eine direkte href="..."-Ausgabe, aber HIER wird
+            // die URL erst in MARKDOWN eingesetzt, das ein literales "&" erwartet und beim
+            // spaeteren rex_markdown::parse() SELBST nochmal escapt. Ohne diese Rueck-
+            // Dekodierung wuerde jeder Querlink mit Anker (oder generell mehr als einem
+            // Parameter) im gerenderten HTML als "&amp;amp;func=..." landen - fuer den
+            // Browser ein anderer Parametername als "func", die Navigation zeigt dann
+            // stumm die Startseite statt der Zielseite (per echtem Test gefunden).
+            $url = str_replace('&amp;', '&', rex_url::currentBackendPage(['func' => $builderDocFileMap[$fileName]]));
             if (isset($matches[3])) {
                 $url .= $matches[3];
             }

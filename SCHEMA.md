@@ -130,6 +130,22 @@ Wichtig für Schema-Verständnis:
 - Es wurden keine neuen `config.php`-Keys eingeführt.
 - Daher war keine Änderung an `element-config.schema.json` bzw. `schema/element-config.schema.json` erforderlich.
 
+### MediaAltResolver – ALT-Text-Auflösung (Template-API)
+
+`FriendsOfREDAXO\Builder\MediaAltResolver::resolve()` ermittelt einen sinnvollen
+`alt`-Text für ein Mediapool-Bild (inkl. automatischer Erkennung als "dekorativ"
+markierter Bilder über das optionale `mediaplace`-Addon) – vollständige Referenz
+inkl. Prioritätsreihenfolge in [API.md, Abschnitt „MediaAltResolver"](API.md#mediaaltresolver).
+
+Wichtig für Schema-Verständnis:
+
+- Die Klasse betrifft ausschließlich die Laufzeit-Ausgabe in Templates.
+- Es wurden keine neuen `config.php`-Keys eingeführt – jedes Element, das ein
+  `be_media`-Feld nutzt, kann `MediaAltResolver::resolve()` direkt im eigenen
+  Template aufrufen, ohne eigene Dekorativ-Logik zu duplizieren.
+- Daher war keine Änderung an `element-config.schema.json` bzw.
+  `schema/element-config.schema.json` erforderlich.
+
 ### Legacy Editor & Migration
 
 For YForm value-based builder fields, the following configuration fields control Legacy-HTML handling:
