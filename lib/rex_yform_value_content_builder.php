@@ -12,6 +12,7 @@ use FriendsOfREDAXO\Builder\Starter\StarterConfig as Config;
  */
 class rex_yform_value_content_builder extends rex_yform_value_abstract
 {
+    // UNGENUTZT - siehe getNextMediaCounter() unten, das $GLOBALS statt dieses Felds nutzt.
     private static $widgetCounters = [
         'media' => 0,
         'link' => 0,
@@ -25,11 +26,19 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
     
     /**
      * Get next unique media counter (global über alle Instanzen)
+     *
+     * Zufaellige Startbasis statt fixer 0 - siehe ausfuehrlicher Docblock bei
+     * FriendsOfREDAXO\Builder\Fields\FieldAbstract::counterBase(): ein reiner
+     * PHP-$GLOBALS-Zaehler ist nur INNERHALB eines einzelnen Requests eindeutig,
+     * jedes AJAX-"Element hinzufuegen" ist aber ein eigener Request - zwei
+     * be_media-Felder aus zwei verschiedenen Requests bekamen dadurch dieselbe
+     * generierte Id (z.B. zweimal "REX_MEDIA_1"), was der Browser bei
+     * getElementById()/querySelector() nur am jeweils ERSTEN Element auffasst.
      */
     private static function getNextMediaCounter()
     {
         if (!isset($GLOBALS['yform_cb_media_counter'])) {
-            $GLOBALS['yform_cb_media_counter'] = 0;
+            $GLOBALS['yform_cb_media_counter'] = random_int(0, 899999);
         }
         return ++$GLOBALS['yform_cb_media_counter'];
     }
