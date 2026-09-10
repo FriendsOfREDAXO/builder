@@ -18,6 +18,12 @@ abstract class FieldAbstract implements FieldInterface
 {
     /**
      * Statische Widget-Counter für eindeutige IDs
+     *
+     * UNGENUTZT seit der PHP-$GLOBALS-basierten Zaehler-Variante unten
+     * (getNextMediaCounter()/getNextLinkCounter()) - bewusst stehen gelassen statt
+     * geloescht, falls ein anderer Addon-Teil bereits darauf zugreift; neue Nutzung
+     * bitte stattdessen ueber generateId() (echtes uniqid()) oder die beiden
+     * getNext...Counter()-Methoden unten.
      */
     protected static array $widgetCounters = [
         'media' => 0,
@@ -173,8 +179,7 @@ abstract class FieldAbstract implements FieldInterface
     protected static function getNextMediaCounter(): int
     {
         if (!isset($GLOBALS['yform_cb_media_counter'])) {
-            // Wir starten bei 1000 um Kollisionen mit Standard-Slices zu vermeiden
-            $GLOBALS['yform_cb_media_counter'] = 1000;
+            $GLOBALS['yform_cb_media_counter'] = self::counterBase();
         }
         return ++$GLOBALS['yform_cb_media_counter'];
     }
@@ -185,10 +190,38 @@ abstract class FieldAbstract implements FieldInterface
     protected static function getNextLinkCounter(): int
     {
         if (!isset($GLOBALS['yform_cb_link_counter'])) {
-            // Wir starten bei 1000 um Kollisionen mit Standard-Slices zu vermeiden
-            $GLOBALS['yform_cb_link_counter'] = 1000;
+            $GLOBALS['yform_cb_link_counter'] = self::counterBase();
         }
         return ++$GLOBALS['yform_cb_link_counter'];
+    }
+
+    /**
+     * Request-eindeutige Startbasis fuer die beiden Counter oben.
+     *
+     * Die alte, fixe Basis (1000) war nur INNERHALB eines einzelnen PHP-Requests
+     * eindeutig - jeder "Element hinzufuegen"-Klick im Content-Builder ist aber ein
+     * eigener AJAX-Request (ContentBuilderApi::renderSlice() bzw.
+     * ModuleBuilder::renderEditorSlice()/Helper::renderSliceBackend(), je nach
+     * Aufrufkontext), der GLOBALS neu initialisiert. Zwei be_link-/be_media-Felder,
+     * die in ZWEI verschiedenen Requests gerendert wurden (z.B. zwei nacheinander
+     * eingefuegte Slices desselben oder unterschiedlicher Elementtypen), bekamen
+     * dadurch identische IDs (z.B. zweimal "REX_LINK_1001_NAME") - HTML-Id-Kollision,
+     * der Browser trifft bei getElementById()/querySelector() immer nur das ERSTE
+     * Element mit dieser Id. Sichtbarer Effekt (per echtem User-Report gefunden,
+     * reproduziert sowohl an einem eigenen Element als auch am Original
+     * starter_cards): die Linkmap-Auswahl schrieb den gewaehlten Artikel ins
+     * FALSCHE, meist unsichtbare Duplikat-Feld - das im Formular sichtbare
+     * "Ziel-Seite"-Feld blieb leer, obwohl kein Fehler auftrat.
+     *
+     * mt_rand() auf Mikrosekunden-Basis (statt einer fixen Zahl) macht die Basis
+     * ueber mehrere getrennte Requests hinweg praktisch kollisionsfrei, ohne echten
+     * Cross-Request-Zustand (Session/DB) zu brauchen - die Counter muessen nur
+     * INNERHALB des sichtbaren DOM eindeutig sein, nicht global ueber die Zeit
+     * persistieren.
+     */
+    private static function counterBase(): int
+    {
+        return 1000 + random_int(0, 899999);
     }
 
     /**
