@@ -150,7 +150,7 @@ if (trim((string) $wrapper_max_width) !== '') {
             </div>
             <label style="display:flex; align-items:center; gap:6px; margin:0; font-weight:normal; white-space:nowrap; cursor:pointer; flex-shrink:0;">
                 <input type="checkbox" id="cb-compact-toggle-<?= rex_escape($field_id) ?>" style="cursor:pointer;" />
-                <span style="font-size:13px;">Kompaktmodus</span>
+                <span style="font-size:13px;"><?= rex_i18n::msg('builder_compact_mode') ?></span>
             </label>
         </div>
 
@@ -497,18 +497,17 @@ if (trim((string) $wrapper_max_width) !== '') {
     var wrapper  = toggle.closest('.yform-content-builder');
     if (!wrapper) return;
 
-    var saved = localStorage.getItem(lsKey) === '1';
-    toggle.checked = saved;
-    if (saved) wrapper.classList.add('compact-mode');
+    // localStorage ('1'/'0') uebersteuert die Addon-Einstellung (Wrapper-Klasse aus PHP),
+    // ohne Eintrag gilt die Einstellung; die Checkbox zeigt immer den wirksamen Zustand.
+    var stored = null;
+    try { stored = localStorage.getItem(lsKey); } catch (e) {}
+    if (stored === '1') wrapper.classList.add('compact-mode');
+    else if (stored === '0') wrapper.classList.remove('compact-mode');
+    toggle.checked = wrapper.classList.contains('compact-mode');
 
     toggle.addEventListener('change', function() {
-        if (this.checked) {
-            wrapper.classList.add('compact-mode');
-            localStorage.setItem(lsKey, '1');
-        } else {
-            wrapper.classList.remove('compact-mode');
-            localStorage.setItem(lsKey, '0');
-        }
+        wrapper.classList.toggle('compact-mode', this.checked);
+        try { localStorage.setItem(lsKey, this.checked ? '1' : '0'); } catch (e) {}
     });
 }());
 </script>

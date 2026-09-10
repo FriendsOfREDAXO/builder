@@ -33,6 +33,7 @@ class ModuleBuilder
     /** @var array<int, string> */
     protected array $preventSelfNestingElements = [];
     protected bool $enableOnlineToggle = false;
+    protected bool $compactMode = false;
     protected bool $legacyCke5Enabled = false;
     protected string $legacyCke5Profile = 'default';
     protected string $legacyCke5Lang = 'de';
@@ -61,6 +62,10 @@ class ModuleBuilder
         $instance->enableOnlineToggle = array_key_exists('enable_online_toggle', $options)
             ? (bool) $options['enable_online_toggle']
             : (bool) rex_addon::get('builder')->getConfig('enable_online_toggle', false);
+        // Kompaktmodus wie im YForm-Template: Addon-Einstellung, per Option uebersteuerbar
+        $instance->compactMode = array_key_exists('compact_mode', $options)
+            ? (bool) $options['compact_mode']
+            : (bool) rex_addon::get('builder')->getConfig('compact_mode', false);
         $instance->legacyCke5Enabled = array_key_exists('legacy_cke5_enabled', $options)
             ? $instance->normalizeBool($options['legacy_cke5_enabled'])
             : false;
@@ -164,8 +169,9 @@ class ModuleBuilder
 
         ob_start();
         ?>
-        <div class="form-group yform-content-builder"<?= $wrapperStyleString !== '' ? ' style="' . rex_escape($wrapperStyleString) . '"' : '' ?>
+        <div class="form-group yform-content-builder<?= $this->compactMode ? ' compact-mode' : '' ?>"<?= $wrapperStyleString !== '' ? ' style="' . rex_escape($wrapperStyleString) . '"' : '' ?>
              data-framework="<?= rex_escape($this->framework) ?>"
+             data-compact-mode="<?= $this->compactMode ? '1' : '0' ?>"
              data-online-toggle="<?= $this->enableOnlineToggle ? '1' : '0' ?>"
              data-legacy-mode="<?= $legacyActive ? '1' : '0' ?>"
              data-copy-paste="<?= $this->enableCopyPaste ? '1' : '0' ?>"
@@ -325,6 +331,33 @@ class ModuleBuilder
                 })();
                 </script>
             <?php else: ?>
+                <?php $compactToggleId = 'cb-compact-toggle-module-' . $this->valueId . '-' . uniqid(); ?>
+                <div class="yform-cb-module-tools">
+                    <label class="yform-cb-compact-toggle" for="<?= $compactToggleId ?>">
+                        <input type="checkbox" id="<?= $compactToggleId ?>" data-cb-compact-key="cb-compact-mode-module-<?= (int) $this->valueId ?>">
+                        <span><?= rex_i18n::msg('builder_compact_mode') ?></span>
+                    </label>
+                </div>
+                <script nonce="<?= rex_response::getNonce() ?>">
+                (function () {
+                    // Kompaktmodus: Einstellung aus dem Addon (Wrapper-Klasse), per Checkbox
+                    // je Redakteur uebersteuerbar (localStorage: '1'/'0', sonst Einstellung).
+                    var toggle = document.getElementById(<?= json_encode($compactToggleId) ?>);
+                    if (!toggle) return;
+                    var wrapper = toggle.closest('.yform-content-builder');
+                    if (!wrapper) return;
+                    var key = toggle.getAttribute('data-cb-compact-key');
+                    var stored = null;
+                    try { stored = localStorage.getItem(key); } catch (e) {}
+                    if (stored === '1') wrapper.classList.add('compact-mode');
+                    else if (stored === '0') wrapper.classList.remove('compact-mode');
+                    toggle.checked = wrapper.classList.contains('compact-mode');
+                    toggle.addEventListener('change', function () {
+                        wrapper.classList.toggle('compact-mode', this.checked);
+                        try { localStorage.setItem(key, this.checked ? '1' : '0'); } catch (e) {}
+                    });
+                }());
+                </script>
                 <div class="content-builder-slices">
                     <?php foreach ($this->slices as $index => $slice): ?>
                         <?= $this->renderEditorSlice($slice, $index, $groupedAvailableElements) ?>
