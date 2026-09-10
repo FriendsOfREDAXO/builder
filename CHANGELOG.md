@@ -4,6 +4,21 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.2.0-beta.2] - 2026-09-10
+
+### Added
+
+- **`MediaAltResolver::resolve()` erkennt jetzt "dekorativ" markierte Mediapool-Bilder.** Prüft sowohl das klassische, optionale `mediaplace`-Metainfo-Feld `med_alt_decorative` als auch dessen neueres JSON-Metadaten-System (eigener Alt-Feld-Widget-Typ) und liefert für als dekorativ markierte Bilder immer ein leeres `alt`-Attribut (WCAG-korrekt) – gewinnt bewusst gegen jeden manuellen oder aufgelösten Alt-Text. Zusätzlich liest `resolve()` jetzt auch `mediaplace`s eigenes, sprachrichtiges JSON-Alt-Feld (vorher nur das klassische `med_alt`-Metainfo-Feld). `mediaplace` bleibt für `builder` komplett optional – ohne das Addon oder ohne die jeweiligen Metainfo-Felder verhält sich `resolve()` unverändert wie zuvor. Vorher war diese Erkennung nur in einzelnen externen Addon-Elementen (z. B. `ncss`) lokal nachgebaut; jetzt profitieren alle Elemente mit einem `be_media`-Feld automatisch davon, ohne eigene Dekorativ-Logik zu duplizieren. Betrifft `lib/MediaAltResolver.php`.
+
+### Documentation
+
+- **`MediaAltResolver` erstmals dokumentiert** – vollständige Referenz (Prioritätsreihenfolge der Alt-Text-Auflösung, Dekorativ-Erkennung, Beispielaufruf) in `API.md` (Abschnitt „Helper-Klassen") und `SCHEMA.md` (Abschnitt „Media-Output-Konvention"), plus ein Hinweis direkt beim `be_media`-Feldtyp in `API.md`. War bisher trotz produktiver Nutzung durch mehrere externe Addon-Elemente nirgends beschrieben.
+- **Neuer vollständiger Abschnitt „Vollständiges Integrationsbeispiel: Eigenes Addon mit eigenen Elementen" in `DEV.md`.** Die einzelnen Extension Points (`BUILDER_ELEMENT_PATHS`, `BUILDER_ELEMENT_MODE`, `BUILDER_MEDIA_TYPE_PRESETS`, freies `framework`-Textfeld) waren bereits einzeln referenziert, aber es gab kein durchgängiges Beispiel, wie ein externes Addon sie zu einem vollständigen, additiven Element-Set kombiniert (reales Referenzbeispiel: `ncss`s 17 eigene Elemente). Deckt außerdem zwei bislang undokumentierte Fallstricke ab: Element-*Labels* haben (anders als Element-*Keys*) keinen echten Namensraum-Mechanismus (Kollisionsgefahr im Element-Picker), und ein in `fields` definiertes, aber in keiner `field_groups`-Gruppe gelistetes Feld wird im Backend-Formular kommentarlos gar nicht gerendert.
+
+### Fix
+
+- **Markdown-Querlinks mit Anker-Fragment (`[Text](Datei.md#anker)`) zwischen den Builder-Doku-Seiten (Seite „Dokumentation" im Backend) navigierten stumm zur Übersichtsseite statt zum Ziel.** `pages/docs.php` schreibt solche Links vor dem Markdown-Rendering auf interne Backend-Routen um (`rex_url::currentBackendPage(['func' => ...])`) – diese Methode liefert bereits HTML-escapte Query-Parameter (`&amp;` statt `&`) zurück, was beim direkten Einsetzen in Markdown zu doppeltem Escaping führte (`rex_markdown::parse()` escapt beim Rendern selbst nochmal): im gerenderten `href` stand am Ende `&amp;amp;func=...`, für den Browser ein anderer Parametername als `func` – die Navigation landete deshalb immer auf der Standard-Sektion. Betraf JEDEN Cross-Datei-Link in den Doku-Seiten mit mehr als einem Query-Parameter, nicht nur neue Anker-Links (per echtem Test auch bei einem bereits lange bestehenden `[DEV.md](DEV.md)`-Link ohne Anker reproduziert). Fix: die von `currentBackendPage()` zurückgegebene URL wird vor dem Einsetzen ins Markdown einmal zurück-dekodiert (`&amp;` → `&`), damit nur noch das abschließende `rex_markdown::parse()` sie escaped. Betrifft `pages/docs.php`.
+
 ## [1.2.0-beta.1] - 2026-09-08
 
 ### Added

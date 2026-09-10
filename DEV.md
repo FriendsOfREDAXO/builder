@@ -169,14 +169,15 @@ Hinweis:
 
 1. [Architektur-Übersicht](#architektur-übersicht)
 2. [Extension Points Referenz](#extension-points-referenz)
-3. [Config-Klassen Nutzung](#config-klassen-nutzung)
-4. [Framework Support](#framework-support)
-5. [Eigene Elemente erstellen](#eigene-elemente-erstellen)
-6. [Editor-Profile Setup](#editor-profile-setup)
-7. [Element-Pfade registrieren](#element-pfade-registrieren)
-8. [TemplateEngine nutzen](#templateengine-nutzen)
-9. [Best Practices](#best-practices)
-10. [Häufige Fragen](#häufige-fragen)
+3. [Vollständiges Integrationsbeispiel: Eigenes Addon mit eigenen Elementen](#vollständiges-integrationsbeispiel-eigenes-addon-mit-eigenen-elementen)
+4. [Config-Klassen Nutzung](#config-klassen-nutzung)
+5. [Framework Support](#framework-support)
+6. [Eigene Elemente erstellen](#eigene-elemente-erstellen)
+7. [Editor-Profile Setup](#editor-profile-setup)
+8. [Element-Pfade registrieren](#element-pfade-registrieren)
+9. [TemplateEngine nutzen](#templateengine-nutzen)
+10. [Best Practices](#best-practices)
+11. [Häufige Fragen](#häufige-fragen)
 
 ---
 
@@ -517,6 +518,126 @@ rex_extension::register('BUILDER_FRAMEWORK_NORMALIZE', function (rex_extension_p
     return $framework === 'bs' ? 'bootstrap' : $framework;
 });
 ```
+
+---
+
+## Vollständiges Integrationsbeispiel: Eigenes Addon mit eigenen Elementen
+
+Die einzelnen Extension Points oben sind unabhängig dokumentiert - dieser Abschnitt
+zeigt, wie ein externes Addon sie zu einem vollständigen, eigenständigen Element-Set
+kombiniert. Reales Referenzbeispiel: das CSS-Framework-Addon `ncss` registriert
+eigene, nativ auf sein Design-System zugeschnittene Elemente (Cards, Hero, FAQ,
+Spalten-Layout etc.) additiv neben `builder`s eigenen Elementen - ohne `builder`
+selbst zu verändern und ohne eine harte Abhängigkeit zwischen beiden Addons.
+
+### 1. Element-Pfad registrieren (`BUILDER_ELEMENT_PATHS` + `BUILDER_ELEMENT_MODE`)
+
+In `boot.php` des eigenen Addons, additiv gegen die Verfügbarkeit von `builder`
+abgesichert:
+
+```php
+if (rex_addon::get('builder')->isAvailable()) {
+    rex_extension::register('BUILDER_ELEMENT_PATHS', static function (rex_extension_point $ep) {
+        $paths = (array) $ep->getSubject();
+        $paths['my_addon'] = rex_path::addon('my_addon', 'elements');
+        return $paths;
+    }, rex_extension::EARLY);
+
+    // 'merge' (Standardfall): eigene Elemente ERGÄNZEN builder's Core-Elemente.
+    // 'replace' würde stattdessen NUR die eigenen Elemente zeigen - siehe
+    // BUILDER_ELEMENT_MODE-Doku weiter oben in dieser Datei.
+    rex_extension::register('BUILDER_ELEMENT_MODE', static function () {
+        return 'merge';
+    }, rex_extension::EARLY);
+}
+```
+
+`builder` scannt den registrierten Pfad danach automatisch (`scandir()`) nach
+Unterordnern mit einer `config.php` - keine weitere Registrierung pro Element
+nötig. Der ELEMENT-KEY ist dabei immer der VERZEICHNISNAME, nicht ein `key`-Feld
+innerhalb der `config.php` selbst (`ModuleBuilder::loadElementsFromBasePath()`
+überschreibt `$config['key']`/`$config['type']` mit dem Ordnernamen). Ein
+Namenspräfix (z. B. `my_addon_` je Element-Ordner) ist reine Konvention zur
+Kollisionsvermeidung, kein von `builder` erzwungener Mechanismus.
+
+**Achtung Label-Kollision:** `builder` selbst hat KEINEN echten Namensraum-
+Mechanismus für Element-*Labels* (nur für Keys). Trägt ein eigenes Element
+dasselbe `label` wie ein Core-Element (z. B. beide "Spalten-Layout"), erscheinen
+im Element-Picker zwei optisch identische Einträge - ein Klick auf den falschen
+fügt versehentlich das andere Element ein, ohne sichtbaren Fehler. Eigene Labels
+deshalb immer mit einem sprechenden Präfix versehen (z. B. "Meine Firma:
+Spalten-Layout").
+
+### 2. Eigenes Element-Verzeichnis anlegen
+
+```
+elements/
+  my_addon_headline/
+    config.php
+    templates/
+      plain.php
+```
+
+`config.php` folgt demselben Format wie jedes andere Element (siehe „Eigene
+Elemente erstellen" oben) - `fields`, `field_groups`, `category` etc. `category`
+gruppiert das Element im Element-Picker unter einer eigenen Überschrift (z. B.
+`'category' => 'meinAddon'` erscheint dort als eigene Sektion).
+
+**Wichtiger Fallstrick:** `field_groups` ist ein reiner UI-Tab-Filter. Ein Feld,
+das in `fields` definiert, aber in KEINER `field_groups`-Gruppe gelistet ist, wird
+im Backend-Formular schlicht NICHT gerendert - ohne Fehler, ohne Warnung, einfach
+unsichtbar. Bei jedem neuen/geänderten Feld beide Stellen synchron halten.
+
+### 3. Eigenes Template-„Framework" nutzen (statt `bootstrap`/`uikit`/`tailwind`)
+
+Das `framework`-Feld im `content_builder`-YForm-Feldtyp ist ein freies Textfeld
+(seit 1.2.0-beta.1) - ein eigenes CSS-Framework-Addon muss keinen der eingebauten
+Namen verwenden. Trägt der Redakteur z. B. `plain` als Framework-Namen ein, sucht
+`renderSlice()` zuerst `templates/plain.php` im jeweiligen Element-Ordner (Fallback-
+Kette: `<framework>` → `plain` → `uikit` → `bootstrap`). Ein Element, das
+AUSSCHLIESSLICH `templates/plain.php` mitbringt, funktioniert deshalb unabhängig
+vom sonst im Projekt gewählten Framework-Namen, solange dieser nicht zufällig
+ebenfalls "plain" heißt.
+
+### 4. Eigene Media-Presets registrieren (`BUILDER_MEDIA_TYPE_PRESETS`)
+
+Für responsive Bildausgabe über `ResponsiveImage`/`MediaTypeRegistry` (siehe
+SCHEMA.md, „Media-Output-Konvention"):
+
+```php
+if (rex_addon::get('media_manager')->isAvailable()) {
+    rex_extension::register('BUILDER_MEDIA_TYPE_PRESETS', static function (rex_extension_point $ep) {
+        $presets = (array) $ep->getSubject();
+        $presets['my_addon_hero_16_9'] = [
+            'ratio' => '16_9',
+            'mode' => 'focuspoint',
+            'widths' => [640, 1024, 1440, 1920],
+            'default_width' => 1440,
+        ];
+        return $presets;
+    }, rex_extension::EARLY);
+}
+```
+
+Im Template dann über `ResponsiveImage::forFile($file)->withDesktopPreset('my_addon_hero_16_9')->...`
+verwenden - niemals einen eigenen, statischen Media-Manager-Typnamen anlegen (siehe
+SCHEMA.md für die Begründung).
+
+### 5. ALT-Text-Auflösung wiederverwenden statt duplizieren
+
+Jedes eigene Element mit einem `be_media`-Feld sollte `MediaAltResolver::resolve()`
+(siehe SCHEMA.md, „MediaAltResolver") direkt aufrufen, statt eine eigene Alt-Text-
+Priorisierung zu bauen - das deckt automatisch auch die Dekorativ-Erkennung über
+das optionale `mediaplace`-Addon ab, ohne dass das eigene Addon dessen API selbst
+kennen muss.
+
+### Zusammenfassung: additive Integration ohne Kernänderung
+
+Alle fünf Schritte oben sind rein additiv - `builder` selbst wird an keiner Stelle
+verändert, das eigene Addon bleibt bei fehlendem `builder` (bzw. fehlendem
+`media_manager` für Schritt 4) einfach inaktiv (`rex_addon::isAvailable()`-Gates).
+Genau dieses Muster nutzt `ncss` für seine 17 eigenen Elemente unter
+`elements/ncss_*/` (Kategorie „nativeCSS" im Element-Picker).
 
 ---
 

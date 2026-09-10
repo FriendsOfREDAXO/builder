@@ -794,6 +794,12 @@ Optionale HTML-Attribute:
 ]
 ```
 
+Für die ALT-Text-Ausgabe im Template steht `MediaAltResolver::resolve()` bereit
+(manueller Alt-Text → Mediapool-Alt-Feld → Mediapool-Titel → Kontext-Fallback,
+inkl. automatischer Erkennung als "dekorativ" markierter Bilder) – siehe
+[Helper-Klassen, Abschnitt „MediaAltResolver"](#mediaaltresolver) weiter unten für
+Details und Priorität.
+
 ### be_link
 
 ```php
@@ -1877,6 +1883,43 @@ Hinweise:
 - Die Klasse ist für Template-Nutzung gedacht und reduziert duplizierte `<picture>/<img>`-Logik.
 - Intern wird weiterhin das virtuelle Typschema `cb_<preset>__<width>` verwendet.
 - Ohne verfügbaren Media Manager fällt die Ausgabe auf `rex_url::media(...)` zurück.
+
+### MediaAltResolver
+
+```php
+use FriendsOfREDAXO\Builder\MediaAltResolver;
+
+$alt = MediaAltResolver::resolve(
+    $mediaFile,           // Mediapool-Dateiname aus einem be_media-Feld
+    $manualAlt,           // vom Redakteur im Element selbst eingegebener Alt-Text (optional)
+    $contextFallback,     // z. B. die Element-Überschrift, falls Mediapool nichts liefert
+    $isLinkedImageWithDescriptiveText = false,  // true, wenn das Bild verlinkt ist und der Linktext selbst schon beschreibend ist
+    $linkedText = ''      // der Linktext, nur relevant wenn der vorherige Parameter true ist
+);
+```
+
+Löst den `alt`-Text für ein einzelnes Bild anhand einer festen Priorität auf, damit
+kein Element eine eigene, jeweils leicht unterschiedliche Alt-Text-Logik nachbauen
+muss:
+
+1. **Dekorativ-Kennzeichnung** – ist das Bild im Mediapool (über das optionale
+   `mediaplace`-Addon, sowohl dessen klassisches `med_alt_decorative`-Metainfo-Feld
+   als auch dessen neueres JSON-Metadaten-System) explizit als rein dekorativ
+   markiert, liefert `resolve()` immer `''` (WCAG-korrektes leeres `alt`) – gewinnt
+   bewusst gegen jeden manuellen oder aufgelösten Alt-Text.
+2. Verlinktes Bild mit bereits beschreibendem Linktext (`$isLinkedImageWithDescriptiveText`)
+   → ebenfalls `''` (das Bild ist in diesem Fall redundant zum Linktext).
+3. `$manualAlt`, falls sinnvoll (kein reiner Dateiname/Leerstring).
+4. `mediaplace`s JSON-Metadaten-Alt-Feld, sprachrichtig für die aktuelle `rex_clang`.
+5. Klassisches `med_alt`-Metainfo-Feld.
+6. Mediapool-Titel.
+7. `$contextFallback`.
+8. Leerer String.
+
+`mediaplace` ist für `builder` ein rein optionales Addon (wie schon der bestehende
+`assets/js/mediaplace-bridge.js`-Include) – ist es nicht installiert oder fehlt das
+jeweilige Metainfo-Feld, verhält sich `resolve()` einfach so, als wäre nichts als
+dekorativ markiert (kein Fehlerfall, kein Fatal Error).
 
 ### FieldRegistry
 
