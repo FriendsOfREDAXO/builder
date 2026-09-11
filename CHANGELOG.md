@@ -4,6 +4,28 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.2.0] - 2026-09-10
+
+Hier ist eine kompakte und übersichtliche Zusammenfassung der Release Notes für die beiden Betas:
+
+**✨ Neue Features & Verbesserungen**
+
+* **WCAG-konforme Bilder:** Der `MediaAltResolver` erkennt jetzt "dekorativ" markierte Mediapool-Bilder (auch über das neue JSON-Metadaten-System) und erzwingt standardkonform ein leeres `alt`-Attribut für alle entsprechenden `be_media`-Felder. *(Beta 2)*
+* **Volle Framework-Freiheit:** Das Framework-Feld im YForm-Feldtyp ist jetzt ein Freitextfeld (statt festem Dropdown). Ideal für externe Addons mit eigenen CSS-Frameworks. *(Beta 1)*
+* **Theme-Support im Live-Preview:** Der Theme-Kontext (aus den Addon-Einstellungen) wird ab sofort auch im AJAX-Live-Preview korrekt angewandt. *(Beta 1)*
+* **Neuer Extension Point:** `BUILDER_SLICE_PREVIEW_HTML` ermöglicht es externen Addons, das Backend-Preview-Markup abzufangen und anzupassen (z. B. für Shadow DOM Isolierung). *(Beta 1)*
+
+**🐛 Bugfixes** *(alle Beta 2)*
+
+* **Widget-ID Kollisionen:** Linkmap- und Medienpool-Auswahlen landen nicht mehr im falschen Feld, wenn mehrere Elemente hintereinander via AJAX eingefügt werden (Zähler-Reset behoben).
+* **Kompaktmodus greift überall:** Der Kompaktmodus funktioniert nun auch im Builder-Modul auf der Struktur-Seite wie erwartet, inklusive umschaltbarer Checkbox pro Redakteur.
+* **Backend-Doku Links:** Markdown-Querlinks mit Ankern (`#anker`) navigieren wieder korrekt zum Ziel (doppeltes HTML-Escaping im Router behoben).
+
+**📖 Dokumentation** *(alle Beta 2)*
+
+* **API & Schema:** Der `MediaAltResolver` ist nun erstmals vollständig in der `API.md` und `SCHEMA.md` dokumentiert.
+* **Addon-Integration:** Die `DEV.md` enthält jetzt ein vollständiges Referenzbeispiel (inklusive Fallstricke), wie externe Addons mit eigenen Element-Sets nahtlos integriert werden.
+
 ## [1.2.0-beta.2] - 2026-09-10
 
 ### Added
