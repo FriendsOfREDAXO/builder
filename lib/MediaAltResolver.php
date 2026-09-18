@@ -185,7 +185,11 @@ class MediaAltResolver
         if (null !== $media) {
             foreach (['med_alt', 'med_alttext', 'med_alt_text'] as $key) {
                 try {
-                    $value = trim((string) $media->getValue($key));
+                    if (class_exists(\FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::class)) {
+                        $value = trim(\FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getMediaValue($media, $key));
+                    } else {
+                        $value = trim((string) $media->getValue($key));
+                    }
                 } catch (rex_exception $e) {
                     $value = '';
                 }
