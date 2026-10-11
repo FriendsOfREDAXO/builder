@@ -4,6 +4,25 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.3.0] - 2026-10-11
+
+Legacy-Modus des YForm-Feldtyps `content_builder` (HTML → Builder) je Datensatz steuerbar – für den schrittweisen Umstieg von CKE5/TinyMCE-Textfeldern auf den Builder.
+
+### Added
+
+- **Neuer Extension Point `BUILDER_LEGACY_MIGRATION`.** Entscheidet je Datensatz, ob alter HTML-Inhalt in den Builder umgewandelt werden darf, und liefert alle Texte des Legacy-Bereichs. Subject: `['allowed' => true, 'message' => '', 'hint' => '', 'button' => '', 'label' => '']` (vorbelegt aus Feldoptionen bzw. lang-Datei), Parameter: `field`, `name`, `table`, `data_id`, `dataset`, `values` (aktuelle Werte aller Formularfelder), `send`. Bei `allowed = false` erscheint statt des Buttons der Hinweis `message`, und ein gesendetes Migrations-Flag wird serverseitig ignoriert.
+- **Neuer Extension Point `BUILDER_LEGACY_EMPTY_MODE`** (Subject `'builder'|'legacy'`, gleiche Parameter) und **Feldoption `legacy_empty_mode`** (Standard `builder` = bisheriges Verhalten): Leere Werte können bei aktivem Legacy-Modus direkt im HTML-Editor starten, z. B. für Datensätze, die weiter in einem Frontend-Formular gepflegt werden.
+- **Texte des Legacy-Modus anpassbar:** Feldoptionen `legacy_label`, `legacy_migration_hint_text`, `legacy_migration_button_text`, `legacy_migration_denied_text`. Leer = Standardtexte aus den neuen lang-Keys `builder_legacy_label`, `builder_legacy_migration_hint`, `builder_legacy_migration_button`, `builder_legacy_migration_denied`, `builder_legacy_migration_saving` (de/en). Im Template steht kein fester Text mehr.
+
+### Fix
+
+- **Leerer Legacy-Editor ließ sich nicht speichern.** Ein leer abgeschickter HTML-Editor wurde als fehlerhafter Builder-POST gewertet („Content-Builder konnte nicht verarbeitet werden“) und blockierte das Speichern. Der Legacy-Editor sendet jetzt das Flag `<id>__legacy_mode`; ein leerer Wert wird dann als `''` gespeichert (bzw. als `[]`, wenn gleichzeitig umgewandelt wird).
+- **Legacy-Modus ohne Builder-JavaScript.** Im Legacy-Modus trägt die Editor-Textarea jetzt selbst den Feldnamen (das Hidden-Field nur noch im Builder-Modus). Der HTML-Inhalt wird so auch in Frontend-Formularen ohne `content-builder.js` gespeichert.
+
+### Documentation
+
+- Legacy-Modus mit allen Optionen in `ADMINS.md`, Extension Points mit Beispiel (Umwandlung nur nach Sperre des Datensatzes) in `DEV.md`, Optionen in `SCHEMA.md`.
+
 ## [1.2.0] - 2026-09-10
 
 Hier ist eine kompakte und übersichtliche Zusammenfassung der Release Notes für die beiden Betas:

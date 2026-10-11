@@ -419,7 +419,7 @@
 
             if ($notice.length) {
                 $notice.removeClass('alert-info').addClass('alert-warning');
-                $notice.find('span').first().text('Die Umwandlung wird jetzt gespeichert. Danach wird das Formular erneut mit modernem Content-Builder geöffnet.');
+                $notice.find('span').first().text($button.attr('data-saving-text') || 'Die Umwandlung wird jetzt gespeichert. Danach wird das Formular erneut mit modernem Content-Builder geöffnet.');
             }
 
             $button.prop('disabled', true).addClass('disabled');

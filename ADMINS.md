@@ -125,6 +125,28 @@ Alternativ wird auch `max_width` akzeptiert. Wenn einer der beiden Werte gesetzt
 
 Für Module ist dieselbe Option in der PHP-API beschrieben: siehe [API.md](API.md) im Abschnitt zur Full Builder API.
 
+### Legacy-Modus: bestehendes HTML weiter bearbeiten und umstellen
+
+Wird ein bisheriges Textfeld (CKE5/TinyMCE) auf `content_builder` umgestellt, bleiben alte HTML-Inhalte mit `legacy_cke5_enabled = 1` editierbar: Statt des Builders erscheint der klassische Editor, darüber optional ein Hinweis mit Button zum Umwandeln in den Builder.
+
+| Option | Standard | Wirkung |
+|---|---|---|
+| `legacy_cke5_enabled` | `0` | Legacy-Modus an/aus |
+| `legacy_editor_attributes` | CKE5-Attribute | Attribute der Editor-Textarea, für TinyMCE z. B. `class="form-control tiny-editor" data-profile="default" rows="14"` |
+| `legacy_empty_mode` | `builder` | Startmodus bei **leerem** Inhalt: `builder` oder `legacy` (HTML-Editor) |
+| `legacy_label` | lang `builder_legacy_label` | Bezeichnung über dem Editor (für Redakteure z. B. „Text“) |
+| `legacy_migration_hint` | `1` | Hinweis/Button bzw. Sperr-Hinweis anzeigen |
+| `legacy_migration_hint_text` | lang `builder_legacy_migration_hint` | Hinweistext, wenn Umwandeln erlaubt ist |
+| `legacy_migration_button_text` | lang `builder_legacy_migration_button` | Text des Umwandeln-Buttons |
+| `legacy_migration_denied_text` | lang `builder_legacy_migration_denied` | Hinweis statt Button, wenn Umwandeln nicht erlaubt ist |
+| `legacy_migration_target` / `legacy_migration_field` | `starter_text` / `text` | Zielelement und -feld der Umwandlung |
+
+Leere Textoptionen verwenden die Standardtexte aus der lang-Datei des AddOns.
+
+**Je Datensatz entscheiden:** Ob ein Datensatz umgewandelt werden darf (und welche Texte er zeigt) und womit ein neuer, leerer Datensatz startet, regeln die Extension Points `BUILDER_LEGACY_MIGRATION` und `BUILDER_LEGACY_EMPTY_MODE` – mit vollständigem Beispiel in [DEV.md](DEV.md#builder_legacy_migration--builder_legacy_empty_mode-). Ist die Umwandlung nicht erlaubt, fehlt der Button, und auch ein manipuliert gesendetes Umwandeln-Flag wird serverseitig ignoriert.
+
+Im Legacy-Modus trägt die Editor-Textarea selbst den Feldnamen. Das Feld funktioniert dadurch auch in Frontend-Formularen ohne das Builder-JavaScript (Editor-Assets von CKE5/TinyMCE müssen dort selbst eingebunden werden).
+
 ## Medienmodell
 
 - Basistyp: `content_builder`

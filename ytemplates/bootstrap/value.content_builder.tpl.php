@@ -19,6 +19,12 @@
  * @var bool $legacy_migration_hint
  * @var string $legacy_migration_target
  * @var string $legacy_migration_field
+ * @var bool $legacy_migration_allowed
+ * @var string $legacy_migration_message
+ * @var string $legacy_migration_hint_text
+ * @var string $legacy_migration_button_text
+ * @var string $legacy_migration_saving_text
+ * @var string $legacy_label
  * @var string $wrapper_max_width
  * @var string $element_defaults_json
  */
@@ -107,7 +113,7 @@ $legacyMigrateButtonId = 'yform_cb_legacy_migrate_' . uniqid();
 $legacyNoticeId = 'yform_cb_legacy_notice_' . uniqid();
 $legacyEditorAttributeParts = [];
 foreach ($legacy_editor_attributes as $attrName => $attrValue) {
-    if ($attrName === '' || strtolower((string) $attrName) === 'id') {
+    if ($attrName === '' || in_array(strtolower((string) $attrName), ['id', 'name'], true)) {
         continue;
     }
 
@@ -169,22 +175,33 @@ if (trim((string) $wrapper_max_width) !== '') {
     <?php if ($legacy_is_active): ?>
         <div class="panel panel-default content-builder-legacy-panel" style="margin-bottom: 12px;">
             <div class="panel-body">
-                <?php if ($legacy_migration_hint): ?>
+                <?php if ($legacy_migration_hint && $legacy_migration_allowed): ?>
                     <div id="<?= $legacyNoticeId ?>" class="alert alert-info yform-cb-legacy-notice" style="margin-bottom: 12px; padding: 8px 12px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-                            <span>Sie bearbeiten aktuell einen älteren Inhalt. Wechseln Sie jetzt zum modernen Content-Builder.</span>
-                            <button type="button" id="<?= $legacyMigrateButtonId ?>" class="btn btn-default btn-xs yform-cb-legacy-migrate">
-                                <i class="fa fa-exchange"></i> Zum modernen Content-Builder wechseln
+                            <span><?= rex_escape($legacy_migration_hint_text) ?></span>
+                            <button type="button" id="<?= $legacyMigrateButtonId ?>" class="btn btn-default btn-xs yform-cb-legacy-migrate" data-saving-text="<?= rex_escape($legacy_migration_saving_text) ?>">
+                                <i class="fa fa-exchange"></i> <?= rex_escape($legacy_migration_button_text) ?>
                             </button>
                         </div>
+                    </div>
+                <?php elseif ($legacy_migration_hint && trim($legacy_migration_message) !== ''): ?>
+                    <div class="alert alert-warning yform-cb-legacy-denied" style="margin-bottom: 12px; padding: 8px 12px;">
+                        <?= rex_escape($legacy_migration_message) ?>
                     </div>
                 <?php endif; ?>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label class="control-label" for="<?= $legacyEditorId ?>">Legacy HTML (Editor)</label>
+                    <?php if (trim($legacy_label) !== ''): ?>
+                        <label class="control-label" for="<?= $legacyEditorId ?>"><?= rex_escape($legacy_label) ?></label>
+                    <?php endif; ?>
                     <textarea
                         id="<?= $legacyEditorId ?>"
+                        name="FORM[<?= $this->params['form_name'] ?>][<?= $this->getId() ?>]"
                         <?= $legacyEditorAttributeString !== '' ? $legacyEditorAttributeString : '' ?>><?= rex_escape($legacy_html) ?></textarea>
+                    <input type="hidden"
+                           name="FORM[<?= $this->params['form_name'] ?>][<?= $this->getId() ?>__legacy_mode]"
+                           value="1"
+                           class="yform-cb-legacy-mode-flag">
                     <input type="hidden"
                            name="FORM[<?= $this->params['form_name'] ?>][<?= $this->getId() ?>__legacy_migrate]"
                            value="0"
@@ -478,8 +495,10 @@ if (trim((string) $wrapper_max_width) !== '') {
             </div>
     </div>
 
-        <input type="hidden" 
-            name="FORM[<?= $this->params['form_name'] ?>][<?= $this->getId() ?>]" 
+        <?php /* Im Legacy-Modus traegt die Textarea selbst den Feldnamen (funktioniert so auch ohne Builder-JS,
+                 z. B. in Frontend-Formularen); das Hidden-Field dient dann nur noch dem JS als Zwischenspeicher. */ ?>
+        <input type="hidden"<?php if (!$legacy_is_active): ?>
+            name="FORM[<?= $this->params['form_name'] ?>][<?= $this->getId() ?>]"<?php endif; ?>
             class="content-builder-data" 
             value='<?= $legacy_is_active ? rex_escape($legacy_html) : rex_escape(json_encode($builderValue, JSON_UNESCAPED_UNICODE)) ?>'>
     

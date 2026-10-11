@@ -23,6 +23,10 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
     private const LEGACY_DEFAULT_TARGET = 'starter_text';
     private const LEGACY_DEFAULT_EDITOR_CLASSES = 'form-control cke5-editor yform-cb-legacy-editor';
     private const MAX_WIDTH_PATTERN = '#^[a-zA-Z0-9.%()\-\s+/]+$#';
+
+    /** @var array{allowed: bool, message: string, hint: string, button: string, label: string}|null */
+    private ?array $legacyMigrationState = null;
+    private ?string $legacyEmptyMode = null;
     
     /**
      * Get next unique media counter (global über alle Instanzen)
@@ -1148,11 +1152,20 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         $formName = $this->params['form_name'];
         $fieldId = $this->getId();
         $migrationFlagField = $fieldId . '__legacy_migrate';
+        $legacyModeFlagField = $fieldId . '__legacy_mode';
         
         if (isset($_POST['FORM'][$formName][$fieldId])) {
             $postValue = $_POST['FORM'][$formName][$fieldId];
-            $migrateLegacyOnSubmit = isset($_POST['FORM'][$formName][$migrationFlagField])
+            $migrationRequested = isset($_POST['FORM'][$formName][$migrationFlagField])
                 && $this->asBool($_POST['FORM'][$formName][$migrationFlagField]);
+            // Flag wird nur ausgegeben, wenn das Formular im Legacy-Editor angezeigt wurde.
+            $legacyEditorPosted = isset($_POST['FORM'][$formName][$legacyModeFlagField])
+                && $this->asBool($_POST['FORM'][$formName][$legacyModeFlagField]);
+            // Serverseitig erneut pruefen: Ist die Umwandlung fuer diesen Datensatz
+            // nicht erlaubt (BUILDER_LEGACY_MIGRATION), wird das Flag ignoriert.
+            $migrateLegacyOnSubmit = $migrationRequested
+                && $this->isLegacyModeEnabled()
+                && $this->resolveLegacyMigrationState()['allowed'];
             
             // Wenn bereits JSON-String (aus Hidden Field), direkt verwenden
             if (is_string($postValue)) {
@@ -1184,9 +1197,16 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                         $this->params['warning'][] = $fieldId;
                         $this->params['warning_messages'][$fieldId] = 'Legacy-Inhalt konnte nicht migriert werden: Das konfigurierte Zielelement "' . $configuredTarget . '" ist in diesem Feld nicht verfügbar.';
                     }
+                } elseif ($migrateLegacyOnSubmit && $legacyEditorPosted && trim($postValue) === '') {
+                    // Leerer Legacy-Editor + Umwandlung: als leerer Builder-Stand speichern.
+                    $this->setValue('[]');
                 } elseif ($this->isLegacyModeEnabled() && $this->isLegacyHtmlString($postValue)) {
                     // Legacy-HTML explizit erlauben, damit bestehende Inhalte editierbar bleiben.
                     $this->setValue($postValue);
+                } elseif ($this->isLegacyModeEnabled() && $legacyEditorPosted && trim($postValue) === '') {
+                    // Leerer Legacy-Editor (z. B. neuer Datensatz mit legacy_empty_mode=legacy
+                    // oder bewusst geleerter HTML-Text): leer speichern statt Warnung.
+                    $this->setValue('');
                 } else {
                     // Niemals still auf leer setzen, wenn der Builder-POST fehlerhaft ist.
                     // Sonst werden bestehende Inhalte beim Speichern ungewollt gelöscht.
@@ -1221,7 +1241,10 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
         $availableElements = $this->getAvailableElements();
 
         $legacyEnabled = $this->isLegacyModeEnabled();
-        $legacyActive = $legacyEnabled && $this->isLegacyHtmlString($rawValue);
+        $legacyActive = $this->isLegacyEditorActive($rawValue);
+        $legacyState = $legacyActive
+            ? $this->resolveLegacyMigrationState()
+            : ['allowed' => false, 'message' => '', 'hint' => '', 'button' => '', 'label' => ''];
 
         $legacyProfile = trim((string) $this->getElement('legacy_cke5_profile', self::LEGACY_DEFAULT_PROFILE));
         if ($legacyProfile === '') {
@@ -1290,6 +1313,12 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             'legacy_migration_hint' => $migrationHintEnabled,
             'legacy_migration_target' => $migrationTarget,
             'legacy_migration_field' => $migrationField,
+            'legacy_migration_allowed' => $legacyState['allowed'],
+            'legacy_migration_message' => $legacyState['message'],
+            'legacy_migration_hint_text' => $legacyState['hint'],
+            'legacy_migration_button_text' => $legacyState['button'],
+            'legacy_migration_saving_text' => rex_i18n::msg('builder_legacy_migration_saving'),
+            'legacy_label' => $legacyState['label'],
             'wrapper_max_width' => $wrapperMaxWidth,
             'element_defaults_json' => $elementDefaultsJson,
         ];
@@ -1425,6 +1454,151 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
     protected function isLegacyModeEnabled(): bool
     {
         return $this->asBool($this->getElement('legacy_cke5_enabled', '0'));
+    }
+
+    /**
+     * Liest eine Text-Feldoption; leer => Standardtext aus der lang-Datei.
+     */
+    protected function getLegacyText(string $option, string $langKey): string
+    {
+        $text = trim((string) $this->getElement($option, ''));
+        if ($text !== '') {
+            return $text;
+        }
+
+        return rex_i18n::msg($langKey);
+    }
+
+    /**
+     * Kontext fuer die Legacy-Extension-Points (BUILDER_LEGACY_MIGRATION,
+     * BUILDER_LEGACY_EMPTY_MODE): Tabelle, Datensatz-ID, gespeicherter Datensatz
+     * und die aktuellen Werte aller Felder des Formulars (beim Absenden die
+     * gesendeten Werte, sonst die gespeicherten).
+     *
+     * @return array<string, mixed>
+     */
+    protected function getLegacyExtensionParams(): array
+    {
+        $tableName = trim((string) $this->getParam('main_table', ''));
+        if ($tableName === '') {
+            $tableName = trim((string) $this->getParam('table_name', ''));
+        }
+
+        $dataId = (int) $this->getParam('main_id', 0);
+        if ($dataId < 0) {
+            $dataId = 0;
+        }
+
+        $dataset = null;
+        if ($tableName !== '' && $dataId > 0 && class_exists(rex_yform_manager_dataset::class)) {
+            try {
+                $dataset = rex_yform_manager_dataset::get($dataId, $tableName);
+            } catch (Throwable $e) {
+                $dataset = null;
+            }
+        }
+
+        $values = [];
+        $valueObjects = $this->params['values'] ?? [];
+        if (is_array($valueObjects)) {
+            foreach ($valueObjects as $valueObject) {
+                if ($valueObject instanceof rex_yform_value_abstract && $valueObject->getName() !== '') {
+                    $values[$valueObject->getName()] = $valueObject->getValue();
+                }
+            }
+        }
+
+        return [
+            'field' => $this,
+            'name' => $this->getName(),
+            'table' => $tableName,
+            'data_id' => $dataId,
+            'dataset' => $dataset,
+            'values' => $values,
+            'send' => (bool) ($this->params['send'] ?? false),
+        ];
+    }
+
+    /**
+     * Darf der Legacy-Inhalt dieses Datensatzes in den Builder umgewandelt werden?
+     * Liefert ausserdem alle Texte des Legacy-Bereichs (Feldoption bzw. lang-Datei,
+     * per BUILDER_LEGACY_MIGRATION je Datensatz ueberschreibbar).
+     *
+     * @return array{allowed: bool, message: string, hint: string, button: string, label: string}
+     */
+    protected function resolveLegacyMigrationState(): array
+    {
+        if ($this->legacyMigrationState !== null) {
+            return $this->legacyMigrationState;
+        }
+
+        $state = [
+            'allowed' => true,
+            'message' => $this->getLegacyText('legacy_migration_denied_text', 'builder_legacy_migration_denied'),
+            'hint' => $this->getLegacyText('legacy_migration_hint_text', 'builder_legacy_migration_hint'),
+            'button' => $this->getLegacyText('legacy_migration_button_text', 'builder_legacy_migration_button'),
+            'label' => $this->getLegacyText('legacy_label', 'builder_legacy_label'),
+        ];
+
+        $result = rex_extension::registerPoint(new rex_extension_point(
+            'BUILDER_LEGACY_MIGRATION',
+            $state,
+            $this->getLegacyExtensionParams()
+        ));
+
+        if (is_array($result)) {
+            $state['allowed'] = array_key_exists('allowed', $result) ? $this->asBool($result['allowed']) : $state['allowed'];
+            foreach (['message', 'hint', 'button', 'label'] as $key) {
+                if (isset($result[$key]) && is_scalar($result[$key])) {
+                    $state[$key] = (string) $result[$key];
+                }
+            }
+        } elseif (is_bool($result)) {
+            $state['allowed'] = $result;
+        }
+
+        return $this->legacyMigrationState = $state;
+    }
+
+    /**
+     * Startmodus fuer LEERE Werte bei aktivem Legacy-Modus: 'builder' oder 'legacy'.
+     */
+    protected function resolveLegacyEmptyMode(): string
+    {
+        if ($this->legacyEmptyMode !== null) {
+            return $this->legacyEmptyMode;
+        }
+
+        $mode = strtolower(trim((string) $this->getElement('legacy_empty_mode', 'builder')));
+        if ($mode !== 'legacy') {
+            $mode = 'builder';
+        }
+
+        $result = rex_extension::registerPoint(new rex_extension_point(
+            'BUILDER_LEGACY_EMPTY_MODE',
+            $mode,
+            $this->getLegacyExtensionParams()
+        ));
+
+        $result = is_string($result) ? strtolower(trim($result)) : $mode;
+
+        return $this->legacyEmptyMode = ($result === 'legacy' ? 'legacy' : 'builder');
+    }
+
+    /**
+     * Soll fuer den aktuellen Wert der Legacy-Editor (statt des Builders) gezeigt werden?
+     */
+    protected function isLegacyEditorActive(string $rawValue): bool
+    {
+        if (!$this->isLegacyModeEnabled()) {
+            return false;
+        }
+
+        if ($this->isLegacyHtmlString($rawValue)) {
+            return true;
+        }
+
+        return trim($rawValue) === '' && $this->resolveLegacyEmptyMode() === 'legacy';
     }
 
     protected function buildLegacyMigrationJson(string $legacyHtml): ?string
@@ -2020,7 +2194,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                     '1' => 'Ja',
                 ],
                 'default' => '0',
-                'notice' => 'Erlaubt die Bearbeitung alter HTML-Inhalte mit CKE5, statt sie als leer zu behandeln.',
+                'notice' => 'Erlaubt die Bearbeitung alter HTML-Inhalte mit CKE5 oder TinyMCE (siehe Legacy Editor Attribute), statt sie als leer zu behandeln.',
             ],
             'legacy_cke5_profile' => [
                 'type' => 'text',
@@ -2048,6 +2222,7 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                     '1' => 'Ja',
                 ],
                 'default' => '1',
+                'notice' => 'Ob die Umwandlung je Datensatz erlaubt ist, entscheidet der Extension Point BUILDER_LEGACY_MIGRATION (Standard: erlaubt).',
             ],
             'legacy_migration_target' => [
                 'type' => 'choice',
@@ -2070,6 +2245,41 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
             ],
             'description' => ['type' => 'text', 'label' => 'Beschreibung'],
             'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
+            // Neue Optionen bewusst am Ende: Positionen bestehender Optionen (Pipe-/Array-Syntax) bleiben stabil.
+            'legacy_empty_mode' => [
+                'type' => 'choice',
+                'label' => 'Legacy: Startmodus bei leerem Inhalt',
+                'choices' => [
+                    'builder' => 'Content-Builder',
+                    'legacy' => 'Legacy-Editor (HTML)',
+                ],
+                'default' => 'builder',
+                'notice' => 'Nur bei aktivem Legacy-Modus. Je Datensatz per Extension Point BUILDER_LEGACY_EMPTY_MODE änderbar.',
+            ],
+            'legacy_label' => [
+                'type' => 'text',
+                'label' => 'Legacy: Bezeichnung des Editors',
+                'default' => '',
+                'notice' => 'Leer = Standardtext („' . rex_escape(rex_i18n::msg('builder_legacy_label')) . '“). Für Redakteure z. B. „Text“.',
+            ],
+            'legacy_migration_hint_text' => [
+                'type' => 'text',
+                'label' => 'Legacy: Hinweistext (Umwandlung erlaubt)',
+                'default' => '',
+                'notice' => 'Leer = Standardtext („' . rex_escape(rex_i18n::msg('builder_legacy_migration_hint')) . '“).',
+            ],
+            'legacy_migration_button_text' => [
+                'type' => 'text',
+                'label' => 'Legacy: Text des Umwandeln-Buttons',
+                'default' => '',
+                'notice' => 'Leer = Standardtext („' . rex_escape(rex_i18n::msg('builder_legacy_migration_button')) . '“).',
+            ],
+            'legacy_migration_denied_text' => [
+                'type' => 'text',
+                'label' => 'Legacy: Hinweistext (Umwandlung nicht erlaubt)',
+                'default' => '',
+                'notice' => 'Wird statt des Buttons angezeigt, wenn BUILDER_LEGACY_MIGRATION die Umwandlung verbietet. Leer = Standardtext („' . rex_escape(rex_i18n::msg('builder_legacy_migration_denied')) . '“).',
+            ],
         ];
         
         return [

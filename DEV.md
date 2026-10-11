@@ -521,6 +521,90 @@ rex_extension::register('BUILDER_FRAMEWORK_NORMALIZE', function (rex_extension_p
 
 ---
 
+### BUILDER_LEGACY_MIGRATION / BUILDER_LEGACY_EMPTY_MODE ⭐
+
+Steuern den Legacy-Modus des YForm-Feldtyps `content_builder` (`legacy_cke5_enabled = 1`)
+**je Datensatz** – z. B. wenn ein Teil der Datensätze HTML bleiben muss, weil er in einem
+Frontend-Formular weiter mit CKE5/TinyMCE bearbeitet wird.
+
+Beide Extension Points bekommen dieselben Parameter:
+
+| Parameter | Typ | Inhalt |
+|---|---|---|
+| `field` | `rex_yform_value_content_builder` | das Feld-Objekt (`getName()`, `getElement()`, `getParam()` …) |
+| `name` | `string` | Feldname, z. B. `text` |
+| `table` | `string` | Tabellenname (`main_table`), leer bei freien Formularen |
+| `data_id` | `int` | ID des Datensatzes, `0` bei neuen Datensätzen |
+| `dataset` | `rex_yform_manager_dataset\|null` | der **gespeicherte** Datensatz (nur Tabellen-Manager und `data_id > 0`) |
+| `values` | `array<string, mixed>` | aktuelle Werte aller Felder des Formulars (`name => Wert`) – beim Absenden die **gesendeten** Werte, sonst die gespeicherten |
+| `send` | `bool` | ob das Formular gerade abgeschickt wurde |
+
+**BUILDER_LEGACY_MIGRATION** – darf der HTML-Inhalt dieses Datensatzes in den Builder
+umgewandelt werden, und welche Texte zeigt der Legacy-Bereich?
+
+- Subject: `array{allowed: bool, message: string, hint: string, button: string, label: string}`,
+  vorbelegt mit `allowed = true` und den Texten aus den Feldoptionen
+  (`legacy_migration_denied_text`, `legacy_migration_hint_text`, `legacy_migration_button_text`,
+  `legacy_label`) bzw. – wenn leer – aus der lang-Datei.
+- Return: das (geänderte) Array. `allowed = false` blendet den Umwandeln-Button aus und zeigt
+  stattdessen `message` (leer = gar kein Hinweis). Zusätzlich wird ein gesendetes
+  Migrations-Flag serverseitig ignoriert – der Inhalt wird nie umgewandelt, sondern als HTML gespeichert.
+  `hint`/`button` gelten, wenn die Umwandlung erlaubt ist, `label` ist die Bezeichnung über dem Editor.
+- Wird nur aufgerufen, wenn der Legacy-Editor angezeigt wird bzw. ein Migrations-Flag ankommt
+  (ein Aufruf pro Feld und Request).
+
+**BUILDER_LEGACY_EMPTY_MODE** – womit startet ein **leerer** Wert (neuer Datensatz)?
+
+- Subject: `string` `'builder'` oder `'legacy'`, vorbelegt aus der Feldoption `legacy_empty_mode`
+  (Standard `builder`).
+- Return: `'builder'` oder `'legacy'` (alles andere = `builder`).
+- Wird nur bei aktivem Legacy-Modus und leerem Wert aufgerufen. Ein leer gespeicherter
+  Legacy-Editor speichert `''` (nicht `[]`), damit der Datensatz beim nächsten Öffnen wieder
+  über diesen EP entschieden wird.
+
+**Beispiel: Kreis-News bleiben HTML, Umwandlung nur nach Sperre**
+
+```php
+// boot.php des Projekt-AddOns (nur Backend)
+$isNewsText = static fn (rex_extension_point $ep): bool
+    => $ep->getParam('table') === rex::getTable('news') && $ep->getParam('name') === 'text';
+
+rex_extension::register('BUILDER_LEGACY_MIGRATION', static function (rex_extension_point $ep) use ($isNewsText) {
+    $state = $ep->getSubject();
+    if (!$isNewsText($ep)) {
+        return $state;
+    }
+
+    $values = $ep->getParam('values');
+    $isKreisNews = trim((string) ($values['kreisnews'] ?? '')) !== '';
+    $isLocked = (string) ($values['locked'] ?? '0') === '1';
+
+    $state['label'] = 'Text';
+    if ($isKreisNews && !$isLocked) {
+        $state['allowed'] = false;
+        $state['message'] = 'Diese Kreis-News wird von den Kreisen im Frontend bearbeitet und bleibt deshalb im Texteditor. '
+            . 'Zum Umwandeln die News zuerst für die Kreise sperren und speichern.';
+    }
+
+    return $state;
+});
+
+rex_extension::register('BUILDER_LEGACY_EMPTY_MODE', static function (rex_extension_point $ep) use ($isNewsText) {
+    if (!$isNewsText($ep)) {
+        return $ep->getSubject();
+    }
+
+    // Neue Kreis-News starten als HTML, alle anderen im Builder
+    return trim((string) ($ep->getParam('values')['kreisnews'] ?? '')) !== '' ? 'legacy' : 'builder';
+});
+```
+
+Hinweis: `values` enthält beim Absenden die gesendeten Werte. Wird `locked` im selben Formular
+gesetzt und gleichzeitig umgewandelt, ist die Umwandlung damit erlaubt. Soll stattdessen nur der
+**gespeicherte** Stand zählen, `$ep->getParam('dataset')?->getValue('locked')` verwenden.
+
+---
+
 ## Vollständiges Integrationsbeispiel: Eigenes Addon mit eigenen Elementen
 
 Die einzelnen Extension Points oben sind unabhängig dokumentiert - dieser Abschnitt

@@ -157,6 +157,13 @@ For YForm value-based builder fields, the following configuration fields control
 - **`legacy_migration_hint`** (choice): Show migration prompt to modern editor.
 - **`legacy_migration_target`** (choice): Element type for HTML migration (e.g., `starter_text`). Auto-resolves invalid choices.
 - **`legacy_migration_field`** (text): Target field key in migration element (e.g., `text`, `content`, `body`).
+- **`legacy_empty_mode`** (choice `builder`|`legacy`, default `builder`): Start mode for empty values while legacy mode is enabled. Per record via EP `BUILDER_LEGACY_EMPTY_MODE`.
+- **`legacy_label`** (text): Label above the legacy editor (empty = lang `builder_legacy_label`).
+- **`legacy_migration_hint_text`** (text): Hint shown when migration is allowed (empty = lang `builder_legacy_migration_hint`).
+- **`legacy_migration_button_text`** (text): Migration button text (empty = lang `builder_legacy_migration_button`).
+- **`legacy_migration_denied_text`** (text): Notice shown instead of the button when migration is not allowed (empty = lang `builder_legacy_migration_denied`).
+
+Per-record control: EP `BUILDER_LEGACY_MIGRATION` (subject `['allowed' => bool, 'message' => string, 'hint' => string, 'button' => string, 'label' => string]`) decides whether a record may be migrated and which texts are shown; a migration flag is ignored server-side if not allowed. See [DEV.md](DEV.md).
 
 ### Conditional Visibility (`visible_if`)
 
