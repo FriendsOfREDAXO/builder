@@ -1204,9 +1204,16 @@ class rex_yform_value_content_builder extends rex_yform_value_abstract
                     // Legacy-HTML explizit erlauben, damit bestehende Inhalte editierbar bleiben.
                     $this->setValue($postValue);
                 } elseif ($this->isLegacyModeEnabled() && $legacyEditorPosted && trim($postValue) === '') {
-                    // Leerer Legacy-Editor (z. B. neuer Datensatz mit legacy_empty_mode=legacy
-                    // oder bewusst geleerter HTML-Text): leer speichern statt Warnung.
-                    $this->setValue('');
+                    // Leerer Legacy-Editor: bei neuem/leerem Datensatz leer speichern. Hatte der Datensatz aber
+                    // Text, ist ein leerer Editor fast immer ein Ladefehler im Browser (WYSIWYG-Editor nicht
+                    // initialisiert, Inhalt nicht uebernommen) - dann den Inhalt behalten statt ihn zu loeschen
+                    // (gleiches Sicherheitsnetz wie beim leeren Builder-Stand oben).
+                    if ($this->hasMeaningfulExistingContent(trim((string) $this->getValue()))) {
+                        $this->params['warning'][] = $fieldId;
+                        $this->params['warning_messages'][$fieldId] = rex_i18n::msg('builder_legacy_empty_kept');
+                    } else {
+                        $this->setValue('');
+                    }
                 } else {
                     // Niemals still auf leer setzen, wenn der Builder-POST fehlerhaft ist.
                     // Sonst werden bestehende Inhalte beim Speichern ungewollt gelöscht.
