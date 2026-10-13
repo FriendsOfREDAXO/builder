@@ -389,7 +389,10 @@
 
             if ($textarea.hasClass('tiny-editor') && typeof tinymce !== 'undefined' && textareaId !== '') {
                 var tinyEditor = tinymce.get(textareaId);
-                if (tinyEditor) {
+                // Nur einen FERTIG initialisierten Editor auslesen: Waehrend TinyMCE noch laedt (Plugins kommen
+                // asynchron), liefert getContent() '' - das wurde in die Textarea geschrieben, TinyMCE startete dann
+                // mit leerem Inhalt und beim Speichern war der Text weg.
+                if (tinyEditor && tinyEditor.initialized) {
                     $textarea.val(tinyEditor.getContent());
                 }
             }
