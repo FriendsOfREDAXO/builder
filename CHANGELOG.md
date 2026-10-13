@@ -4,6 +4,12 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.3.2] - 2026-10-13
+
+### Fixed
+
+- **Legacy-Editor (TinyMCE) startete leer:** Beim Laden las `getLegacyEditorHtml()` den TinyMCE-Inhalt, auch wenn der Editor noch nicht fertig initialisiert war (Plugins laden asynchron, auf echten Servern spürbar). `getContent()` lieferte dann `''`, das wurde in die Textarea geschrieben – TinyMCE startete leer, und beim Speichern war der Text weg. Jetzt wird nur ein initialisierter Editor ausgelesen.
+
 ## [1.3.1] - 2026-10-13
 
 ### Fixed
