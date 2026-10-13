@@ -4,6 +4,12 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.3.1] - 2026-10-13
+
+### Fixed
+
+- **Datenverlust im Legacy-Modus verhindert:** Kam der Legacy-Editor (HTML) beim Speichern leer an, obwohl der Datensatz Text hatte, wurde der Text bisher als „bewusst geleert“ gelöscht. Das passiert aber vor allem, wenn der WYSIWYG-Editor im Browser den Inhalt nicht geladen hat (der Text ist dann im Formular gar nicht zu sehen). Jetzt bleibt der bisherige Inhalt erhalten, das Formular wird nicht gespeichert und zeigt einen Hinweis – gleiches Sicherheitsnetz wie beim leeren Builder-Stand. Neue oder leere Datensätze werden weiterhin leer gespeichert.
+
 ## [1.3.0] - 2026-10-11
 
 Legacy-Modus des YForm-Feldtyps `content_builder` (HTML → Builder) je Datensatz steuerbar – für den schrittweisen Umstieg von CKE5/TinyMCE-Textfeldern auf den Builder.

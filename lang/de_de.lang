@@ -166,3 +166,4 @@ builder_legacy_migration_hint = Sie bearbeiten aktuell einen älteren Inhalt. We
 builder_legacy_migration_button = Zum modernen Content-Builder wechseln
 builder_legacy_migration_denied = Dieser Inhalt kann derzeit nicht in den modernen Content-Builder umgewandelt werden.
 builder_legacy_migration_saving = Die Umwandlung wird jetzt gespeichert. Danach wird das Formular erneut mit modernem Content-Builder geöffnet.
+builder_legacy_empty_kept = Der Text kam leer an, obwohl vorher Inhalt gespeichert war – vermutlich hat der Editor ihn nicht geladen. Der bisherige Inhalt wurde behalten, nichts wurde gespeichert. Bitte die Seite neu laden und erneut bearbeiten.

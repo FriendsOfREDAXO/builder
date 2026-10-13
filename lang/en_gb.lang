@@ -176,3 +176,4 @@ builder_legacy_migration_hint = You are editing older content. Switch to the mod
 builder_legacy_migration_button = Switch to the modern Content Builder
 builder_legacy_migration_denied = This content cannot be converted to the modern Content Builder at the moment.
 builder_legacy_migration_saving = The conversion is being saved. The form will then reopen with the modern Content Builder.
+builder_legacy_empty_kept = The text arrived empty although content was stored before – the editor probably did not load it. The existing content was kept and nothing was saved. Please reload the page and edit again.
