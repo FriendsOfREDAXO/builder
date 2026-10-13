@@ -4,11 +4,16 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [1.3.1] - 2026-10-13
+## [1.3.2] - 2026-10-13
 
 ### Fixed
 
 - **Legacy-Editor (TinyMCE) startete leer:** Beim Laden las `getLegacyEditorHtml()` den TinyMCE-Inhalt, auch wenn der Editor noch nicht fertig initialisiert war (Plugins laden asynchron, auf echten Servern spürbar). `getContent()` lieferte dann `''`, das wurde in die Textarea geschrieben – TinyMCE startete leer, und beim Speichern war der Text weg. Jetzt wird nur ein initialisierter Editor ausgelesen.
+
+## [1.3.1] - 2026-10-13
+
+### Fixed
+
 - **Datenverlust im Legacy-Modus verhindert:** Kam der Legacy-Editor (HTML) beim Speichern leer an, obwohl der Datensatz Text hatte, wurde der Text bisher als „bewusst geleert“ gelöscht. Das passiert aber vor allem, wenn der WYSIWYG-Editor im Browser den Inhalt nicht geladen hat (der Text ist dann im Formular gar nicht zu sehen). Jetzt bleibt der bisherige Inhalt erhalten, das Formular wird nicht gespeichert und zeigt einen Hinweis – gleiches Sicherheitsnetz wie beim leeren Builder-Stand. Neue oder leere Datensätze werden weiterhin leer gespeichert.
 
 ## [1.3.0] - 2026-10-11
