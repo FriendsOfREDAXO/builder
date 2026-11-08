@@ -4,6 +4,11 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.4.0] - 2026-11-08
+
+### Neu
+- **Aktionen für markierten Text**: Markiert man in der Builder-Ansicht Text in der Vorschau eines Elements, erscheint darüber eine kleine Leiste mit Aktionen. Der Builder bringt selbst keine Aktion mit; AddOns melden ihre über `window.BuilderSelectionActions.push({ id, label, icon, maxLength, isAvailable(ctx), run(ctx) })` an (Reihenfolge der Skripte egal). `ctx` enthält Text, Element, Elementtyp, Slice-ID, Builder und Formular. Erste Nutzerin: Knowledgebase „Ins Glossar“. Beschreibung in `DEV.md`.
+
 ## [1.3.2] - 2026-10-13
 
 ### Fixed

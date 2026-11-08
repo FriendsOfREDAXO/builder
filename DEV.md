@@ -1359,3 +1359,26 @@ echo '</pre>';
 - **SCHEMA.md**: [JSON Schema & Config-Klassen](SCHEMA.md)
 - **TUTORIAL.md**: [Schritt-für-Schritt Element erstellen](TUTORIAL.md)
 - **CHANGELOG.md**: [Version 3.1.0 Änderungen](CHANGELOG.md)
+
+
+## Aktionen für markierten Text (ab 1.4.0)
+
+In der Builder-Ansicht erscheint über markiertem Text in der Vorschau eines Elements (`.slice-rendered`) eine kleine Leiste. AddOns hängen dort eigene Aktionen an – der Builder selbst bringt keine mit.
+
+```js
+window.BuilderSelectionActions = window.BuilderSelectionActions || [];
+window.BuilderSelectionActions.push({
+    id: 'mein-addon-aktion',        // eindeutig, gleiche id ersetzt
+    label: 'Ins Glossar',
+    icon: 'fa-book',                // Font-Awesome-Klasse, optional
+    maxLength: 120,                 // längere Markierungen blenden die Aktion aus (Standard 200)
+    isAvailable: function (ctx) {   // optional
+        return ctx.sliceType !== 'table';
+    },
+    run: function (ctx) {
+        // ctx.text, ctx.slice, ctx.sliceType, ctx.sliceId, ctx.builder, ctx.form, ctx.rect
+    }
+});
+```
+
+Das Skript `assets/js/selection-actions.js` lädt mit dem Builder. Ein vor ihm ausgeführtes `push()` landet in einer Warteschlange und wird übernommen. Weitere Methoden: `register()`, `unregister(id)`, `list()`, `hide()`. Die Leiste schließt mit Esc oder beim Wegklicken; Text in Eingabefeldern und in der Element-Werkzeugleiste löst sie nicht aus.
