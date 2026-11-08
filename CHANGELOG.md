@@ -4,6 +4,11 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.4.1] - 2026-11-08
+
+### Behoben
+- **Auswahllisten in aufklappbaren Bereichen abgeschnitten**: In den Element-Einstellungen (z. B. „Allgemeine Block-Einstellungen“ → „Sektion“ → „Container-Breite“) wurde die geöffnete Liste am Rand des Bereichs abgeschnitten und vom nächsten Bereich verdeckt. Der Bereich hatte `overflow: hidden` und `max-height` für eine Animation, die wegen `display: none` im zugeklappten Zustand nie lief.
+
 ## [1.4.0] - 2026-11-08
 
 ### Neu
