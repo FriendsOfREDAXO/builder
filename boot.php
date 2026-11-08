@@ -147,6 +147,7 @@ if (rex::isBackend()) {
     ]));
     rex_view::addJsFile($assetUrl('js/mediaplace-bridge.js'));
     rex_view::addJsFile($assetUrl('content-builder.js'));
+    rex_view::addJsFile($assetUrl('js/selection-actions.js'));
     rex_view::addJsFile($assetUrl('media-browser.js'));
     rex_view::addJsFile($assetUrl('field-widgets.js'));
     rex_view::setJsProperty('BUILDER_I18N', [
