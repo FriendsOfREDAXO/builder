@@ -92,11 +92,11 @@
   transform: rotate(180deg);
 }
 
-/* Akkordeon Inhalt - Div basiert */
+/* Akkordeon Inhalt - Div basiert
+   Kein overflow: hidden / max-height – das schnitt aufklappende Auswahllisten (Selectpicker,
+   Dropdowns) am Rand des Bereichs ab. Zugeklappt gilt display: none, eine Höhen-Animation gab es nie. */
 .builder-fieldset-body {
-  max-height: 2000px;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  overflow: visible;
   padding: 16px;
   display: block;
 }
