@@ -1344,8 +1344,13 @@
 
                 var $btn = $(this);
                 var action = $btn.data('cb-media-action');
-                var counter = $btn.data('cb-media-counter');
-                var inputId = $btn.data('input-id');
+                // Zähler immer aus der aktuellen Feld-ID ableiten: Beim Einfügen, Duplizieren oder
+                // Verschieben eines Elements bekommt das Feld eine neue ID (REX_MEDIA_<n>), aktualisiert wird
+                // aber nur data-input-id. Ein veraltetes data-cb-media-counter ließ den Medienpool in ein
+                // nicht existierendes Feld schreiben – die Auswahl kam nie an.
+                var inputId = $btn.attr('data-input-id');
+                var idMatch = /^REX_MEDIA_(\d+)$/.exec(inputId || '');
+                var counter = idMatch ? idMatch[1] : $btn.attr('data-cb-media-counter');
                 var $input = $('#' + inputId);
                 var currentValue = $input.val();
                 var rawTypes = $btn.attr('data-cb-media-types') || '';
@@ -1798,6 +1803,10 @@
 
                         $input.attr('id', newId);
                         $input.closest('.rex-js-widget-media').find('[data-input-id="' + oldId + '"]').attr('data-input-id', newId);
+                        // Zähler für Öffnen/Ansehen mitziehen (sonst zeigt data-cb-media-counter auf die alte ID)
+                        if (newId.indexOf('REX_MEDIA_') === 0) {
+                            $input.closest('.rex-js-widget-media').find('[data-input-id="' + newId + '"][data-cb-media-counter]').attr('data-cb-media-counter', newId.replace('REX_MEDIA_', ''));
+                        }
                         $input.closest('.rex-js-widget-media').find('[data-target="#' + oldId + '"]').attr('data-target', '#' + newId);
 
                         var $widget = $input.closest('.rex-js-widget-media');
@@ -3701,6 +3710,10 @@
                             // Zugehörige Buttons aktualisieren (data-id für Linkmap, data-input-id für Media)
                             $newItem.find('[data-id="' + oldId + '"]').attr('data-id', newId);
                             $newItem.find('[data-input-id="' + oldId + '"]').attr('data-input-id', newId);
+                            // Zähler für Öffnen/Ansehen mitziehen (sonst zeigt data-cb-media-counter auf die alte ID)
+                            if (newId.indexOf('REX_MEDIA_') === 0) {
+                                $newItem.find('[data-input-id="' + newId + '"][data-cb-media-counter]').attr('data-cb-media-counter', newId.replace('REX_MEDIA_', ''));
+                            }
 
                             // NAME-Input aktualisieren (für Linkmap)
                             var $nameInput = $newItem.find('#' + oldId + '_NAME');
@@ -3956,6 +3969,10 @@
                             // Zugehörige Buttons aktualisieren (data-id für Linkmap, data-input-id für Media)
                             $newItem.find('[data-id="' + oldId + '"]').attr('data-id', newId);
                             $newItem.find('[data-input-id="' + oldId + '"]').attr('data-input-id', newId);
+                            // Zähler für Öffnen/Ansehen mitziehen (sonst zeigt data-cb-media-counter auf die alte ID)
+                            if (newId.indexOf('REX_MEDIA_') === 0) {
+                                $newItem.find('[data-input-id="' + newId + '"][data-cb-media-counter]').attr('data-cb-media-counter', newId.replace('REX_MEDIA_', ''));
+                            }
                             
                             // NAME-Input aktualisieren (für Linkmap)
                             var $nameInput = $newItem.find('#' + oldId + '_NAME');
