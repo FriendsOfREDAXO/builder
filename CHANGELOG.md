@@ -4,6 +4,11 @@ Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [1.4.2] - 2026-11-18
+
+### Behoben
+- **Bild aus dem Medienpool kam nicht im Feld an**: Bei einem neu eingefügten (oder duplizierten, verschobenen) Element öffnete „Medium auswählen“ den Medienpool für ein Feld, das es nicht mehr gab – „Datei übernehmen“ blieb ohne Wirkung. Beim Einfügen bekommt das Medienfeld eine neue ID, der Button merkte sich aber in `data-cb-media-counter` die alte Nummer. Öffnen und Ansehen leiten die Nummer jetzt aus der aktuellen Feld-ID ab, beim Neu-Nummerieren wird `data-cb-media-counter` mitgezogen. Betraf alle Elemente mit Medienfeld (z. B. „Bild & Text“, „Bild oder Video + Text“), auch SVGs. Mit MediaPlace (Overlay statt Popup) trat der Fehler nicht auf; beide Wege getestet.
+
 ## [1.4.1] - 2026-11-08
 
 ### Behoben
